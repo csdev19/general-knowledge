@@ -1,0 +1,445 @@
+# Schemas-First Implementation Guide
+
+_How to define Zod schemas in the domain package and reuse them across the whole application._
+
+This guide explains how to use the Zod schemas from the `@your-scope/domain` package across the application.
+
+## Package Structure
+
+```
+packages/domain/src/
+├── constants/
+│   ├── currency.ts
+│   ├── your-entity-status.ts
+│   └── comment-type.ts
+├── types/
+│   ├── api-response.ts
+│   └── result.ts
+└── schemas/              👈 schemas live here
+    ├── your-entity.ts
+    ├── your-entity-details.ts
+    ├── comment.ts
+    └── index.ts
+```
+
+## Zod v4 Syntax
+
+**IMPORTANT**: This project uses Zod v4. Always use the modern syntax:
+
+```typescript
+// ✅ Zod v4 (CORRECT)
+z.uuid()          // Not z.string().uuid()
+z.url()           // Not z.string().url()
+z.email()         // Not z.string().email()
+z.date()          // For date objects
+z.coerce.date()   // To coerce strings to dates
+
+// ❌ Zod v3 syntax (WRONG - DO NOT USE)
+z.string().uuid()
+z.string().url()
+z.string().email()
+```
+
+## Schema Organization
+
+Each entity has its own schema file with:
+
+- **Base schema**: Complete domain model
+- **Create schema**: Fields for creation (derived from base)
+- **Update schema**: Fields for updates (derived from base/create)
+- **Additional schemas**: Filters, partials, etc. as needed
+
+### Example: Entity Schemas
+
+```typescript
+// packages/domain/src/schemas/your-entity.ts
+import { z } from "zod";
+import { YOUR_ENTITY_STATUSES, CURRENCIES } from "../constants";
+
+// Base schema - source of truth (using Zod v4 syntax)
+export const yourEntityBaseSchema = z.object({
+  id: z.uuid(),                     // ✅ Zod v4: z.uuid() not z.string().uuid()
+  name: z.string().min(1, "Name is required"),
+  status: z.enum([
+    YOUR_ENTITY_STATUSES.ACTIVE,
+    YOUR_ENTITY_STATUSES.REJECTED,
+    YOUR_ENTITY_STATUSES.CANCELLED,
+    YOUR_ENTITY_STATUSES.COMPLETED,
+  ]),
+  salary: z.number().min(0).nullable(),
+  currency: z.enum([CURRENCIES.USD, CURRENCIES.PEN]),
+  userId: z.string(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+// Create schema - derived from base
+export const createYourEntitySchema = yourEntityBaseSchema
+  .pick({
+    name: true,
+    status: true,
+  })
+  .extend({
+    salary: z.number().min(0).optional(),
+    currency: z.enum([CURRENCIES.USD, CURRENCIES.PEN]).optional(),
+  });
+
+// Update schema
+export const updateYourEntitySchema = createYourEntitySchema;
+
+// Type exports
+export type YourEntityBase = z.infer<typeof yourEntityBaseSchema>;
+export type CreateYourEntity = z.infer<typeof createYourEntitySchema>;
+export type UpdateYourEntity = z.infer<typeof updateYourEntitySchema>;
+```
+
+## Backend Usage
+
+### API Contract Validation
+
+The domain Zod schema is the input contract for the route. The API layer validates the
+body against it before the handler runs.
+
+```typescript
+// apps/server/src/contract/your-entity.contract.ts
+import { z } from "zod";
+import { oc } from "@orpc/contract";
+import { updateYourEntitySchema } from "@your-scope/domain/schemas";
+
+export const yourEntityContract = {
+  update: oc
+    .route({ method: "PUT", path: "/your-entities/{id}" })
+    .input(updateYourEntitySchema.extend({ id: z.string() })) // 👈 Zod schema from domain
+    .output(/* response schema */),
+};
+```
+
+### Benefits:
+
+- ✅ Automatic validation
+- ✅ Type inference (end-to-end via the contract)
+- ✅ Consistent validation rules shared between frontend and backend
+- ✅ Single source of truth
+
+## Frontend Usage
+
+### Form Validation with React Hook Form
+
+```typescript
+// apps/web/src/components/your-entity/your-entity-form.tsx
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  updateYourEntitySchema,
+  type UpdateYourEntity
+} from "@your-scope/domain/schemas";
+
+export function YourEntityForm() {
+  const form = useForm<UpdateYourEntity>({
+    resolver: zodResolver(updateYourEntitySchema),
+    defaultValues: {
+      name: "",
+      status: "active",
+    },
+  });
+
+  const onSubmit = (data: UpdateYourEntity) => {
+    // data is fully typed and validated
+    updateMutation.mutate(data);
+  };
+
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      {/* form fields */}
+    </form>
+  );
+}
+```
+
+### Type-Safe Hooks
+
+```typescript
+// apps/web/src/hooks/use-your-entities.ts
+import { useMutation } from "@tanstack/react-query";
+import type { UpdateYourEntity } from "@your-scope/domain/schemas";
+
+export function useUpdateYourEntity(id: string) {
+  return useMutation({
+    mutationFn: async (data: UpdateYourEntity) => {
+      const response = await api.yourEntities[id].put(data);
+      if (response.error) throw new Error(response.error.message);
+      return response.data;
+    },
+  });
+}
+```
+
+## Schema Derivation Patterns
+
+### Using `.pick()` and `.omit()`
+
+```typescript
+// Pick specific fields
+export const createSchema = baseSchema.pick({
+  name: true,
+  status: true,
+});
+
+// Omit specific fields
+export const updateSchema = baseSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+```
+
+### Using `.extend()`
+
+```typescript
+// Add or override fields
+export const createSchema = baseSchema
+  .pick({ name: true })
+  .extend({
+    // Make salary optional
+    salary: z.number().min(0).optional(),
+  });
+```
+
+### Using `.partial()`
+
+```typescript
+// Make all fields optional
+export const partialUpdateSchema = updateSchema.partial();
+```
+
+### Using `.required()`
+
+```typescript
+// Make all fields required
+export const strictSchema = baseSchema.required();
+```
+
+## Available Schemas
+
+### Entity
+
+```typescript
+import {
+  yourEntityBaseSchema,
+  createYourEntitySchema,
+  updateYourEntitySchema,
+  partialUpdateYourEntitySchema,
+  filterYourEntitySchema,
+  type YourEntityBase,
+  type CreateYourEntity,
+  type UpdateYourEntity,
+} from "@your-scope/domain/schemas";
+```
+
+### Entity Details
+
+```typescript
+import {
+  yourEntityDetailsBaseSchema,
+  createYourEntityDetailsSchema,
+  updateYourEntityDetailsSchema,
+  type YourEntityDetailsBase,
+  type CreateYourEntityDetails,
+  type UpdateYourEntityDetails,
+} from "@your-scope/domain/schemas";
+```
+
+### Comment
+
+```typescript
+import {
+  commentBaseSchema,
+  createCommentSchema,
+  updateCommentSchema,
+  type CommentBase,
+  type CreateComment,
+  type UpdateComment,
+} from "@your-scope/domain/schemas";
+```
+
+## Best Practices
+
+### 1. Always Use Schemas for Validation
+
+```typescript
+// ✅ Good - use schema
+const result = createYourEntitySchema.safeParse(data);
+if (!result.success) {
+  throw new Error(result.error.message);
+}
+
+// ❌ Bad - manual validation
+if (!data.name || data.name.length === 0) {
+  throw new Error("Name is required");
+}
+```
+
+### 2. Derive Schemas, Don't Duplicate
+
+```typescript
+// ✅ Good - derive from base
+export const updateSchema = baseSchema.pick({ name: true });
+
+// ❌ Bad - duplicate definition
+export const updateSchema = z.object({
+  name: z.string().min(1),
+});
+```
+
+### 3. Export Types
+
+```typescript
+// ✅ Good - export inferred types
+export type CreateYourEntity = z.infer<typeof createYourEntitySchema>;
+
+// ❌ Bad - define types separately
+export type CreateYourEntity = {
+  name: string;
+  status: string;
+};
+```
+
+### 4. Use Descriptive Error Messages
+
+```typescript
+// ✅ Good - clear messages
+z.string().min(1, "Name is required")
+z.number().min(0, "Value must be positive")
+
+// ❌ Bad - no messages
+z.string().min(1)
+z.number().min(0)
+```
+
+### 5. Handle Validation Errors Gracefully
+
+```typescript
+// Frontend
+const result = schema.safeParse(data);
+if (!result.success) {
+  // Show user-friendly errors
+  result.error.errors.forEach((err) => {
+    toast.error(`${err.path.join('.')}: ${err.message}`);
+  });
+}
+
+// Backend
+try {
+  const validated = schema.parse(body);
+} catch (error) {
+  if (error instanceof z.ZodError) {
+    throw new BadRequestError(error.errors[0].message);
+  }
+}
+```
+
+## Testing Schemas
+
+### Unit Tests
+
+```typescript
+import { describe, it, expect } from "vitest";
+import { createYourEntitySchema } from "@your-scope/domain/schemas";
+
+describe("createYourEntitySchema", () => {
+  it("should validate valid data", () => {
+    const data = {
+      name: "Acme Corp",
+      status: "active",
+    };
+
+    const result = createYourEntitySchema.safeParse(data);
+    expect(result.success).toBe(true);
+  });
+
+  it("should reject empty name", () => {
+    const data = {
+      name: "",
+      status: "active",
+    };
+
+    const result = createYourEntitySchema.safeParse(data);
+    expect(result.success).toBe(false);
+  });
+
+  it("should accept optional salary", () => {
+    const data = {
+      name: "Acme Corp",
+      status: "active",
+      salary: 100000,
+    };
+
+    const result = createYourEntitySchema.safeParse(data);
+    expect(result.success).toBe(true);
+  });
+});
+```
+
+## Troubleshooting
+
+### Schema Not Found
+
+If you get import errors:
+
+1. Build the domain package:
+
+```bash
+bun run --filter=@your-scope/domain build
+```
+
+2. Check package.json exports:
+
+```json
+{
+  "exports": {
+    "./schemas": {
+      "types": "./dist/schemas.d.mts",
+      "import": "./dist/schemas.mjs"
+    }
+  }
+}
+```
+
+### Type Inference Issues
+
+If types aren't inferred correctly:
+
+```typescript
+// Use explicit type annotation
+const data: CreateYourEntity = {
+  name: "Acme",
+  status: "active",
+};
+
+// Or use satisfies
+const data = {
+  name: "Acme",
+  status: "active",
+} satisfies CreateYourEntity;
+```
+
+### Validation Errors in Production
+
+Always use `.safeParse()` instead of `.parse()` to avoid throwing:
+
+```typescript
+// ✅ Good - doesn't throw
+const result = schema.safeParse(data);
+if (!result.success) {
+  // handle error
+}
+
+// ❌ Bad - throws error
+const validated = schema.parse(data); // throws ZodError
+```
+
+## Next Steps
+
+- Review your domain architecture patterns for architectural decisions
+- See your backend API response type conventions for API patterns
+- Check the [Constants Pattern](./constants-pattern.md) for using constants with schemas
