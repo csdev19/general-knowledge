@@ -8,14 +8,41 @@ _How to run a production-equivalent build locally and why dev vs prod builds dif
 bun run preview:local
 ```
 
-Runs from the monorepo root. A typical `preview:local` script does, in order:
+Runs from the monorepo root. The exact steps depend on **how the web app gets its
+backend** — the two variants differ only in whether a local API process is needed.
 
-1. Starts the API app (`wrangler dev`, e.g. port 3000) in the background
-2. Builds `@repo/web-ui` — compiles the component library to `dist/`
-3. Builds the web app — full Vite production bundle
-4. Serves the web app with `vite preview` on `localhost:4173`
+### Variant A — external API worker (Hono/oRPC/Elysia on Cloudflare Workers)
+
+The web app calls a separate API worker, so the script boots it first:
+
+1. Start the API app (`wrangler dev`, e.g. port 3000) in the background
+2. Build `@repo/web-ui` — compile the component library to `dist/`
+3. Build the web app — full Vite production bundle
+4. Serve the web app with `vite preview` on `localhost:4173`
 
 Ctrl+C kills the API process group (wrangler + all its children) cleanly.
+
+### Variant B — Convex backend (no local API step)
+
+Convex runs its **own** dev server (`convex dev`) separately and the web app talks
+to a Convex **deployment URL** read from `.env` at build time — there is no API
+worker to boot. So the script is just build → build → serve:
+
+```bash
+#!/usr/bin/env bash
+set -e
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Prod resolves @scope/web-ui to ./dist (the `import` condition), NOT ./src
+# (the `development` condition dev uses) — build the library first.
+bun run --cwd "$ROOT_DIR/packages/web-ui" build
+bun run --cwd "$ROOT_DIR/apps/web" build      # full Vite production bundle
+bun run --cwd "$ROOT_DIR/apps/web" serve       # vite preview on :4173
+```
+
+The prod build reads the Convex URLs from `apps/web/.env`; pointing at your running
+Convex dev deployment is fine for a styling/bundling check (the goal is the
+frontend, not the backend).
 
 ## Why dev and prod builds differ
 
