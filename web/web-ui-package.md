@@ -367,3 +367,12 @@ If you're migrating from app-specific components:
 4. **Remove duplicate theme variables** from app CSS files
 
 > Building the package before a production build matters: the package exports point to built `dist/` files. If you get "Cannot find module" errors, run `bun run build` inside `packages/web-ui/`. See [Local Preview](./local-preview.md) for why dev and prod resolve workspace packages differently.
+
+> **One Tailwind build per app — the app owns it.** The package must **not** inject its
+> own Tailwind utilities layer (e.g. an `import "./styles.css"` in the package's
+> `src/index.ts` combined with `vite-plugin-lib-inject-css`). The app already
+> `@import`s the package's `styles.css` (source) and its `@source` scans the package's
+> components, so the app's build generates every class the components use. A second
+> utilities layer shipped from the package `dist` loads as a separate stylesheet in prod
+> and silently overrides app-only responsive variants (`md:`/`lg:`) — the
+> [tailwind-v4-split-css-cascade](./tailwind-v4-split-css-cascade.md) bug.
