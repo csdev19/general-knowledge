@@ -70,3 +70,10 @@ Use `preview:local` before opening a PR whenever:
 - You changed anything in `packages/web-ui/` (CSS, component base classes)
 - You're working on layout/styling and want to confirm it matches prod
 - A visual bug only reproduces in prod and you need a fast iteration loop
+
+## See also
+
+The canonical prod-only styling bug this catches:
+[tailwind-v4-split-css-cascade](./tailwind-v4-split-css-cascade.md) — responsive
+`md:`/`lg:` display toggles break in prod because a duplicated Tailwind utilities layer
+loads last and overrides them. `preview:local` is how you reproduce it.

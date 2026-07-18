@@ -11,4 +11,5 @@ Generalized, product-agnostic notes on building web frontends with **TanStack St
 | [web-ui-package.md](./web-ui-package.md) | Shared `web-ui` package: shadcn components, Tailwind v4 theming with OKLCH tokens, and workflow. |
 | [bundle-splitting.md](./bundle-splitting.md) | Reduce a large main JS chunk using Vite `manualChunks` for vendor libraries. |
 | [local-preview.md](./local-preview.md) | Run a production-equivalent build locally and understand why dev and prod builds differ. |
+| [tailwind-v4-split-css-cascade.md](./tailwind-v4-split-css-cascade.md) | **Prod-only bug**: responsive layout (`md:`/`lg:` display toggles) breaks in the production build — duplicated Tailwind utilities layer across split stylesheets. Symptom, root cause, and the single-Tailwind-source fix. |
 | [pending-navigation.md](./pending-navigation.md) | Global loading bar + per-route `pendingComponent` for navigation feedback. |
