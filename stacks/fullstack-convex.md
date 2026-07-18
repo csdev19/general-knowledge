@@ -19,9 +19,13 @@ Si no necesitas realtime, el default sigue siendo [hono-orpc](./fullstack-hono-o
 - [schemas-first](../conventions/schemas-first.md) — los schemas Zod siguen siendo la fuente de verdad
 - [Monorepo](../monorepos/monorepo-structure.md)
 
-**2 · Web** — [data loading](../web/data-loading.md), [UI package](../web/web-ui-package.md)
+**2 · Convex** — [conexión del cliente](../convex/client-connection.md) (las dos URLs, `useQuery` reactivo, API generada), [Better Auth en Convex](../convex/better-auth.md)
 
-**3 · Convenciones** — [constants](../conventions/constants-pattern.md), [backlog](../conventions/backlog-pattern.md)
+**3 · Web** — [data loading](../web/data-loading.md), [UI package](../web/web-ui-package.md)
+
+**4 · Mobile (opcional)** — si sumas app Expo sobre este Convex: [mobile-expo](./mobile-expo.md), [dev builds & Metro](../mobile/expo-dev-builds-and-metro.md)
+
+**5 · Convenciones** — [constants](../conventions/constants-pattern.md), [backlog](../conventions/backlog-pattern.md)
 
 ## Notas de ensamblaje (lo específico de este stack)
 
@@ -30,11 +34,14 @@ Si no necesitas realtime, el default sigue siendo [hono-orpc](./fullstack-hono-o
   y se importa desde las funciones Convex.
 - **Reactividad**: las queries de Convex son suscripciones; el cliente se re-renderiza solo.
   No necesitas TanStack Query para el estado servidor reactivo (sí para lo que quede fuera de Convex).
-- **Auth**: Better Auth se integra vía el adaptador de Convex; ya no aplica el proxy same-origin
-  de Workers del stack default.
+- **Auth-in-Convex**: Better Auth corre **dentro** de la deployment (`@convex-dev/better-auth`),
+  sirviendo `/api/auth/*` en su HTTP router — no hay server API aparte ni proxy same-origin de
+  Workers. El setup completo, las **versiones pinneadas** (crítico en Expo SDK 57) y los gotchas
+  están en [convex/better-auth](../convex/better-auth.md). Alternativa: auth en un server externo
+  que Convex valida por `customJwt` (ver ese doc).
 - **`router.invalidate()`** tras cambios de sesión sigue siendo necesario para el `beforeLoad` del root.
-- Para patrones detallados de Convex (functions, realtime, migraciones, cron, file storage),
-  usa las skills `convex-*` del entorno de desarrollo — este hub cubre la parte de arquitectura/dominio.
+- Para patrones de bajo nivel de Convex (functions, realtime, migraciones, cron, file storage),
+  usa las skills `convex-*` del entorno; el hub cubre conexión, auth y arquitectura/dominio.
 
-> Nota: este hub aún no tiene una carpeta `convex/` de conocimiento plano. Si acumulas
-> suficientes patrones propios, créala y enlázala aquí (Fase futura).
+> Conocimiento plano de Convex: [`convex/`](../convex/) — conexión del cliente y Better Auth
+> hosteado en Convex.
