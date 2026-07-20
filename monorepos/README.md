@@ -13,6 +13,7 @@ patterns, rationale, pipeline shapes, and commands are preserved.
 | File                                                       | Summary                                                                     |
 | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
 | [monorepo-structure.md](./monorepo-structure.md)           | Workspace layout, Bun catalog, Turbo task graph, lint/format/hooks tooling. |
+| [wrangler-env-config.md](./wrangler-env-config.md)         | Cloudflare Workers config source-of-truth: `.env` over `vars` blocks, catalog-pinned Wrangler, `compatibility_date`. |
 | [ci-cd-pipelines.md](./ci-cd-pipelines.md)                 | Tag-driven independent release/deploy pipelines to Cloudflare Workers + R2. |
 | [pr-checks.md](./pr-checks.md)                             | Two PR-gate workflows (validation + desktop E2E) and why they stay split.   |
 | [ci-per-project-pipelines.md](./ci-per-project-pipelines.md)| Universal compile check plus path-filtered per-project test suites.         |
