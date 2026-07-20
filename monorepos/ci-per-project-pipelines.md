@@ -31,9 +31,13 @@ locally — a CI-parallelism gap tracked as a follow-up, not fixed here).
 
 ### Universal check — `ci.yml` ("CI")
 
-Runs on every PR (skips docs-only via `paths-ignore` and release-please branches via `if`). One job:
+Runs on every PR (skips release-please branches via `if`). One job:
 lint → format → build `@<scope>/*` → type-check all → build web → build backend → type-check
 desktop. **No tests.** ~1–1.5 min. This is `pr-validation` minus the desktop test step.
+
+> **Do not add `paths-ignore` for markdown here.** See
+> [Docs-only PRs still need the formatter](#docs-only-prs-still-need-the-formatter) — skipping the
+> universal check on docs lets malformed markdown land unchecked.
 
 ### Per-project tests (path-filtered, skip release PRs)
 
@@ -71,8 +75,54 @@ If desktop already used `release-desktop.yml` ("Release Desktop") while web/api 
 | only web              | ✅           | —             | ✅        | —         |
 | only api              | ✅           | —             | —         | ✅        |
 | a shared `packages/*` | ✅           | ✅            | ✅        | ✅        |
-| only docs / `*.md`    | —            | —             | —         | —         |
+| only docs / `*.md`    | ✅           | —             | —         | —         |
 | a release-please PR   | —            | —             | —         | —         |
+
+The docs row is the one worth reading twice: the compile check **does** run, the test suites do
+not. See below.
+
+## Docs-only PRs still need the formatter
+
+The tempting simplification is to `paths-ignore: "**/*.md"` on the universal check too, so a
+documentation PR runs nothing at all. **Don't.** If the repo's formatter covers markdown — `oxfmt`
+and Prettier both do, including `.mdx` — then the universal check is the only thing standing
+between a malformed table and `main`.
+
+What that looks like when you skip it: a docs PR merges green, and the next unrelated code PR fails
+on `format --check` complaining about a file its author never touched. The failure surfaces far
+from its cause, in someone else's branch. Rebases make it worse — resolving a conflict inside a
+markdown table routinely leaves the column padding misaligned, which the formatter rejects and a
+human reviewer never notices.
+
+So the split is by **cost**, not by file type:
+
+| Half           | Contents                       | Runs on             | Why                                                              |
+| -------------- | ------------------------------ | ------------------- | ---------------------------------------------------------------- |
+| Fast gate      | lint, format check, type-check | **every** PR        | Seconds. Covers markdown. Nothing here is worth skipping.        |
+| Slow half      | test suites, builds            | code PRs only       | Minutes. A changelog edit cannot break a test.                   |
+
+Two workflows is enough for a small monorepo — a `pr-validation.yml` holding the fast gate and a
+`pr-tests.yml` holding the rest, the latter carrying the `paths-ignore`. Scale up to the
+per-project split above only once individual suites get slow enough to be worth isolating.
+
+### `paths-ignore` semantics worth knowing
+
+A run is skipped only when **every** changed file matches an ignore pattern. A PR touching both
+code and documentation still gets the full suite — which is what you want, and means the filter
+needs no escape hatch for mixed PRs.
+
+Ignore the docs app's directory (`apps/docs/**`, `apps/documentation/**`) alongside `**/*.md` and
+`**/*.mdx`, but confirm first that nothing under it is actually tested or built: check whether it
+has a `test` script and whether its package name is inside the scope your build filters on
+(`--filter='@<scope>/*'`). If the docs app is outside that scope, ignoring it costs nothing.
+
+### Renaming jobs breaks required checks
+
+Splitting one workflow into two renames the status checks. If branch protection requires the old
+name, every PR strands on "Expected — waiting for status" until the setting is updated. Check the
+protection rules **before** merging the split, not after. (On a private repo without Pro, branch
+protection is unavailable and checks are advisory — nothing to update, but worth re-verifying if
+the repo ever goes public or upgrades.)
 
 ## Files
 
