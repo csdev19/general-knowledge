@@ -22,7 +22,7 @@ brainstorm  →  spec (diseño)  →  plan (implementación)  →  ship  →  ar
 1. **Brainstorm** — la idea nace, normalmente como ítem ⚪/🔵 en el [backlog](./backlog-pattern.md).
 2. **Spec (diseño)** — cuando la idea vale la pena, se escribe un doc de diseño en `specs/`. Define objetivo, no-objetivos, arquitectura y decisiones. Es lo que se revisa y aprueba.
 3. **Plan (implementación)** — a partir del spec aprobado, se escribe un plan en `plans/`: tareas concretas, orden, archivos a crear/tocar, checkboxes para trackear. Un spec grande puede partirse en varios planes numerados.
-4. **Ship** — se ejecuta el plan tarea por tarea (código + tests + docs). Los checkboxes marcan el avance.
+4. **Ship** — se ejecuta el plan tarea por tarea (código + tests + docs). Los checkboxes marcan el avance. **Para ejecutar con agentes en paralelo**, el plan primero se convierte en entregables de backlog autosuficientes y queda superseded — ver [plan → backlog](./plan-to-backlog.md).
 5. **Archivar** — cuando shipeó: el aprendizaje duradero se mueve al doc de feature/arquitectura, el ítem sale del mapa del backlog, y el spec/plan quedan como registro histórico.
 
 ## Convención de nombres
