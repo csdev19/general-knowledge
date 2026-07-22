@@ -56,6 +56,8 @@ Ver **[stacks/](./stacks/)** para las guías de ensamblaje:
   de "lo que viene"; nunca pierdes trabajo diferido.
 - **[Workflow specs + plans](./conventions/specs-and-plans-workflow.md)** — brainstorm →
   spec (diseño) → plan (implementación) → archivo al shippear.
+- **[Plan → backlog](./conventions/plan-to-backlog.md)** — convertir un plan aprobado en
+  entregables autosuficientes del backlog, ejecutables por agentes en paralelo.
 
 ---
 
