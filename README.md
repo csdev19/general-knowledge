@@ -30,7 +30,7 @@ Dos capas:
 | [desktop/](./desktop/) | Electron: main/renderer/preload, IPC tipado, permisos nativos, vault local-first, media pipeline, distribución |
 | [monorepos/](./monorepos/) | Turborepo + Bun workspaces, CI/CD por proyecto, PR checks, release-please, estrategia de testing |
 | [packages/](./packages/) | Convención `infra-*`, build strategy (src vs dist), repository contracts, caso de estudio de un package |
-| [conventions/](./conventions/) | Constants/enums-as-const, schemas-first, **patrón backlog**, workflow specs+plans |
+| [conventions/](./conventions/) | Constants/enums-as-const, schemas-first, **patrón backlog**, **patrón changelog**, workflow specs+plans |
 
 ## Stacks (recetas listas)
 
@@ -54,6 +54,9 @@ Ver **[stacks/](./stacks/)** para las guías de ensamblaje:
 
 - **[Patrón backlog](./conventions/backlog-pattern.md)** — carpeta `backlog/` con el mapa
   de "lo que viene"; nunca pierdes trabajo diferido.
+- **[Patrón changelog](./conventions/changelog-pattern.md)** — diario de decisiones en el
+  docs app: un archivo por entrada, índice auto-generado (cero merge conflicts),
+  complementa el `CHANGELOG.md` de release-please.
 - **[Workflow specs + plans](./conventions/specs-and-plans-workflow.md)** — brainstorm →
   spec (diseño) → plan (implementación) → archivo al shippear.
 - **[Plan → backlog](./conventions/plan-to-backlog.md)** — convertir un plan aprobado en
