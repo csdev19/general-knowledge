@@ -30,7 +30,7 @@ Dos capas:
 | [desktop/](./desktop/) | Electron: main/renderer/preload, IPC tipado, permisos nativos, vault local-first, media pipeline, distribución |
 | [monorepos/](./monorepos/) | Turborepo + Bun workspaces, CI/CD por proyecto, PR checks, release-please, estrategia de testing |
 | [packages/](./packages/) | Convención `infra-*`, build strategy (src vs dist), repository contracts, caso de estudio de un package |
-| [conventions/](./conventions/) | Constants/enums-as-const, schemas-first, **patrón backlog**, workflow specs+plans |
+| [conventions/](./conventions/) | Constants/enums-as-const, schemas-first, **patrón backlog**, workflow specs+plans, **delegación a agentes** |
 
 ## Stacks (recetas listas)
 
@@ -58,6 +58,10 @@ Ver **[stacks/](./stacks/)** para las guías de ensamblaje:
   spec (diseño) → plan (implementación) → archivo al shippear.
 - **[Plan → backlog](./conventions/plan-to-backlog.md)** — convertir un plan aprobado en
   entregables autosuficientes del backlog, ejecutables por agentes en paralelo.
+- **[Delegación a agentes](./conventions/ai-agent-delegation.md)** — los dos modos
+  (rápido/caro vs lento/barato), qué roles nunca se abaratan, y la evidencia medida de
+  que lo que hace lento un trabajo delegado es la estructura del proceso, no el tier
+  del modelo.
 
 ---
 
