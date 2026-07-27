@@ -54,6 +54,9 @@ Ver **[stacks/](./stacks/)** para las guías de ensamblaje:
 
 - **[Patrón backlog](./conventions/backlog-pattern.md)** — carpeta `backlog/` con el mapa
   de "lo que viene"; nunca pierdes trabajo diferido.
+- **[Patrón changelog](./conventions/changelog-pattern.md)** — diario de decisiones en el
+  docs app: un archivo por entrada, índice auto-generado (cero merge conflicts),
+  complementa el `CHANGELOG.md` de release-please.
 - **[Workflow specs + plans](./conventions/specs-and-plans-workflow.md)** — brainstorm →
   spec (diseño) → plan (implementación) → archivo al shippear.
 - **[Plan → backlog](./conventions/plan-to-backlog.md)** — convertir un plan aprobado en
