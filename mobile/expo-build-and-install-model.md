@@ -162,6 +162,10 @@ detail that makes them work: **`@expo/env` does not overwrite already-defined va
 (`"is already defined and IS NOT overwritten"`), so anything exported before invoking
 Expo wins over `.env`, and `.env` still fills the gaps.
 
+Both are abridged below to show the shape. The **complete, in-use versions** — with the
+argument validation, the warning on a missing critical key, and the comments explaining
+each line — are in [expo-build-scripts](./expo-build-scripts.md); copy from there.
+
 ### Wrapper 1 — run a profile on a device, with its real backend
 
 ```sh
@@ -266,6 +270,9 @@ directory. Add `*.apk` / `*.aab` to `.gitignore` on day one.
 
 ## Related
 
+- [expo-build-scripts](./expo-build-scripts.md) — **the complete files**: `app.config.ts`,
+  `eas.json`, both wrapper scripts, the Gradle plugin, `package.json` and `.gitignore`,
+  copied verbatim from a shipping app with per-file adaptation notes.
 - [expo-dev-builds-and-metro](./expo-dev-builds-and-metro.md) — the native/JS layer split,
   when a rebuild is required, Metro connectivity, clean prebuild, toolchain setup.
 - [google-maps](./google-maps.md) — the maps key, the Google Cloud checklist and SHA-1.
