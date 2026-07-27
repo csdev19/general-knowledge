@@ -26,7 +26,7 @@ Dos capas:
 | [web/](./web/) | TanStack Start/Router/Query, data loading, server functions, UI package compartido, bundle splitting |
 | [api/](./api/) | Hono + oRPC en Cloudflare Workers, patrón api-contract, cliente isomórfico, ADR, gotchas de auth |
 | [convex/](./convex/) | Convex como backend reactivo: conexión del cliente (las dos URLs, `useQuery` reactivo, API generada en monorepo) y **Better Auth hosteado dentro de Convex** (versiones SDK 57, fix del `useSession` colgado, `expo-network`, overrides, `exp://`) |
-| [mobile/](./mobile/) | Expo / React Native: estructura + domain compartido, **dev builds & Metro** (cuándo recompilar, conexión emulador), y **Google Maps** (dev build, key, Maps SDK Android + billing, SHA-1) |
+| [mobile/](./mobile/) | Expo / React Native: estructura + domain compartido, **dev builds & Metro** (cuándo recompilar, conexión emulador), **build & install** (debug/release × perfil, `run:*` vs EAS, un install por ambiente, dónde viajan realmente las env vars) y **Google Maps** (dev build, key, Maps SDK Android + billing, SHA-1) |
 | [desktop/](./desktop/) | Electron: main/renderer/preload, IPC tipado, permisos nativos, vault local-first, media pipeline, distribución |
 | [monorepos/](./monorepos/) | Turborepo + Bun workspaces, CI/CD por proyecto, PR checks, release-please, estrategia de testing |
 | [packages/](./packages/) | Convención `infra-*`, build strategy (src vs dist), repository contracts, caso de estudio de un package |
