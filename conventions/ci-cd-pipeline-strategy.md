@@ -39,7 +39,7 @@ bun run verify   # = turbo check-types + lint + format-check + build packages
 | --- | --- | --- | --- |
 | **Local pre-push hook** | `verify` (types + lint + format + build) | free (your machine) | every human push |
 | **Local on-demand** | `bun run test` (web/backend/mobile) | free | before pushing risky changes |
-| **PR → main (CI)** | `verify` only — **no tests** | cheap (cached) | backstop on every PR |
+| **PR → main (CI)** | `pr-verify` (`verify` minus native) always + `pr-native` (native type-check) paths-gated — **no tests** | cheap (non-native never installs Expo) | backstop on every PR |
 | **Tag → prod (CI)** | full: build + **tests** + EAS native + e2e + security scan + deploy + migrate | expensive, but rare | on promotion |
 
 Rationale: the cheap gate (`verify`) runs *everywhere* so `main` stays releasable and
@@ -66,16 +66,68 @@ Autonomous workers (the night-runner / headless agents) MUST run `bun run verify
 pushing — the exact same script as humans and CI. One gate, one meaning of "green". See
 [[ai-agent-delegation]].
 
+## The mobile/native install is the biggest single cost — split it out
+
+In an Expo/React Native monorepo the dominant CI cost is **not the build and not the
+tests — it's `bun install` of the native app's dependencies.** Measured on a real
+trip-planner install (Bun 1.3, `--filter` on install):
+
+| Install | Size | Files |
+| --- | --- | --- |
+| Full (`bun install`) | **4.6 GB** | 195k |
+| Non-native (`bun install --filter '!native'`) | **1.7 GB** | 107k |
+| Native only (`bun install --filter native`) | 1.1 GB | 74k |
+
+React Native + Expo are ~2.5 GB of that tree because they **ship Android build
+artifacts inside the npm tarball** — e.g. `react-native-worklets` carries a 212 MB
+`libreactnative.so` and an 88 MB `libhermesvm.so` under `android/build/…`. None of it
+is platform-gated, so a Linux CI runner **writes every `.so` and uses none of them.**
+The cost is *materialising* those files, not fetching them (verified: a
+`~/.bun/install/cache` step restored 533 MB in 16s to save only ~23s of a ~230s
+install → **not worth it**).
+
+**The split (two PR jobs):**
+
+- **`pr-verify`** (every PR): `bun install --frozen-lockfile --filter '!native'` then
+  `oxlint && oxfmt --check && turbo run check-types build --filter='!native'`.
+  **Never installs Expo.** `oxlint`/`oxfmt` read *source files*, not `node_modules`, so
+  native source is still linted/formatted here without its deps. (Note: `apps/native`
+  has **no `build` task** anyway, so `turbo build` never touches the mobile app.)
+- **`pr-native`** (paths-gated): `on.pull_request.paths` lists `apps/native/**` **and
+  every workspace `turbo check-types --filter=native` pulls in** (backend, config,
+  domain, `bun.lock`). Installs with `--filter native`, runs native's own `tsc`
+  (`working-directory: apps/native`, since a `--filter native` install has no root
+  turbo). **Type-check only — no tests.** This is the ONLY job that catches a
+  shared-package change breaking native, so its `paths` list must stay complete.
+
+**Net:** a non-native PR (the common case, docs included) never pays the Expo install.
+**Tradeoff (accept it consciously):** a non-native PR that breaks native *through a
+shared package not in `pr-native`'s paths* is caught at tag, not per-PR. Widening
+coverage = one line in `paths`.
+
+Proof it works (measured on the mini, warm store): `--filter '!native'` install →
+1.7 GB / 107,176 files, **zero** `apps/native/node_modules`, **zero** `react-native`/
+`expo`, **zero** `.so` files; full gate green (oxlint 0/0 on 492 files, oxfmt clean on
+863, `turbo check-types build --filter='!native'` 12/12).
+
 ## Cost levers (apply to whatever still runs in CI)
-1. **Turbo + bun cache** in CI (`actions/cache` for `.turbo` and the bun store, keyed on
-   `bun.lock`) — same checks, 3–5× faster. Biggest single win.
+1. **Turbo cache** in CI (`actions/cache` for `.turbo`, keyed on `${{ github.sha }}`
+   with a `turbo-` restore prefix) — replays unchanged `check-types`/`build` outputs.
+   A **bun install cache** (`~/.bun/install/cache` keyed on `bun.lock`) sounds like the
+   same win but was **measured not worth it** for the native tree (see above): the cost
+   is materialising files, not downloading them. *Cache is a deliberate, separate step —
+   ship a clean no-cache baseline first to measure the real per-PR cost, then add it.*
 2. **`concurrency: cancel-in-progress`** per PR — superseded pushes don't keep running.
-3. **`paths` filters** — a docs-only PR shouldn't run native/backend jobs.
+3. **`paths` filters** — a docs-only PR shouldn't run native/backend jobs. (This is what
+   makes `pr-native` cheap — it only fires when native or its deps change.)
 4. **Merge queue** (optional, structural) — validate once at the front of the queue against
    the real pre-merge state, instead of re-validating a moving `main` on every push. Pairs
    with required checks = real branch protection on the one `main`.
 5. **Self-hosted runner** (optional, nuclear) — an always-on machine (e.g. a Mac mini)
-   runs CI for $0 GitHub minutes. Private repo → acceptable risk.
+   runs CI for $0 GitHub minutes. **The silver bullet for the native install specifically:**
+   on a persistent runner `node_modules` + the bun store *survive between runs*, so the
+   Expo install is near-instant after the first time (no re-materialising). Private repo →
+   acceptable risk. Needs a runner registration token from the repo owner.
 
 ## Deploy ordering (a trap worth documenting)
 `convex deploy` (schema) runs before `migrations:runAll` in the release pipeline. A
