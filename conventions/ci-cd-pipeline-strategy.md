@@ -69,22 +69,31 @@ pushing — the exact same script as humans and CI. One gate, one meaning of "gr
 ## The mobile/native install is the biggest single cost — split it out
 
 In an Expo/React Native monorepo the dominant CI cost is **not the build and not the
-tests — it's `bun install` of the native app's dependencies.** Measured on a real
-trip-planner install (Bun 1.3, `--filter` on install):
+tests — it's `bun install` of the native app's dependencies.** Measured on trip-planner
+with the `deps:weight apps` script below (Bun 1.3, macOS/mini, `--filter` on install):
 
 | Install | Size | Files |
 | --- | --- | --- |
-| Full (`bun install`) | **4.6 GB** | 195k |
-| Non-native (`bun install --filter '!native'`) | **1.7 GB** | 107k |
-| Native only (`bun install --filter native`) | 1.1 GB | 74k |
+| Full (`bun install`) | 1.97 GB | 123k |
+| Non-native (`bun install --filter '!native'`) | **1.71 GB** | 107k |
+| Native only (`bun install --filter native`) | 1.18 GB | 74k |
+| Web only (`--filter web`) | 1.37 GB | 91k |
+| Docs only (`--filter docs`) | 0.42 GB | 22k |
 
-React Native + Expo are ~2.5 GB of that tree because they **ship Android build
-artifacts inside the npm tarball** — e.g. `react-native-worklets` carries a 212 MB
-`libreactnative.so` and an 88 MB `libhermesvm.so` under `android/build/…`. None of it
-is platform-gated, so a Linux CI runner **writes every `.so` and uses none of them.**
-The cost is *materialising* those files, not fetching them (verified: a
-`~/.bun/install/cache` step restored 533 MB in 16s to save only ~23s of a ~230s
-install → **not worth it**).
+Two honesty notes, both learned by *actually measuring* rather than trusting a figure:
+
+1. **Numbers are platform-dependent — measure on the target.** React Native ships Android
+   build artifacts inside its npm tarballs (e.g. a `libreactnative.so`/`libhermesvm.so`
+   under `android/build/…`). On **macOS** those largely do not materialise, so the mini
+   shows native adding only ~0.26 GB over `!native`. On a **Linux CI runner** the native
+   tree is materially larger (it writes those Android `.so` files and uses none of them).
+   So the split's payoff is *bigger on CI than the mini table suggests* — but treat any
+   single number as environment-specific and re-measure where it runs. (An earlier
+   "4.6 GB / 195k" figure quoted for the full install was never reproduced on the mini —
+   exactly the kind of stale claim the weight script exists to catch.)
+2. **The cost is *materialising* files, not fetching them.** A `~/.bun/install/cache` step
+   restored 533 MB in 16s to save only ~23s of a ~230s install → **not worth it**. Caching
+   the download does little when the time goes into writing 100k+ files.
 
 **The split (two PR jobs):**
 
@@ -106,9 +115,33 @@ shared package not in `pr-native`'s paths* is caught at tag, not per-PR. Widenin
 coverage = one line in `paths`.
 
 Proof it works (measured on the mini, warm store): `--filter '!native'` install →
-1.7 GB / 107,176 files, **zero** `apps/native/node_modules`, **zero** `react-native`/
+1.71 GB / 107,176 files, **zero** `apps/native/node_modules`, **zero** `react-native`/
 `expo`, **zero** `.so` files; full gate green (oxlint 0/0 on 492 files, oxfmt clean on
 863, `turbo check-types build --filter='!native'` 12/12).
+
+## Protocol: watch dependency weight (don't let a fat dep slip in)
+
+Big dependencies are the thing that makes installs — and therefore CI — expensive, so
+make their weight *visible* instead of discovering it after the minutes are gone. Ship a
+small audit script and run it before adding or bumping a heavy dep.
+
+`scripts/dep-weight.sh` (wired as `bun run deps:weight`), two modes:
+
+- **`deps:weight`** (TOP, instant): reads the current `node_modules` and prints the
+  heaviest packages + total, flagging anything over `THRESHOLD_MB` (default 50). Answers
+  "what is fat right now?" — on trip-planner it surfaced `typescript` (243 MB), `next` +
+  `mermaid` + `lucide-react` (docs), `expo-image` (133 MB), `convex` (111 MB),
+  `date-fns` (80 MB).
+- **`deps:weight apps`** (installs in a throwaway git worktree, slow): reports the install
+  footprint (size + file count) of `full`, each `apps/*` via `--filter <app>`, and
+  `!native`. Answers "what does each app cost to install, and what does the PR gate
+  actually skip?" — this is what produced the table above.
+
+Discipline: before adding/upgrading a dependency, run `deps:weight`; if it lands a package
+over the threshold, justify it or find a lighter one (e.g. a 80 MB date lib is a smell —
+prefer date-fns subpath imports, dayjs, or `Intl`). Keep heavy, platform-specific trees
+(native/Expo) isolated to their own workspace so the `--filter` split keeps working.
+The script is generic to any Bun workspace monorepo — copy it into a new repo as-is.
 
 ## Cost levers (apply to whatever still runs in CI)
 1. **Turbo cache** in CI (`actions/cache` for `.turbo`, keyed on `${{ github.sha }}`
