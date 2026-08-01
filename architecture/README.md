@@ -24,6 +24,10 @@ How to decide how much modeling machinery a domain actually needs.
 - **[domain-modeling-strategy.md](./domain-modeling-strategy.md)** — A pragmatic middle path: contract types as wire truth, branded IDs, value objects only for high-leverage primitives, invariants in use cases.
 - **[domain-layer-contracts.md](./domain-layer-contracts.md)** — Extracting repository interfaces and plain entity types into the domain package so infra implements domain-defined contracts.
 
+## Data & backend topology
+
+- **[data-by-access-pattern.md](./data-by-access-pattern.md)** — Split a backend by access pattern instead of forcing one: live/reactive data vs read-massive catalog; Durable Objects + SQLite for a geo catalog (partition by country, not city); snapshot-not-FK cross-store refs; a neutral auth issuer (one issuer, N validators); shared package carries contract-not-data; versioned immutable CDN slices; curation as a single-writer state machine.
+
 ## Cross-Cutting Concerns
 
 Patterns that span every layer and consumer.
