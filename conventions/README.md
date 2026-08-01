@@ -9,6 +9,11 @@ Reusable, product-agnostic conventions and workflow patterns distilled from real
 - **[schemas-first.md](./schemas-first.md)** — Define Zod (v4) schemas in the domain package and reuse them across backend and frontend.
 - **[tagging-system.md](./tagging-system.md)** — Two-tier tags: default tags in code (slug/label/emoji/color) + per-scope custom tags with a curated color palette. One source of truth across web/mobile/widget.
 
+## Data & delivery
+
+- **[data-sourcing-and-seeding.md](./data-sourcing-and-seeding.md)** — Filling an app with real, structured, geo-tagged reference data (e.g. attractions): why an agent beats a plain chat, legal sources (Wikidata CC0 primary, never scrape TripAdvisor), the curate→resolve→enrich→normalize→validate→seed pipeline, and provenance as a field.
+- **[ci-cd-pipeline-strategy.md](./ci-cd-pipeline-strategy.md)** — Trunk + tags, one `verify` gate, tiered checks; the native/mobile install is the biggest CI cost (split it out); `deps:weight` protocol to watch dependency weight.
+
 ## Workflow conventions
 
 - **[mvp-first-then-refactor.md](./mvp-first-then-refactor.md)** — Two-phase feature workflow: ship an inline MVP end-to-end first, then extract the domain/application/infra layers once it's stable. When to refactor.
