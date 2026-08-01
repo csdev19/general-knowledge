@@ -7,6 +7,27 @@ that day — the trigger, the target options, the migration surface, and what we
 did that de-risks it. **Status: not decided; documented so it is a clear step, not a
 scramble.**_
 
+## Refinement: you may not leave entirely — split by data class
+
+Real-world sharpening of this (Ripuy, 2026-08): "leaving Convex" is usually **not**
+all-or-nothing. Split data by its requirements and move only the part that doesn't fit:
+
+- **Live data** (per-user writes, real-time collaboration, reactive reads) → **keep in
+  Convex**. It is the right tool; don't touch it.
+- **Catalog / reference data** (read-massive, write-rare, shared, no reactivity needed)
+  → **move out** — e.g. Cloudflare **Durable Objects + SQLite** (one per country/region).
+  Paying Convex bandwidth + function calls to serve the same rows a thousand times is waste.
+- **Auth** → a **standalone Better Auth service**, with Convex and the catalog stores as
+  *validators* (they verify tokens, they don't host auth).
+
+Cross-system reference trap: when live data points at a catalog row, **don't store just a
+foreign key** across the two systems — the catalog changes, a place closes, old trips
+break. **Snapshot the essentials at add-time** into the live store instead. (Ripuy spec:
+`trip-planner/docs/superpowers/specs/2026-08-01-ripuy-data-architecture.md`.)
+
+So read the rest of this doc as "how to move a data class off Convex", applied
+selectively — not necessarily a full migration.
+
 ## Why you'd leave Convex (the triggers)
 
 Pull this plan when one or more of these bite:
