@@ -12,6 +12,7 @@ de ensamblaje propias del stack.
 | [fullstack-hono-orpc](./fullstack-hono-orpc.md) | TanStack Start | Hono + oRPC | — | Fullstack type-safe en Cloudflare Workers. **Default.** |
 | [fullstack-elysia-eden](./fullstack-elysia-eden.md) | TanStack Start | Elysia + Eden | — | Alternativa con Eden Treaty |
 | [fullstack-convex](./fullstack-convex.md) | TanStack Start | Convex | ✅ | Cuando quieres reactividad/realtime out-of-the-box |
+| [service-only-hono](./service-only-hono.md) | — | Hono + oRPC | — | Servicio backend compartido por varios productos (p. ej. auth centralizado) |
 | [mobile-expo](./mobile-expo.md) | Expo RN | (consume API) | — | App móvil sobre el domain + API compartidos |
 | [desktop-electron](./desktop-electron.md) | Electron renderer | IPC / opcional API | — | App de escritorio local-first |
 
