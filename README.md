@@ -24,7 +24,7 @@ Dos capas:
 | [architecture/](./architecture/) | DDD + hexagonal, bounded contexts, shared kernel, repository pattern, domain modeling, observabilidad, security hardening, ADRs |
 | [error-handling/](./error-handling/) | Result types, response helpers, api-response-types, error handlers, retrospectiva de centralización |
 | [web/](./web/) | TanStack Start/Router/Query, data loading, server functions, UI package compartido, bundle splitting |
-| [api/](./api/) | Hono + oRPC en Cloudflare Workers, patrón api-contract, cliente isomórfico, ADR, gotchas de auth |
+| [api/](./api/) | Hono + oRPC en Cloudflare Workers, patrón api-contract, cliente isomórfico, ADR, gotchas de auth, **servicio de auth centralizado** (topología cross-origin: la tríada CORS/`trustedOrigins`/cookies, KV como caché de sesión) |
 | [convex/](./convex/) | Convex como backend reactivo: conexión del cliente (las dos URLs, `useQuery` reactivo, API generada en monorepo) y **Better Auth hosteado dentro de Convex** (versiones SDK 57, fix del `useSession` colgado, `expo-network`, overrides, `exp://`) |
 | [mobile/](./mobile/) | Expo / React Native: estructura + domain compartido, **dev builds & Metro** (cuándo recompilar, conexión emulador), **build & install** (debug/release × perfil, `run:*` vs EAS, un install por ambiente, dónde viajan realmente las env vars, **+ kit copy-paste con los scripts completos**) y **Google Maps** (dev build, key, Maps SDK Android + billing, SHA-1) |
 | [desktop/](./desktop/) | Electron: main/renderer/preload, IPC tipado, permisos nativos, vault local-first, media pipeline, distribución |
@@ -42,6 +42,7 @@ Ver **[stacks/](./stacks/)** para las guías de ensamblaje:
 | [fullstack-hono-orpc](./stacks/fullstack-hono-orpc.md) | Web + API type-safe (Hono + oRPC) en Cloudflare Workers. **Default.** |
 | [fullstack-elysia-eden](./stacks/fullstack-elysia-eden.md) | Web + API type-safe (Elysia + Eden Treaty) |
 | [fullstack-convex](./stacks/fullstack-convex.md) | Fullstack reactivo con Convex (realtime) |
+| [service-only-hono](./stacks/service-only-hono.md) | Servicio backend sin cliente, compartido por varios productos (auth centralizado) |
 | [mobile-expo](./stacks/mobile-expo.md) | App móvil Expo sobre el domain + API compartidos |
 | [desktop-electron](./stacks/desktop-electron.md) | App de escritorio Electron local-first |
 
