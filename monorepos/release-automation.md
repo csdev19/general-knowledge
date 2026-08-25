@@ -1,6 +1,10 @@
 # Release automation with release-please (monorepo)
 
-_Adopt release-please to drive independent, drift-free versioning and releases for each app in a monorepo from Conventional Commits._
+_Adopt release-please to drive drift-free versioning and releases in a monorepo from Conventional Commits._
+
+> **This doc is the decision: what was chosen and why.** For the step-by-step procedure — choosing
+> the version topology, the four files to drop in, the token, retiring the `production` branch —
+> follow [release-please-playbook.md](./release-please-playbook.md).
 
 ## Problem
 
@@ -77,6 +81,11 @@ release-please simply becomes the thing that _creates_ those tags instead of a h
 `apps/documentation` (or any non-shipping app) is not released.
 
 ## Configuration
+
+The example below versions three apps independently. That is only valid because these three
+deployables are treated as having disjoint closures (or an explicit compatibility contract) — check
+[the closure rule](#shared-packages--the-closure-rule) against your own dependency graph before
+copying it.
 
 `release-please-config.json` (repo root):
 
@@ -157,13 +166,45 @@ For a batch, the bump is the **highest** among the accumulated commits:
 A batch of only `chore`/`docs`/`refactor` produces **no** release PR — nothing ships until a
 `feat`/`fix` accumulates.
 
-## Shared packages
+## Shared packages — the closure rule
 
-Commits touching only `packages/*` (shared domain/i18n/etc.) do not belong to any app by path.
-Simplest policy: **bundle the shared-package change with the consuming app in the same PR/commit**,
-so it routes to that app. If a shared package later needs to fan out to multiple apps automatically,
-revisit with release-please's `node-workspace` plugin (`linked-versions` / dependent bumping). Out
-of scope for a first adoption.
+Commits route to a component by the files they touch, so a commit touching only `packages/*`
+(shared domain/i18n/etc.) belongs to **no** component. That mechanic decides how many version lines
+a repo may have:
+
+> A deployable's **closure** is the app plus every workspace package it imports, transitively. **Two
+> deployables whose closures intersect must share one version line.** Only deployables with disjoint
+> closures may version independently.
+
+Independent versioning over intersecting closures is not merely untidy, it is incorrect. A change to
+a shared `domain` routes to at most one app; that app releases and deploys, the other keeps running
+its previous tag, and **production ends up running two different builds of the same shared code at
+once** — while `main` looks perfectly consistent.
+
+An earlier version of this doc recommended "bundle the shared-package change with the consuming app
+in the same PR/commit". That only works while a package has exactly **one** deployed consumer. The
+moment a second consumer appears — the normal case for `domain` in a web + api monorepo — bundling
+picks a winner and silently strands the loser.
+
+So:
+
+- **Closures intersect → one version line** for the whole set (a single `"."` component; one tag,
+  several tag-triggered deploy workflows). Shared-package commits are then covered automatically,
+  because everything is one line.
+- **Closures disjoint → independent lines**, one component per deployable, as configured above.
+- **A consumer you cannot force to update** (mobile, desktop, a published SDK) always gets its own
+  line _plus_ an explicit backward-compatibility contract — add the optional field in one release,
+  require it in the next. Take that deal when release cadences genuinely differ, never just for
+  prettier version numbers.
+
+`node-workspace` / `linked-versions` (dependent bumping) is the heavier alternative that keeps
+per-package version numbers while propagating bumps to consumers. It only pays off when a package is
+actually published to a registry — with `workspace:*` everywhere the numbers are decoration — and on
+Bun the plugins have to be dry-run first, since Bun's root `workspaces` is an object rather than the
+array they expect.
+
+Full procedure and copy-paste configs for both topologies:
+[release-please-playbook.md](./release-please-playbook.md#step-1--decide-the-version-topology).
 
 ## Migration
 
