@@ -17,7 +17,8 @@ patterns, rationale, pipeline shapes, and commands are preserved.
 | [ci-cd-pipelines.md](./ci-cd-pipelines.md)                 | Tag-driven independent release/deploy pipelines to Cloudflare Workers + R2. |
 | [pr-checks.md](./pr-checks.md)                             | Two PR-gate workflows (validation + desktop E2E) and why they stay split.   |
 | [ci-per-project-pipelines.md](./ci-per-project-pipelines.md)| Universal compile check plus path-filtered per-project test suites; why docs-only PRs still run the formatter. |
-| [release-automation.md](./release-automation.md)           | release-please manifest mode for drift-free, per-app versioning.            |
+| [release-automation.md](./release-automation.md)           | **Why** release-please: manifest mode, drift-free versioning, and the closure rule that decides how many version lines a repo may have. |
+| [release-please-playbook.md](./release-please-playbook.md) | **How**: pick the topology, drop in the four files, wire the PAT, retire the `production` branch, verify. Start here when adopting it in a repo. |
 | [testing-strategy.md](./testing-strategy.md)               | Layered testing model (unit → component → integration → E2E) overview.      |
 
 ### testing/
