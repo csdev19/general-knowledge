@@ -1,38 +1,38 @@
-# Patrón de Changelog en el docs app (diario de decisiones)
+# Changelog Pattern in the docs app (decision journal)
 
-_Cómo mantener un changelog narrativo en la app de documentación sin que el mantenimiento del índice se coma el valor: un archivo por entrada, índice auto-generado, y un listón claro de qué merece entrada._
+_How to keep a narrative changelog in the documentation app without index maintenance eating the value: one file per entry, an auto-generated index, and a clear bar for what deserves an entry._
 
-El changelog del docs app **no es un log de commits** — eso ya lo genera release-please automáticamente por app (`CHANGELOG.md` desde Conventional Commits; ver [release-automation](../monorepos/release-automation.md)). El changelog del docs app es el **diario de decisiones**: qué se hizo, por qué, qué se descartó, y qué lección dejó. Es la fuente para recuperar contexto entre sesiones (propio o de agentes) después del squash-merge, cuando la historia del PR ya se aplanó.
+The docs app changelog **is not a commit log** — release-please already generates that automatically per app (`CHANGELOG.md` from Conventional Commits; see [release-automation](../monorepos/release-automation.md)). The docs app changelog is the **decision journal**: what was done, why, what was rejected, and what lesson it left behind. It is the source for recovering context between sessions (yours or an agent's) after a squash-merge, once the PR history has been flattened.
 
-## El problema que evita este patrón
+## The problem this pattern avoids
 
-La versión ingenua (probada en trip-planner durante ~6 meses, 46 entradas) mantenía un `index.mdx` a mano con una card + una fila de tabla por entrada. Fallas acumuladas:
+The naive version (tried in trip-planner for ~6 months, 46 entries) maintained an `index.mdx` by hand with a card + a table row per entry. Accumulated failures:
 
-1. **Cada entrada se escribía 3 veces** — el archivo, la card del índice, la fila de la tabla. Las descripciones de las cards degeneraron en párrafos que duplicaban la entrada completa (drift garantizado).
-2. **El índice era un imán de merge conflicts** — todo PR tocaba el mismo archivo en el mismo lugar (tope de la lista). Con agentes trabajando en paralelo, choque seguro.
-3. **Template con tablas de commit hashes** — el hash real no existe hasta el squash-merge, así que las tablas nacían inventadas. Release-please ya mapea commits a versiones.
-4. **Sin listón de entrada** — fixes triviales recibían la misma ceremonia que postmortems, ahogando la señal.
+1. **Every entry was written 3 times** — the file, the index card, the table row. The card descriptions degenerated into paragraphs duplicating the whole entry (guaranteed drift).
+2. **The index was a merge-conflict magnet** — every PR touched the same file in the same place (top of the list). With agents working in parallel, a collision is certain.
+3. **A template with commit-hash tables** — the real hash does not exist until the squash-merge, so the tables were born invented. Release-please already maps commits to versions.
+4. **No entry bar** — trivial fixes got the same ceremony as postmortems, drowning the signal.
 
-## Anatomía
+## Anatomy
 
 ```
 apps/docs/src/content/docs/changelog/
-├── index.mdx                       # Página índice: SOLO intro + <ChangelogIndex />
-├── YYYY-MM-DD-titulo-corto.mdx     # Una entrada = un archivo
+├── index.mdx                       # Index page: ONLY intro + <ChangelogIndex />
+├── YYYY-MM-DD-short-title.mdx      # One entry = one file
 └── ...
-src/components/ChangelogIndex.astro # Genera las cards desde la colección
+src/components/ChangelogIndex.astro # Generates the cards from the collection
 ```
 
-- **Una entrada = un archivo**, nombrado `YYYY-MM-DD-titulo-kebab.mdx`. El prefijo de fecha es obligatorio: es la clave de ordenamiento del índice.
-- **El índice se auto-genera** desde la content collection. Agregar una entrada = crear el archivo. Nadie edita `index.mdx` nunca → cero doble escritura, cero conflicts.
+- **One entry = one file**, named `YYYY-MM-DD-kebab-title.mdx`. The date prefix is mandatory: it is the index's sort key.
+- **The index is auto-generated** from the content collection. Adding an entry = creating the file. Nobody ever edits `index.mdx` → zero double writing, zero conflicts.
 
-## El componente índice (Astro Starlight)
+## The index component (Astro Starlight)
 
 ```astro
 ---
 // src/components/ChangelogIndex.astro
-// El sort por id ES el sort cronológico inverso, gracias al prefijo YYYY-MM-DD
-// del nombre de archivo — sin parsear fechas.
+// Sorting by id IS the reverse-chronological sort, thanks to the YYYY-MM-DD
+// prefix in the file name — no date parsing.
 import { getCollection } from "astro:content";
 import { CardGrid, LinkCard } from "@astrojs/starlight/components";
 
@@ -54,64 +54,64 @@ const entries = (await getCollection("docs"))
 </CardGrid>
 ```
 
-Y el `index.mdx` queda reducido a frontmatter + un párrafo de intro + `<ChangelogIndex />`.
+And `index.mdx` is reduced to frontmatter + an intro paragraph + `<ChangelogIndex />`.
 
-> En otros generadores (fumadocs, Docusaurus, VitePress) el mecanismo cambia pero el patrón es el mismo: el índice se deriva de los archivos, nunca se mantiene a mano.
+> In other generators (fumadocs, Docusaurus, VitePress) the mechanism changes but the pattern is the same: the index is derived from the files, never maintained by hand.
 
-## Formato de entrada
+## Entry format
 
 ```mdx
 ---
 title: "Month DD, YYYY - Short Title"
-description: Resumen de 1-2 líneas — es el texto de la card del índice, corto
+description: A 1-2 line summary — this is the index card's text, keep it short
 date: YYYY-MM-DD
 tags:
   - changelog
   - relevant-tags
 ---
 
-Párrafo de introducción.
+Introduction paragraph.
 
 ---
 
 ## type: Change Title
 
 ### Changes
-- Qué cambió, concreto
+- What changed, concretely
 
 ### Files Changed
-paths/tocados
+paths/touched
 
 ### Decision Rationale
-Por qué, trade-offs, alternativas descartadas.
+Why, trade-offs, rejected alternatives.
 ```
 
-Reglas duras:
+Hard rules:
 
-- **`description` de 1-2 líneas.** La narrativa vive en el cuerpo de la entrada; la card del índice solo anuncia. Si la description necesita un párrafo, el título está mal o la entrada cubre demasiado.
-- **Sin tablas de commit hashes.** No existen hasta el merge, y release-please ya cubre esa capa.
-- **`Decision Rationale` es la sección obligatoria** — es la única información que no vive en ningún otro lado (ni git log, ni el diff, ni release-please).
+- **A 1-2 line `description`.** The narrative lives in the entry body; the index card only announces. If the description needs a paragraph, the title is wrong or the entry covers too much.
+- **No commit-hash tables.** They do not exist until the merge, and release-please already covers that layer.
+- **`Decision Rationale` is the mandatory section** — it is the only information that does not live anywhere else (not in the git log, not in the diff, not in release-please).
 
-## El listón: qué merece entrada
+## The bar: what deserves an entry
 
-Entrada **sí** (hay decisión o lección que registrar):
+Entry **yes** (there is a decision or a lesson to record):
 
-- Features nuevas, cambios de arquitectura, breaking changes
-- Cambios de schema — especialmente migraciones y su historia en prod
-- Fixes con causa raíz no obvia o con lección
-- **Postmortems** — algo salió mal en deploy/prod y cómo se recuperó (las entradas más valiosas del patrón)
+- New features, architecture changes, breaking changes
+- Schema changes — especially migrations and their history in prod
+- Fixes with a non-obvious root cause, or with a lesson
+- **Postmortems** — something went wrong in deploy/prod and how it was recovered (the most valuable entries of the pattern)
 
-Entrada **no** (release-please ya lo registra):
+Entry **no** (release-please already records it):
 
-- Fixes triviales, typos, bumps de dependencias, refactors mecánicos sin historia
+- Trivial fixes, typos, dependency bumps, mechanical refactors with no story
 
-## Relación con release-please
+## Relationship with release-please
 
-Dos capas complementarias, sin solaparse:
+Two complementary layers, no overlap:
 
-| Capa                | Quién la escribe             | Qué cuenta                          |
-| ------------------- | ---------------------------- | ----------------------------------- |
-| `CHANGELOG.md` por app | release-please (automático) | Qué commits entraron en qué versión |
-| `docs/changelog/`   | el autor o el agente (manual, con listón) | Por qué, qué se descartó, lecciones |
+| Layer                    | Who writes it                             | What it tells                        |
+| ------------------------ | ----------------------------------------- | ------------------------------------ |
+| `CHANGELOG.md` per app   | release-please (automatic)                | Which commits went into which version |
+| `docs/changelog/`        | the author or the agent (manual, with a bar) | Why, what was rejected, lessons    |
 
-Si un cambio no tiene "por qué" que contar, no duplica capa: vive solo en la de release-please.
+If a change has no "why" to tell, it does not duplicate the layer: it lives only in the release-please one.

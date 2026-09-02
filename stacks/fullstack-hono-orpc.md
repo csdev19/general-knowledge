@@ -1,55 +1,55 @@
 # Stack: Fullstack Hono + oRPC
 
-_Web (TanStack Start) + API (Hono + oRPC) desplegados como dos Cloudflare Workers,
-conectados por Service Bindings. Type-safety de extremo a extremo. **Stack default.**_
+_Web (TanStack Start) + API (Hono + oRPC) deployed as two Cloudflare Workers,
+connected by Service Bindings. End-to-end type safety. **The default stack.**_
 
-## Cuándo usarlo
+## When to use it
 
-Tu default para productos web fullstack: API tipada, cookies de auth same-origin sobre
-Cloudflare, contrato compartido sin publicar un package. Elige este salvo que necesites
-realtime out-of-the-box (→ [convex](./fullstack-convex.md)) o prefieras Eden Treaty
+Your default for fullstack web products: a typed API, same-origin auth cookies on
+Cloudflare, a shared contract without publishing a package. Pick this one unless you need
+realtime out of the box (→ [convex](./fullstack-convex.md)) or you prefer Eden Treaty
 (→ [elysia](./fullstack-elysia-eden.md)).
 
-## Lista de lectura (en orden)
+## Reading list (in order)
 
-**1 · Cimientos**
-- [Arquitectura DDD + hexagonal](../architecture/README.md) — la regla de dependencias
-- [Domain modeling strategy](../architecture/domain-modeling-strategy.md) — cuánta ceremonia aplicar
-- [Repository pattern](../architecture/repository-pattern.md) — interfaz en domain, impl en infra
-- [Estructura de monorepo](../monorepos/monorepo-structure.md) — Turborepo + Bun workspaces
-- [Convención `infra-*`](../packages/infrastructure-naming.md) y [build strategy](../packages/shared-package-build-strategy.md)
+**1 · Foundations**
+- [DDD + hexagonal architecture](../architecture/README.md) — the dependency rule
+- [Domain modeling strategy](../architecture/domain-modeling-strategy.md) — how much ceremony to apply
+- [Repository pattern](../architecture/repository-pattern.md) — interface in domain, implementation in infra
+- [Monorepo structure](../monorepos/monorepo-structure.md) — Turborepo + Bun workspaces
+- [The `infra-*` convention](../packages/infrastructure-naming.md) and the [build strategy](../packages/shared-package-build-strategy.md)
 
 **2 · API (Hono + oRPC)**
-- [Hono + oRPC overview](../api/hono.md) — el stack de servidor completo
-- [Patrón api-contract](../api/api-contract-pattern.md) — dónde vive el contrato y cómo se consume
-- [Cliente isomórfico](../api/api-client.md) — mismo cliente en server y browser
-- [ADR: oRPC + Hono + Cloudflare](../api/decisions/adr-0002-orpc-hono-cloudflare.md) — por qué esta capa
-- [Gotcha: better-auth cross-origin](../api/gotchas/better-auth-cross-origin.md) — headers inmutables en Workers
+- [Hono + oRPC overview](../api/hono.md) — the full server stack
+- [The api-contract pattern](../api/api-contract-pattern.md) — where the contract lives and how it is consumed
+- [Isomorphic client](../api/api-client.md) — the same client on the server and in the browser
+- [ADR: oRPC + Hono + Cloudflare](../api/decisions/adr-0002-orpc-hono-cloudflare.md) — why this layer
+- [Gotcha: better-auth cross-origin](../api/gotchas/better-auth-cross-origin.md) — immutable headers on Workers
 
 **3 · Web (TanStack Start)**
-- [Data loading](../web/data-loading.md) — loaders + Query; server functions vs cliente isomórfico
-- [Server functions](../web/server-functions.md) — el boundary y sus reglas
-- [UI package compartido](../web/web-ui-package.md) — shadcn/ui + theming OKLCH
-- [Bundle splitting](../web/bundle-splitting.md) y [preview local](../web/local-preview.md)
+- [Data loading](../web/data-loading.md) — loaders + Query; server functions vs the isomorphic client
+- [Server functions](../web/server-functions.md) — the boundary and its rules
+- [Shared UI package](../web/web-ui-package.md) — shadcn/ui + OKLCH theming
+- [Bundle splitting](../web/bundle-splitting.md) and [local preview](../web/local-preview.md)
 
-**4 · Errores y observabilidad**
+**4 · Errors and observability**
 - [Result types](../error-handling/result-types.md) → [response helpers](../error-handling/response-helpers.md) → [api-response-types](../error-handling/api-response-types.md) → [error handlers](../error-handling/error-handlers.md)
-- [Observabilidad](../architecture/observability.md) y [security hardening](../architecture/security-hardening.md)
+- [Observability](../architecture/observability.md) and [security hardening](../architecture/security-hardening.md)
 
-**5 · CI/CD y testing**
-- [CI/CD por proyecto](../monorepos/ci-cd-pipelines.md), [PR checks](../monorepos/pr-checks.md), [release-please](../monorepos/release-automation.md)
-- [Estrategia de testing](../monorepos/testing-strategy.md)
+**5 · CI/CD and testing**
+- [CI/CD per project](../monorepos/ci-cd-pipelines.md), [PR checks](../monorepos/pr-checks.md), [release-please](../monorepos/release-automation.md)
+- [Testing strategy](../monorepos/testing-strategy.md)
 
-## Notas de ensamblaje (lo específico de este stack)
+## Assembly notes (what is specific to this stack)
 
-- **Proxy same-origin**: el Worker web proxya `/api/auth/*` y `/api/v1/*` al Worker API.
-  En producción vía Service Bindings (Worker-a-Worker, sin DNS público); en dev local, `fetch()`.
-  Los `Set-Cookie` se reescriben para quitar `domain=` y asignar la cookie al dominio web.
-- **El contrato vive en la app de servidor** (`apps/api/src/contract/`), no en un package aparte.
-  La web lo importa por ruta relativa cross-app (mismo patrón que `type { App }` de Eden).
-  Ver [api-contract-pattern](../api/api-contract-pattern.md) si algún día quieres extraerlo a package.
-- **`router.invalidate()`** tras sign-in/up/out para refrescar el `beforeLoad` del root; si no,
-  el header muestra estado de auth viejo.
-- **La web NO corre Better Auth localmente** — proxya al auth del backend. `infra-auth` no es
-  dependencia de la app web.
-- **CORS del server solo para mobile** (`exp://`, `mobile://`); la web es same-origin vía proxy.
+- **Same-origin proxy**: the web Worker proxies `/api/auth/*` and `/api/v1/*` to the API Worker.
+  In production via Service Bindings (Worker-to-Worker, no public DNS); in local dev, `fetch()`.
+  The `Set-Cookie` headers are rewritten to drop `domain=` and bind the cookie to the web domain.
+- **The contract lives in the server app** (`apps/api/src/contract/`), not in a separate package.
+  The web imports it by a cross-app relative path (the same pattern as Eden's `type { App }`).
+  See [api-contract-pattern](../api/api-contract-pattern.md) if you ever want to extract it into a package.
+- **`router.invalidate()`** after sign-in/up/out, to refresh the root's `beforeLoad`; otherwise
+  the header shows stale auth state.
+- **The web does NOT run Better Auth locally** — it proxies to the backend's auth. `infra-auth` is not
+  a dependency of the web app.
+- **The server's CORS is for mobile only** (`exp://`, `mobile://`); the web is same-origin through the proxy.

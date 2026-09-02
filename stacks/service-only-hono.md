@@ -1,70 +1,70 @@
-# Stack: Service-only Hono (backend sin cliente)
+# Stack: Service-only Hono (backend with no client)
 
-_Un servicio backend desplegado como un único Cloudflare Worker (Hono + oRPC), sin app web
-ni móvil en el monorepo. Los consumidores viven en **otros repos** y lo llaman por HTTPS.
-El caso canónico es un servicio de auth centralizado._
+_A backend service deployed as a single Cloudflare Worker (Hono + oRPC), with no web or
+mobile app in the monorepo. The consumers live in **other repos** and call it over HTTPS.
+The canonical case is a centralized auth service._
 
-## Cuándo usarlo
+## When to use it
 
-Cuando una capacidad tiene que ser compartida por varios productos y no puede vivir dentro
-de ninguno de ellos: identidad, facturación, notificaciones. Si el servicio solo lo consume
-un producto, no lo separes — usa [fullstack-hono-orpc](./fullstack-hono-orpc.md), que además
-te da cookies same-origin gratis.
+When a capability has to be shared by several products and cannot live inside
+any one of them: identity, billing, notifications. If only one product consumes the
+service, do not split it out — use [fullstack-hono-orpc](./fullstack-hono-orpc.md), which
+also gives you same-origin cookies for free.
 
-La diferencia estructural con los demás stacks es que **no hay proxy ni Service Binding**:
-todo consumidor llega cross-origin. Eso cambia auth, cookies y CORS de "detalle" a
-"restricción de diseño" — ver [servicio de auth centralizado](../api/centralized-auth-service.md).
+The structural difference from the other stacks is that **there is no proxy and no Service
+Binding**: every consumer arrives cross-origin. That turns auth, cookies and CORS from a
+"detail" into a "design constraint" — see [centralized auth service](../api/centralized-auth-service.md).
 
-## Lista de lectura (en orden)
+## Reading list (in order)
 
-**1 · Cimientos**
-- [Arquitectura DDD + hexagonal](../architecture/README.md) — la regla de dependencias
-- [Domain modeling strategy](../architecture/domain-modeling-strategy.md) — cuánta ceremonia aplicar
-- [Repository pattern](../architecture/repository-pattern.md) — interfaz en domain, impl en infra
-- [Estructura de monorepo](../monorepos/monorepo-structure.md) — Turborepo + Bun workspaces
-- [Convención `infra-*`](../packages/infrastructure-naming.md) y [build strategy](../packages/shared-package-build-strategy.md)
+**1 · Foundations**
+- [DDD + hexagonal architecture](../architecture/README.md) — the dependency rule
+- [Domain modeling strategy](../architecture/domain-modeling-strategy.md) — how much ceremony to apply
+- [Repository pattern](../architecture/repository-pattern.md) — interface in domain, implementation in infra
+- [Monorepo structure](../monorepos/monorepo-structure.md) — Turborepo + Bun workspaces
+- [The `infra-*` convention](../packages/infrastructure-naming.md) and the [build strategy](../packages/shared-package-build-strategy.md)
 
 **2 · API (Hono + oRPC)**
-- [Hono + oRPC overview](../api/hono.md) — el stack de servidor (ignora la parte de web/proxy)
-- [Patrón api-contract](../api/api-contract-pattern.md) — dónde vive el contrato
-- [ADR: oRPC + Hono + Cloudflare](../api/decisions/adr-0002-orpc-hono-cloudflare.md) — por qué esta capa
+- [Hono + oRPC overview](../api/hono.md) — the server stack (ignore the web/proxy part)
+- [The api-contract pattern](../api/api-contract-pattern.md) — where the contract lives
+- [ADR: oRPC + Hono + Cloudflare](../api/decisions/adr-0002-orpc-hono-cloudflare.md) — why this layer
 
-**3 · El servicio cross-origin (lo propio de este stack)**
-- [Servicio de auth centralizado](../api/centralized-auth-service.md) — topología, la tríada CORS/`trustedOrigins`/cookies, KV como caché de sesión
-- [Gotcha: better-auth cross-origin](../api/gotchas/better-auth-cross-origin.md) — headers inmutables en Workers
-- [Wrangler y config de env](../monorepos/wrangler-env-config.md) — `.env` como única fuente de verdad
-- [Migración de dominio a Workers](../infra/custom-domain-migration.md) — pon servicio y consumidores bajo un mismo dominio padre
+**3 · The cross-origin service (what is specific to this stack)**
+- [Centralized auth service](../api/centralized-auth-service.md) — topology, the CORS/`trustedOrigins`/cookies triad, KV as the session cache
+- [Gotcha: better-auth cross-origin](../api/gotchas/better-auth-cross-origin.md) — immutable headers on Workers
+- [Wrangler and env config](../monorepos/wrangler-env-config.md) — `.env` as the single source of truth
+- [Migrating a domain to Workers](../infra/custom-domain-migration.md) — put the service and its consumers under the same parent domain
 
-**4 · Errores y observabilidad**
+**4 · Errors and observability**
 - [Result types](../error-handling/result-types.md) → [response helpers](../error-handling/response-helpers.md) → [api-response-types](../error-handling/api-response-types.md) → [error handlers](../error-handling/error-handlers.md)
-- [Observabilidad](../architecture/observability.md) y [security hardening](../architecture/security-hardening.md)
+- [Observability](../architecture/observability.md) and [security hardening](../architecture/security-hardening.md)
 
-**5 · CI/CD y testing**
-- [CI/CD por proyecto](../monorepos/ci-cd-pipelines.md), [PR checks](../monorepos/pr-checks.md), [release-please](../monorepos/release-automation.md)
-- [Estrategia de testing](../monorepos/testing-strategy.md)
+**5 · CI/CD and testing**
+- [CI/CD per project](../monorepos/ci-cd-pipelines.md), [PR checks](../monorepos/pr-checks.md), [release-please](../monorepos/release-automation.md)
+- [Testing strategy](../monorepos/testing-strategy.md)
 
-## Notas de ensamblaje (lo específico de este stack)
+## Assembly notes (what is specific to this stack)
 
-- **Un solo Worker.** El app *es* el backend, así que el workflow de deploy tiene un único
-  `wrangler deploy`; no hay paso de Pages ni de build de cliente.
-- **CORS es el límite de acceso real.** No hay proxy que lo esconda. La allowlist sale de
-  `CORS_ORIGIN` y alimenta también `trustedOrigins`; con `credentials: true` el wildcard es
-  ilegal. Dar de alta un consumidor = una entrada más en esa variable.
-- **Cookies `sameSite: "none"` + `secure`.** Y pon servicio y consumidores bajo un mismo
-  dominio padre (`auth.example.com` / `app.example.com`) para que sigan siendo same-site
-  pese a las políticas de cookies de terceros.
-- **Sin React en ningún package.** `i18n` sirve copy transaccional (correos, push, mensajes
-  de error) vía el core no-React de `use-intl`; fuera provider, hooks y peer dep de React.
-- **`application` puede nacer vacío.** Un barrel con `export {}` que marca dónde van los
-  casos de uso es scaffolding legítimo, no residuo — documenta que es intencional.
-- **Prefija las tablas** y acota `tablesFilter` a ese prefijo, para que `drizzle-kit push`
-  nunca proponga borrar tablas de otro servicio que comparta la base.
-- **Bindings en `wrangler.jsonc`, config en `.env`.** KV, Durable Objects y colas son
-  bindings; secretos y URLs no. Nunca un bloque `vars`.
+- **A single Worker.** The app *is* the backend, so the deploy workflow has a single
+  `wrangler deploy`; there is no Pages step and no client build.
+- **CORS is the real access boundary.** There is no proxy hiding it. The allowlist comes from
+  `CORS_ORIGIN` and also feeds `trustedOrigins`; with `credentials: true` a wildcard is
+  illegal. Onboarding a consumer = one more entry in that variable.
+- **Cookies with `sameSite: "none"` + `secure`.** And put the service and its consumers under the
+  same parent domain (`auth.example.com` / `app.example.com`) so they stay same-site
+  despite third-party cookie policies.
+- **No React in any package.** `i18n` serves transactional copy (emails, push, error
+  messages) through `use-intl`'s non-React core; drop the provider, the hooks and React as a peer dep.
+- **`application` may start empty.** A barrel with `export {}` marking where the use cases
+  will go is legitimate scaffolding, not residue — document that it is intentional.
+- **Prefix the tables** and scope `tablesFilter` to that prefix, so `drizzle-kit push`
+  never proposes dropping tables belonging to another service sharing the database.
+- **Bindings in `wrangler.jsonc`, config in `.env`.** KV, Durable Objects and queues are
+  bindings; secrets and URLs are not. Never a `vars` block.
 
-## Generarlo
+## Generating it
 
-`bun run customize` en [monorepo-template](https://github.com/niway-dev/monorepo-template)
-ofrece este stack como **Backend only — Hono + oRPC API**: conserva `apps/server-hono` y
-`packages/i18n`, borra web, móvil, `web-ui` y `tokens`, y genera el workflow de deploy de
-un solo Worker.
+`bun run customize` in [monorepo-template](https://github.com/niway-dev/monorepo-template)
+offers this stack as **Backend only — Hono + oRPC API**: it keeps `apps/server-hono` and
+`packages/i18n`, deletes web, mobile, `web-ui` and `tokens`, and generates the single-Worker
+deploy workflow.
