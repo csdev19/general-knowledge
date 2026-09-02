@@ -37,7 +37,7 @@ Patterns that span every layer and consumer.
 
 ## Decisions (ADRs)
 
-- **[decisions/adr-0001-effect-use-cases.md](./decisions/adr-0001-effect-use-cases.md)** — Adopting Effect-TS for application use cases to solve dependency injection, typed error channels, and dual-consumer wiring.
+- **[decisions/adr-0001-effect-use-cases.md](./decisions/adr-0001-effect-use-cases.md)** — Adopting Effect-TS for application use cases to solve dependency injection, typed error channels, and dual-consumer wiring. For the adoption decision itself and the writing patterns, see [effect/](../effect/).
 
 ---
 

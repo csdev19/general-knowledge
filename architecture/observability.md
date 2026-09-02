@@ -231,7 +231,7 @@ A useful progression for building this out incrementally:
 
 - A `/health` endpoint that verifies DB connectivity with a lightweight query (`SELECT 1`) and returns a degraded status if the DB is unreachable; monitor with an external uptime service.
 
-**Effect migration (long-term)**
+**Effect migration (long-term)** — see [effect/](../effect/) for whether and how far to adopt.
 
 - Replace `AppError` with `Data.TaggedError`; define `Layer`s for the DB client, auth session, and repositories.
 - Replace the `withErrorHandling` wrapper with Effect's runtime (handles the envelope automatically) and `logError` with `Effect.withSpan` + OpenTelemetry for native tracing. Function signatures then explicitly declare all possible errors and dependencies in their types.
