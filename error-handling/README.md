@@ -9,3 +9,7 @@ Read the docs in this order:
 3. **[API Response Types](./api-response-types.md)** — The `ApiResponse<T>` envelope shape used by every endpoint, including error and pagination metadata.
 4. **[Error Handlers](./error-handlers.md)** — Utilities that turn `Result` values into consistent thrown errors (`handleDatabaseResult`, `handleListDatabaseResult`, `handleMutationResult`, `handleResult`).
 5. **[Error Handling Overhaul](./error-handling-overhaul.md)** — A real-world retrospective: a centralized `withErrorHandling` wrapper, typed `AppError` errors, and structured JSON logging that keeps internal error details out of user-facing responses.
+
+---
+
+**Heavier alternative.** `Result` gives typed errors for almost nothing. When you also need dependency injection, interruption or resource safety, the trade-off is documented in [effect/why-effect.md](../effect/why-effect.md) — including why typed errors alone are not a reason to adopt Effect.
