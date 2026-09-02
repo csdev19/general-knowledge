@@ -1,93 +1,93 @@
-# Patrón de Backlog
+# Backlog Pattern
 
-_Cómo mantener una carpeta `backlog/` que es la fuente de verdad de "lo que viene", sin perder nunca el trabajo diferido._
+_How to keep a `backlog/` folder that is the source of truth for "what's coming", without ever losing deferred work._
 
-Un `backlog/` es una carpeta de documentación (no un tablero de tickets) donde vive todo el trabajo **planeado, propuesto o pausado que aún no está terminado**. Es el mapa de "lo que viene", con suficiente contexto en cada ítem para retomarlo sin re-investigar.
+A `backlog/` is a documentation folder (not a ticket board) where all **planned, proposed or paused work that is not finished yet** lives. It is the map of "what's coming", with enough context on each item to pick it back up without re-investigating.
 
-La idea central: cuando pospones una idea, una mejora o un análisis, **no se pierde**. Queda escrito con su contexto. Cuando lo retomás semanas después, no arrancás de cero.
+The core idea: when you postpone an idea, an improvement or an analysis, **it is not lost**. It stays written down with its context. When you come back to it weeks later, you do not start from zero.
 
-## Anatomía
+## Anatomy
 
 ```
 backlog/
-├── index.md              # El mapa: tabla con todos los ítems y su estado
-├── <feature-a>.md        # Un ítem = un archivo, con contexto para retomarlo
+├── index.md              # The map: a table with every item and its status
+├── <feature-a>.md        # One item = one file, with the context to resume it
 ├── <feature-b>.md
 └── ...
 ```
 
-- **`index.md`** — la tabla-mapa. Fuente de verdad de "qué sigue".
-- **Un ítem = un archivo** — cada ítem con sustancia gana su propio doc. Los ítems triviales (solo una idea ⚪) pueden vivir únicamente como fila del mapa, sin doc propio.
+- **`index.md`** — the map table. The source of truth for "what's next".
+- **One item = one file** — every item with substance earns its own doc. Trivial items (just an idea, ⚪) can live only as a row on the map, with no doc of their own.
 
-## Leyenda de estado
+## Status legend
 
-Emojis para escanear el estado de un vistazo:
+Emojis so you can scan status at a glance:
 
-| Emoji | Significado                                    |
-| ----- | ---------------------------------------------- |
-| 🟡    | En progreso (posiblemente pausado)             |
-| 🟢    | Listo para validar (mergeado / en prod)        |
-| 🔵    | Propuesto (analizado, aún no empezado)         |
-| ⚪    | Idea (sin análisis todavía)                    |
+| Emoji | Meaning                                  |
+| ----- | ---------------------------------------- |
+| 🟡    | In progress (possibly paused)            |
+| 🟢    | Ready to validate (merged / in prod)     |
+| 🔵    | Proposed (analyzed, not started yet)     |
+| ⚪    | Idea (no analysis yet)                   |
 
-Se puede extender con estados terminales (`✅ Decidido y cerrado`) o de seguimiento (`A vigilar`), pero estos cuatro son la base. Un ítem `✅` que ya está validado se **saca del mapa** y su aprendizaje se mueve al doc de feature/arquitectura correspondiente.
+It can be extended with terminal statuses (`✅ Decided and closed`) or watch statuses (`Keep an eye on`), but these four are the base. An item that is `✅` and already validated is **removed from the map**, and its learning moves into the matching feature/architecture doc.
 
-## Formato del mapa (tabla del index)
+## Map format (the index table)
 
-Cada fila es un ítem. Columnas mínimas: **Ítem · Área · Estado · Esfuerzo · Detalle (link)**.
+Each row is an item. Minimum columns: **Item · Area · Status · Effort · Detail (link)**.
 
 ```markdown
-| Ítem                             | Área      | Estado                          | Esfuerzo   | Detalle                  |
-| -------------------------------- | --------- | ------------------------------- | ---------- | ------------------------ |
-| **Nombre del ítem** (contexto)   | Pipeline  | 🟢 Mergeado (#12) · validar     | Medio      | [Ver](./mi-item)         |
-| Otro ítem más chico              | Editor    | 🔵 Propuesto                    | Bajo–Medio | [Ver](./otro-item)       |
-| Una idea suelta                  | Infra     | ⚪ Idea                         | Alto       | —                        |
+| Item                            | Area      | Status                       | Effort     | Detail             |
+| ------------------------------- | --------- | ---------------------------- | ---------- | ------------------ |
+| **Item name** (context)         | Pipeline  | 🟢 Merged (#12) · validate   | Medium     | [View](./my-item)  |
+| Another, smaller item           | Editor    | 🔵 Proposed                  | Low–Medium | [View](./other)    |
+| A loose idea                    | Infra     | ⚪ Idea                      | High       | —                  |
 ```
 
-- **Área** agrupa por dominio/subsistema (Pipeline, Editor, Infra, QA, DX...).
-- **Estado** incluye el emoji + una nota corta (número de PR, "validar en prod", etc.).
-- **Esfuerzo** es una estimación gruesa (`Bajo` / `Medio` / `Alto` / `Variado` / `—`).
-- **Detalle** enlaza al archivo del ítem, o `—` si no tiene doc propio.
+- **Area** groups by domain/subsystem (Pipeline, Editor, Infra, QA, DX...).
+- **Status** is the emoji + a short note (PR number, "validate in prod", etc.).
+- **Effort** is a coarse estimate (`Low` / `Medium` / `High` / `Mixed` / `—`).
+- **Detail** links to the item's file, or `—` if it has no doc of its own.
 
-## Formato de un ítem (un archivo)
+## Item format (one file)
 
-Cada ítem-archivo debe tener **lo justo para retomarlo sin re-investigar**: qué es, en qué estado quedó, qué se decidió, qué falta.
+Each item file needs **just enough to resume it without re-investigating**: what it is, what state it was left in, what was decided, what is missing.
 
 ```markdown
-# <Nombre del ítem>
+# <Item name>
 
-> **Estado: <emoji> <resumen de una línea>.** Dónde quedó, qué falta para cerrarlo.
-> Enlaces al spec/plan si existen.
+> **Status: <emoji> <one-line summary>.** Where it was left, what is missing to close it.
+> Links to the spec/plan if they exist.
 
-Uno o dos párrafos: qué problema resuelve y por qué importa.
+One or two paragraphs: what problem it solves and why it matters.
 
-## Qué se hizo / qué shipeó
+## What was done / what shipped
 
-| Pieza        | Qué hace                          |
+| Piece        | What it does                      |
 | ------------ | --------------------------------- |
 | ...          | ...                               |
 
-## Qué falta / cómo validar
+## What is missing / how to validate
 
-- [ ] Paso pendiente 1
-- [ ] Paso pendiente 2
+- [ ] Pending step 1
+- [ ] Pending step 2
 
-## Fuera de alcance (ítems separados)
+## Out of scope (separate items)
 
-- Cosa relacionada → enlace a su propio ítem del backlog.
+- Related thing → link to its own backlog item.
 ```
 
-Lo importante no es la plantilla exacta sino el principio: **el archivo tiene que dejar al próximo lector (o a vos en un mes) listo para actuar**, sin volver a investigar.
+What matters is not the exact template but the principle: **the file has to leave the next reader (or you, a month from now) ready to act**, with no re-investigation.
 
-## Cómo se usa
+## How it is used
 
-- Cada ítem que se empieza a trabajar pasa a 🟡 y, si tiene sustancia, gana su propio doc.
-- Al completar un ítem: mover el aprendizaje al doc de feature/arquitectura correspondiente y **quitarlo del mapa**.
-- Mantener **esfuerzo** y **estado** siempre actualizados — es la fuente de verdad de "qué sigue".
+- Every item that gets picked up moves to 🟡 and, if it has substance, earns its own doc.
+- When an item is completed: move the learning into the matching feature/architecture doc and **remove it from the map**.
+- Keep **effort** and **status** always up to date — it is the source of truth for "what's next".
 
-## Por qué ayuda
+## Why it helps
 
-- **Nunca se pierde trabajo diferido.** Toda idea o mejora pospuesta queda escrita con su contexto.
-- **Se retoma sin costo.** El contexto vive en el ítem, no en la cabeza de quien lo pausó.
-- **Se ve el estado de un vistazo.** El mapa con emojis dice qué sigue sin abrir nada.
-- **Separa "pensar" de "hacer".** Un ítem 🔵 propuesto ya tiene el análisis; empezarlo es solo ejecutar.
+- **Deferred work is never lost.** Every postponed idea or improvement stays written down with its context.
+- **Resuming is free.** The context lives in the item, not in the head of whoever paused it.
+- **Status is visible at a glance.** The map with its emojis says what is next without opening anything.
+- **It separates "thinking" from "doing".** A 🔵 proposed item already has the analysis; starting it is just execution.

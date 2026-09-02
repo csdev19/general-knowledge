@@ -1,74 +1,74 @@
-# Workflow de Specs y Plans
+# Specs and Plans Workflow
 
-_El flujo brainstorm → spec (diseño) → plan (implementación) → archivar, y cómo se conecta con el backlog._
+_The brainstorm → spec (design) → plan (implementation) → archive flow, and how it connects to the backlog._
 
-Dos carpetas hermanas sostienen todo el trabajo con sustancia:
+Two sibling folders hold all the work with substance:
 
 ```
 docs/
-├── specs/    # Documentos de diseño: QUÉ y POR QUÉ
-└── plans/    # Planes de implementación: CÓMO, paso a paso
+├── specs/    # Design documents: WHAT and WHY
+└── plans/    # Implementation plans: HOW, step by step
 ```
 
-Separar diseño de implementación evita mezclar "qué queremos y por qué" con "en qué orden tocamos los archivos". El spec se puede discutir y aprobar antes de escribir una sola línea de plan.
+Separating design from implementation avoids mixing "what we want and why" with "in what order we touch the files". A spec can be discussed and approved before a single line of plan is written.
 
-## El flujo
-
-```
-brainstorm  →  spec (diseño)  →  plan (implementación)  →  ship  →  archivar
-   (idea)       specs/YYYY-...     plans/YYYY-...          (PRs)   (mover aprendizaje)
-```
-
-1. **Brainstorm** — la idea nace, normalmente como ítem ⚪/🔵 en el [backlog](./backlog-pattern.md).
-2. **Spec (diseño)** — cuando la idea vale la pena, se escribe un doc de diseño en `specs/`. Define objetivo, no-objetivos, arquitectura y decisiones. Es lo que se revisa y aprueba.
-3. **Plan (implementación)** — a partir del spec aprobado, se escribe un plan en `plans/`: tareas concretas, orden, archivos a crear/tocar, checkboxes para trackear. Un spec grande puede partirse en varios planes numerados.
-4. **Ship** — se ejecuta el plan tarea por tarea (código + tests + docs). Los checkboxes marcan el avance. **Para ejecutar con agentes en paralelo**, el plan primero se convierte en entregables de backlog autosuficientes y queda superseded — ver [plan → backlog](./plan-to-backlog.md).
-5. **Archivar** — cuando shipeó: el aprendizaje duradero se mueve al doc de feature/arquitectura, el ítem sale del mapa del backlog, y el spec/plan quedan como registro histórico.
-
-## Convención de nombres
-
-Archivos con fecha al frente para orden cronológico natural:
+## The flow
 
 ```
-specs/YYYY-MM-DD-<topic>-design.md      # p.ej. 2026-06-28-version-gate-design.md
-plans/YYYY-MM-DD-<topic>.md             # p.ej. 2026-06-28-version-gate.md
+brainstorm  →  spec (design)  →  plan (implementation)  →  ship  →  archive
+   (idea)      specs/YYYY-...     plans/YYYY-...          (PRs)   (move the learning)
 ```
 
-- El **spec** lleva el sufijo `-design`.
-- El **plan** comparte fecha y topic con su spec, sin el `-design`.
-- Cuando un plan se parte en fases, se numeran: `...-video-editor-01-foundation.md`, `...-02-timeline.md`, etc.
-- La fecha es la de creación del doc, no la de ship.
+1. **Brainstorm** — the idea is born, usually as a ⚪/🔵 item in the [backlog](./backlog-pattern.md).
+2. **Spec (design)** — once the idea is worth it, a design doc goes into `specs/`. It defines the goal, the non-goals, the architecture and the decisions. This is what gets reviewed and approved.
+3. **Plan (implementation)** — from the approved spec, a plan goes into `plans/`: concrete tasks, order, files to create/touch, checkboxes to track progress. A large spec can be split into several numbered plans.
+4. **Ship** — the plan is executed task by task (code + tests + docs). The checkboxes mark progress. **To execute with agents in parallel**, the plan is first converted into self-sufficient backlog deliverables and becomes superseded — see [plan → backlog](./plan-to-backlog.md).
+5. **Archive** — once shipped: the durable learning moves into the feature/architecture doc, the item leaves the backlog map, and the spec/plan remain as a historical record.
 
-## Qué va en cada uno
+## Naming convention
 
-### Spec (`specs/`) — diseño
+Files with the date up front, for a natural chronological order:
 
-- **Encabezado**: título, fecha, branch, scope (qué apps/paquetes toca).
-- **Goal / Non-Goals**: qué se resuelve y, explícito, qué se deja afuera (diferido).
-- **Architecture**: el enfoque, el flujo de datos, las decisiones clave y su porqué.
-- **Files**: qué se crea y qué se modifica (a alto nivel).
+```
+specs/YYYY-MM-DD-<topic>-design.md      # e.g. 2026-06-28-version-gate-design.md
+plans/YYYY-MM-DD-<topic>.md             # e.g. 2026-06-28-version-gate.md
+```
 
-Responde **QUÉ** y **POR QUÉ**. No entra en el orden táctico de la implementación.
+- The **spec** carries the `-design` suffix.
+- The **plan** shares the date and topic with its spec, without the `-design`.
+- When a plan is split into phases, they are numbered: `...-video-editor-01-foundation.md`, `...-02-timeline.md`, etc.
+- The date is the doc's creation date, not the ship date.
 
-### Plan (`plans/`) — implementación
+## What goes in each
 
-- **Goal / Architecture / Tech Stack**: resumen ejecutable de una o dos líneas cada uno.
-- **Referencia al spec**: enlace al doc de diseño que lo origina.
-- **Convenciones a leer antes de empezar**: idioma del repo, reglas de commit, cómo correr tests, etc.
-- **Estructura de archivos**: crear/modificar, explícito.
-- **Tareas con checkboxes** (`- [ ]`): en orden, idealmente estilo TDD, para trackear avance y permitir ejecución agéntica.
+### Spec (`specs/`) — design
 
-Responde **CÓMO** y **EN QUÉ ORDEN**.
+- **Header**: title, date, branch, scope (which apps/packages it touches).
+- **Goal / Non-Goals**: what it solves and, explicitly, what is left out (deferred).
+- **Architecture**: the approach, the data flow, the key decisions and their rationale.
+- **Files**: what gets created and what gets modified (at a high level).
 
-## Cómo se conecta con el backlog
+It answers **WHAT** and **WHY**. It does not get into the tactical order of the implementation.
 
-- El **backlog** es el mapa de "lo que viene"; `specs/` y `plans/` son el trabajo detallado detrás de un ítem con sustancia.
-- Un ítem del backlog que arranca enlaza a su spec y su plan (`Design: /specs/...` · `Plan: /plans/...`).
-- Al shipear, el ítem se marca 🟢/✅ y sale del mapa; el spec/plan quedan archivados como registro.
+### Plan (`plans/`) — implementation
 
-## Por qué ayuda
+- **Goal / Architecture / Tech Stack**: an executable summary, one or two lines each.
+- **Reference to the spec**: a link to the design doc it comes from.
+- **Conventions to read before starting**: the repo's language, commit rules, how to run tests, etc.
+- **File structure**: create/modify, explicitly.
+- **Tasks with checkboxes** (`- [ ]`): in order, ideally TDD-style, to track progress and allow agentic execution.
 
-- **Diseño antes que código**: el spec se aprueba sin comprometer implementación.
-- **Ejecución trackeable**: los checkboxes del plan hacen visible el avance y permiten retomar (o delegar a un agente) sin perder el hilo.
-- **Registro histórico**: fecha + topic dejan un rastro cronológico de decisiones.
-- **Encaja con el backlog**: idea → spec → plan → ship es el ciclo de vida completo de cada ítem.
+It answers **HOW** and **IN WHAT ORDER**.
+
+## How it connects to the backlog
+
+- The **backlog** is the map of "what's coming"; `specs/` and `plans/` are the detailed work behind an item with substance.
+- A backlog item that gets started links to its spec and its plan (`Design: /specs/...` · `Plan: /plans/...`).
+- On ship, the item is marked 🟢/✅ and leaves the map; the spec/plan stay archived as a record.
+
+## Why it helps
+
+- **Design before code**: the spec is approved without committing to an implementation.
+- **Trackable execution**: the plan's checkboxes make progress visible and let you resume (or delegate to an agent) without losing the thread.
+- **Historical record**: date + topic leave a chronological trail of decisions.
+- **It fits the backlog**: idea → spec → plan → ship is the full lifecycle of every item.
