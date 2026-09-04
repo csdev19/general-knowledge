@@ -16,7 +16,7 @@ Reusable architecture patterns for building a local-first desktop app with Elect
 
 ## Native integration
 
-- [permissions-and-onboarding.md](./permissions-and-onboarding.md) — Cross-platform screen/mic/camera permission checks and requests (macOS quirks especially), split into pure renderer logic + thin main-process wiring, and the first-run onboarding flow.
+- [permissions-and-onboarding.md](./permissions-and-onboarding.md) — The OS gates behind capture (mic, screen, **system audio**, camera) per platform and which ones Electron can actually check; the macOS backend choice that decides which permission system audio needs; dev-mode TCC attribution to the terminal; re-read-on-focus and "the attempt is the truth"; the first-run onboarding flow; and how to prove it all with a probe and a self-skipping E2E.
 - [library-vault.md](./library-vault.md) — Local-first storage: files as the source of truth, JSON metadata sidecars, a configurable vault directory, and a privileged streamable media protocol for playback.
 
 ## Distribution & product
