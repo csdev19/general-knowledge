@@ -19,6 +19,7 @@ patterns, rationale, pipeline shapes, and commands are preserved.
 | [ci-per-project-pipelines.md](./ci-per-project-pipelines.md)| Universal compile check plus path-filtered per-project test suites; why docs-only PRs still run the formatter. |
 | [release-automation.md](./release-automation.md)           | **Why** release-please: manifest mode, drift-free versioning, and the closure rule that decides how many version lines a repo may have. |
 | [release-please-playbook.md](./release-please-playbook.md) | **How**: pick the topology, drop in the four files, wire the PAT, retire the `production` branch, verify. Start here when adopting it in a repo. |
+| [git-hooks-lefthook-playbook.md](./git-hooks-lefthook-playbook.md) | **Git hooks with lefthook**: the decision (what it gives beyond a library swap, and that speed is not it), the hook contract (commit fixes · push verifies · commit-msg guards release-please · CI backstops), the `lefthook.yml` to copy, and the husky + lint-staged migration with the `core.hooksPath` trap. |
 | [testing-strategy.md](./testing-strategy.md)               | Layered testing model (unit → component → integration → E2E) overview.      |
 
 ### testing/

@@ -102,16 +102,13 @@ Package manager: **Bun** (`packageManager: "bun@1.3.4"`). Build orchestration: *
 - **Linting:** [`oxlint`](https://oxc.rs) (`bun run lint`).
 - **Formatting:** [`oxfmt`](https://oxc.rs) (`bun run format`, or `format:tracked` to format only
   git-tracked source files).
-- **Git hooks:** [`husky`](https://typicode.github.io/husky/) (`prepare: "husky"`) +
-  [`lint-staged`](https://github.com/lint-staged/lint-staged) runs `oxlint` + `oxfmt --write` on
-  staged JS/TS files and `oxfmt --write` on staged JSON/CSS on every commit:
-
-```json
-"lint-staged": {
-  "*.{js,jsx,cjs,mjs,ts,tsx,cts,mts}": ["oxlint", "oxfmt --write"],
-  "*.{json,jsonc,css}": ["oxfmt --write"]
-}
-```
+- **Git hooks:** [`lefthook`](https://lefthook.dev) (`prepare: "lefthook install"`), declared in
+  one `lefthook.yml` at the root. `pre-commit` formats and lints the staged files and re-stages
+  the fixes; `pre-push` runs the same read-only `oxlint` + `oxfmt --check` that CI runs;
+  `commit-msg` rejects messages release-please cannot parse. The config to copy, the contract, and
+  the migration from the previous husky + lint-staged setup live in
+  [git-hooks-lefthook-playbook.md](./git-hooks-lefthook-playbook.md). Repos created before
+  September 2026 still carry husky + lint-staged; migrate them on their next touch.
 
 ## Notes
 

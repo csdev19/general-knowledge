@@ -55,8 +55,11 @@ if the local hook ran.
 
 ## The local pre-push hook
 
-- Commit a hook the whole team inherits: `.githooks/pre-push` → runs `bun run verify`.
-  Enable with `git config core.hooksPath .githooks` (documented in the repo README/setup).
+- Commit a hook the whole team inherits, declared in `lefthook.yml` and installed by
+  `bun install` — see the [lefthook playbook](../monorepos/git-hooks-lefthook-playbook.md).
+  Its default `pre-push` runs the read-only part of `verify` (lint + format check); add
+  types/build to the hook only when CI type failures become the common reason PRs go red.
+  Do not hand-roll `.githooks/` + `core.hooksPath`: the playbook explains why that drifted.
 - **Pre-push, not pre-commit** — pre-commit fires on every tiny commit and gets bypassed;
   pre-push fires once, when you actually share.
 - Keep it fast (turbo cache) or it gets skipped.
@@ -175,7 +178,7 @@ red-merges (the failure mode of "no protection": anything can land on the one ma
 
 ## Checklist to adopt this in a repo
 - [ ] Add `verify` script (types + lint + format + build; NO tests) to root `package.json`.
-- [ ] Add `.githooks/pre-push` running `bun run verify`; document `core.hooksPath`.
+- [ ] Add `lefthook.yml` with the `pre-push` job (and `commit-msg` if release-please is used) per the [lefthook playbook](../monorepos/git-hooks-lefthook-playbook.md).
 - [ ] PR workflow: run `verify` only, cached; drop tests from PR.
 - [ ] Tag workflow(s): build + tests + native builds + e2e + security + deploy + migrate.
 - [ ] Turbo/bun cache + `cancel-in-progress` + `paths` on the surviving jobs.
