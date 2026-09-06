@@ -31,7 +31,7 @@ Two layers:
 | [mobile/](./mobile/) | Expo / React Native: structure + shared domain, **dev builds & Metro** (when to rebuild, emulator connection), **build & install** (debug/release × profile, `run:*` vs EAS, one install per environment, where env vars actually travel, **+ a copy-paste kit with the full scripts**), **Google Maps** (dev build, key, Maps SDK Android + billing, SHA-1) and **Android 15/16 edge-to-edge** (the grey screen from `KeyboardAvoidingView`, and why the emulator cannot reproduce it) |
 | [desktop/](./desktop/) | Electron: main/renderer/preload, typed IPC, native permissions, local-first vault, media pipeline, distribution |
 | [infra/](./infra/) | Domains, DNS and edge routing: **migrating a domain to Cloudflare Workers** — the inherited parking records that break the deploy, apex vs `www`, and the checklist of everything a new origin invalidates (auth, OAuth, CORS, deep links) |
-| [monorepos/](./monorepos/) | Turborepo + Bun workspaces, CI/CD per project, PR checks, release-please, testing strategy |
+| [monorepos/](./monorepos/) | Turborepo + Bun workspaces, CI/CD per project, PR checks, release-please, **git hooks with lefthook** (the hook contract and the husky migration), testing strategy |
 | [packages/](./packages/) | The `infra-*` convention, build strategy (src vs dist), repository contracts, a package case study |
 | [conventions/](./conventions/) | **English only**, constants/enums-as-const, schemas-first, **backlog pattern**, specs+plans workflow, **agent delegation** |
 
@@ -70,6 +70,10 @@ See **[stacks/](./stacks/)** for the assembly guides:
 - **[Release automation](./monorepos/release-please-playbook.md)** — release-please from day 1:
   `main` is integration, production is a tag, no `production` branch. Includes the closure rule
   that decides how many version lines a repo may have.
+- **[Git hooks with lefthook](./monorepos/git-hooks-lefthook-playbook.md)** — one `lefthook.yml`
+  per repo: commit fixes what you commit, push verifies what you share with the same read-only
+  commands as CI, commit-msg rejects what release-please cannot parse. Includes the migration from
+  husky + lint-staged and why the gain is the contract, not speed.
 - **[Agent delegation](./conventions/ai-agent-delegation.md)** — the two modes
   (fast/expensive vs slow/cheap), which roles never get cheaper, and the measured evidence
   that what makes delegated work slow is the structure of the process, not the model tier.
