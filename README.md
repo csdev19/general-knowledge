@@ -72,3 +72,7 @@ Ver **[stacks/](./stacks/)** para las guías de ensamblaje:
 ---
 
 _El diseño de este hub está en [`docs/specs/2026-07-10-general-knowledge-hub-design.md`](./docs/specs/2026-07-10-general-knowledge-hub-design.md)._
+
+## Product legal documents
+
+- [Terms, privacy, Cloud and cookies templates](./legal/README.md) — reusable starting points for evolving products, with adaptation guidance.
