@@ -13,3 +13,7 @@ pipelines ship to.
 | Doc | Summary |
 | --- | --- |
 | [custom-domain-migration.md](./custom-domain-migration.md) | Pointing a domain at a Cloudflare Worker: imported registrar parking records block `custom_domain` deploys (522/525 + an empty `/domains/records` error), how to diagnose it with `dig`, which records must survive, apex vs `www`, and the 8-item checklist of things a new origin breaks (auth trusted origins, OAuth redirects, CORS, deep links…). |
+
+## Email
+
+- [Transactional email for Niway apps](./transactional-email.md) — shared Resend sender domain, app-specific addresses, scope and the correction to earlier migration advice.
