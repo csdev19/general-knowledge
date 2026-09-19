@@ -44,15 +44,21 @@ installed and up to date and still be logged out, or pointed at a project you
 lack access to. Prove it with one real operation:
 
 ```bash
-if infisical secrets --env=dev --recursive --silent >/dev/null 2>&1; then
-  ok "can read the dev environment"
+if infisical secrets --env=dev --recursive --tags api-runtime --silent >/dev/null 2>&1; then
+  ok "can read the selected dev scope"
 else
-  fail "cannot read the dev environment — run: infisical login"
+  fail "cannot read the selected dev scope — check login and access"
 fi
 ```
 
+Replace `api-runtime` with a consumer that exists in the project and is permitted
+for this developer. A successful fetch proves connectivity and that request's
+access, not that all required keys were returned: empty or incomplete tag matches
+need separate consumer-contract validation. For first-time setup, run the checker
+for installation guidance, log in, then rerun it for the access check.
+
 **One check that proves the chain beats two that can disagree.** The first draft
-here probed for a login session *and* read a secret, and cheerfully printed
+here probed for a login session _and_ read a secret, and cheerfully printed
 "not logged in" directly above "can read the dev environment" — the session
 probe used the wrong command. A check that can be wrong in a way the real
 operation contradicts is worse than no check.
@@ -94,7 +100,8 @@ Details that matter:
   fail the run.
 - **Parse versions leniently.** Tools disagree about where the number sits —
   take the first version-shaped token on the first line and compare with
-  `sort -V`.
+  `sort -V` where supported. If a required tool has a minimum version and the
+  version cannot be parsed, fail with a diagnostic rather than reporting success.
 - **Make it idempotent and fast**, so re-running it is free and people do.
 - **Test the failure path**, not just the happy one. Run it with a stripped
   `PATH` and read the output as a newcomer would.
@@ -121,3 +128,5 @@ the fix is one line in the array. Nobody has to notice a paragraph went stale.
 
 - [Infisical secrets playbook](../infra/infisical-secrets.md) — the first tool
   this pattern was built to cover.
+- [Environment inventory and README contract](../infra/environment-inventory.md) —
+  link the setup checker to the project's actual key and consumer requirements.

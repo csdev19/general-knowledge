@@ -3,8 +3,15 @@
 > Status: **evaluated and set aside** (2026-09-18). `invisible-assistant` runs
 > it; `kaipu-record-monorepo` started adopting it and stopped partway, keeping
 > [Infisical alone](./infisical-secrets.md). This doc exists so the decision is
-> not re-litigated from scratch, and so the parts that *are* worth knowing
+> not re-litigated from scratch, and so the parts that _are_ worth knowing
 > survive.
+
+**Documentation boundary:** setup, consumer tags, Worker files, build/signing
+delivery, and CI migration belong to the standalone
+[Infisical playbook](./infisical-secrets.md). Its
+[README and variable-inventory contract](./environment-inventory.md) applies
+whether or not Varlock is used. The snippets below document the evaluated
+Varlock integration; they are not required Infisical onboarding steps.
 
 ## What varlock adds on top of Infisical
 
@@ -23,8 +30,8 @@ CORS_ORIGIN=forEnv(production, "https://example.com", "http://localhost:3001")
 
 Genuinely useful properties:
 
-- **A committed declaration of what env exists** that cannot silently drift from
-  the code, unlike `.env.example`.
+- **A committed declaration of what env exists** that can be validated and typed,
+  unlike a purely illustrative `.env.example`; consumer coverage still needs checks.
 - **Type validation and generated TS types** (`@generateTsTypes`).
 - **`varlock scan`** — leak detection for secrets committed in plaintext.
 - **Mixed resolution** — secrets from Infisical, non-secrets as literals, in one
@@ -46,10 +53,10 @@ adopting: if there is no validation layer, varlock's schema is worth much more.
 **2. Cloudflare Workers need two different integrations.** Which one depends on
 how the app runs:
 
-| App shape | Integration |
-| --- | --- |
+| App shape                    | Integration                                                                       |
+| ---------------------------- | --------------------------------------------------------------------------------- |
 | `wrangler` directly, no Vite | `@varlock/cloudflare-integration/init`, which re-exports `ENV` from `varlock/env` |
-| `@cloudflare/vite-plugin` | `varlockCloudflareVitePlugin()` |
+| `@cloudflare/vite-plugin`    | `varlockCloudflareVitePlugin()`                                                   |
 
 Dev injection happens over a named pipe. In a monorepo with both shapes this is
 the most fragile part of the stack, and it is the cost that finally outweighed
@@ -92,8 +99,9 @@ Versions that installed and ran cleanly together: `varlock` 1.19.0,
   local, some literal — and the `forEnv()` switch earns its complexity.
 - No Cloudflare Workers, or only one Worker shape.
 
-If none of those hold, [Infisical alone](./infisical-secrets.md) does the same
-job with a fraction of the machinery.
+If none of those hold, [Infisical with the existing runtime schemas](./infisical-secrets.md)
+can meet the project's delivery and validation needs with fewer integrations.
+It does not automatically provide Varlock's scanning or generated types.
 
 ## References
 
