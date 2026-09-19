@@ -13,7 +13,8 @@ pipelines ship to.
 | Doc | Summary |
 | --- | --- |
 | [custom-domain-migration.md](./custom-domain-migration.md) | Pointing a domain at a Cloudflare Worker: imported registrar parking records block `custom_domain` deploys (522/525 + an empty `/domains/records` error), how to diagnose it with `dig`, which records must survive, apex vs `www`, and the 8-item checklist of things a new origin breaks (auth trusted origins, OAuth redirects, CORS, deep links…). |
-| [infisical-varlock-secrets.md](./infisical-varlock-secrets.md) | Secrets/env playbook: Infisical as the single value store, committed varlock `.env.schema` files as the declaration layer, machine identities (Universal Auth locally, OIDC in CI so GitHub Secrets end up empty), secret-path layout by consumer, Cloudflare `varlock-wrangler` sharp edges, migration order for an existing repo, and the traps found in the first adoption. |
+| [infisical-secrets.md](./infisical-secrets.md) | **The accepted default for secrets.** Infisical as the single value store, fetched at start-up; no hand-maintained `.env` anywhere. Covers the env-slug-vs-name trap, organising paths by the system a credential unlocks (and what paths actually buy you), the two tests for "is this really a secret", the `run` vs generated-file split that Cloudflare Workers force, OIDC in CI, and the migration traps. |
+| [varlock-evaluation.md](./varlock-evaluation.md) | varlock as a declaration layer on top of Infisical: what it adds, and the three reasons it is **not** the default — an existing zod env module already provides the schema, Cloudflare needs two different integrations, and the syntax outruns its docs. Records what was verified against 1.19.0, and when it is still worth reaching for. |
 
 ## Email
 
