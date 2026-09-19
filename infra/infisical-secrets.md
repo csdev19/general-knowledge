@@ -1,230 +1,290 @@
-# Infisical: secrets and env playbook
+# Infisical: secrets and environment playbook
 
-> Adoption status: **accepted default.** Applied to `kaipu-record-monorepo`
-> (2026-09-18), where it replaced dotenvx. `invisible-assistant` runs the
-> varlock variant — see [varlock-evaluation.md](./varlock-evaluation.md) for
-> why that extra layer is no longer the default.
+> Status: **accepted default, independent of Varlock.** Last reviewed: 2026-09-18.
+> Infisical stores values; existing runtime schemas validate them. Varlock is an
+> optional declaration layer evaluated [separately](./varlock-evaluation.md), not
+> a prerequisite for this playbook.
 
-One source of truth for secret **values** (Infisical), fetched at start-up by
-the scripts that need them. No hand-maintained `.env` files anywhere.
+Use one authoritative store **per value and environment**, with consumer-scoped
+delivery. A local migration does not imply production CI has migrated. Document
+the actual source of each consumer until the transition is complete.
 
-**The golden rule:** the repo never contains secrets — not encrypted, not in the
-clear. Where a `.env` exists it is **generated** and gitignored, and editing it
-is always a mistake because the next start overwrites it.
+**The rule:** commit names, contracts, and non-sensitive metadata, never credential
+values. Generated environment files are gitignored, owner-only, and not edited
+by hand. A secret-store project ID is metadata; a credential that authenticates
+to that project is not.
+
+## Start with the documentation contract
+
+Every adopting repository needs three links in its README:
+
+1. Its **variable inventory** in the project's documentation site: every consumed
+   variable, required/default behavior, folder/tag, source, and read stage.
+2. Its **runtime/command guide**: how development, operators, builds, and releases
+   receive values, including override semantics and known integration gaps.
+3. **This playbook** for reusable conventions.
+
+Use the [environment inventory template](./environment-inventory.md). Keep actual
+project key names in that project; do not copy its full table into this hub or
+maintain a second copy in the README. The inventory should include optional,
+test, signing, and deployment values, not just the minimum that boots an app.
 
 ## Mental model
 
-| Piece | What it does | Where it lives |
-| --- | --- | --- |
-| Infisical | Stores secret values, per project and per environment | Cloud (app.infisical.com) |
-| `.infisical.json` | Links the repo to a project. Holds a workspace id, not a credential | Committed |
-| Infisical CLI | Fetches values and injects them into a process | A global tool, declared not installed — see [tool-doctor-pattern](../conventions/tool-doctor-pattern.md) |
-| Your login / a machine identity | How the CLI authenticates | Local session, or OIDC in CI |
+| Piece                    | Responsibility                                                  | Where it lives                                                                                |
+| ------------------------ | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Infisical                | Versioned values and access policies by project/environment     | Chosen cloud region or self-hosted instance                                                   |
+| `.infisical.json`        | Project link and optional instance metadata, no credentials     | Committed                                                                                     |
+| CLI                      | Fetches the selected values for one operation                   | One supported installation contract; see [tool doctor](../conventions/tool-doctor-pattern.md) |
+| Login / machine identity | Authenticates the caller                                        | Local session or CI identity, outside app configuration                                       |
+| Runtime schema           | Types and validates required values once delivered              | Existing code, such as a Zod env module                                                       |
+| Inventory                | Explains each key's owner, consumers, defaults, and propagation | Project docs, linked from README                                                              |
+| Adapter/wrapper          | Selects a source and consumer, bridges runtime boundaries       | Project tooling, covered by contract tests                                                    |
 
-## Project setup (once per product)
+Keep the existing schema if it already works. An inventory documents that schema
+and its other consumers; neither prose nor a tag filter replaces validation.
 
-1. Create the project — one per **product**, not one global.
-2. Load secrets per environment. Import an existing `.env` from the UI, or
-   `infisical secrets set KEY=value --env=dev --path=/server`.
-3. `infisical init` in the repo root writes `.infisical.json`. Commit it: it
-   contains only the workspace id, so a fresh clone points at the right project
-   with no setup.
+## Project and developer setup
 
-### Environment slugs are not environment names
+1. Create one project per product and explicit environment slugs such as `dev`,
+   `staging`, and `prod`. A UI display name such as "Development" is not the slug.
+2. Inventory consumers and classify keys before importing values. Record which
+   CI/release paths still use another store.
+3. Set up folders, consumer tags, and identity permissions. Load values through an
+   approved UI/CLI path that does not leave credentials in shell history or logs.
+4. Commit `.infisical.json`. Select the correct instance/region; do not assume
+   every organization uses the default US cloud endpoint.
+5. Declare the CLI in the tool doctor. With a global-tool policy, do not also
+   retain a competing workspace CLI that can shadow it during package scripts.
+6. Developer flow: install dependencies, run the doctor for missing-tool guidance,
+   `infisical login`, then rerun the doctor to validate access. An initial access
+   failure before login is expected, not a dependency-install failure.
 
-The UI shows "Development"; the API wants `dev`. Passing the display name gives
-a 404 that reads like a permissions problem:
+The doctor checks rather than installs. Verify its probe from the actual project
+directory with a permitted narrow consumer; a readable project does not prove all
+required keys exist or that the application receives them.
 
-```
-Message: Environment with slug 'development' not found
-```
+## Two axes: folders for risk, tags for consumers
 
-Defaults are `dev`, `staging`, `prod`. Check Project Settings → Environments if
-unsure. This cost real time in the Kaipu adoption — check it first.
+Folders answer **"what authority or exposure does this value represent?"** Tags
+answer **"which app or operation needs it?"** Each value has one home and can
+have multiple consumers. Do not duplicate a credential merely because two apps
+need it, and do not infer that two distinct authorities should share a credential
+just because their environment-variable names match.
 
-### Organise by what a credential unlocks
+| Example folder | Intended contents / concern                                                     |
+| -------------- | ------------------------------------------------------------------------------- |
+| `/public`      | Non-credential configuration; not necessarily suitable for public publication   |
+| `/database`    | Database credentials; scope actual roles to required access                     |
+| `/cloudflare`  | Cloud/provider credentials; distinguish deploy authority from storage authority |
+| `/auth`        | Session-signing or authentication secrets                                       |
+| `/email`       | Mail-provider credentials                                                       |
+| `/signing`     | Release signing/notarization material                                           |
 
-Group by the **external system a credential opens**, not by the app that happens
-to use it. Shared systems get their own path; what stays in an app path is
-genuinely that app's own. Every credential then exists in exactly one place, so
-rotation has exactly one target.
+These are examples, not a mandatory six-folder taxonomy. Split further when
+permissions, owners, or rotation consequences differ. A one-key folder is useful
+when it represents a genuinely different authority. Record a short description
+of what a leak enables and where to rotate the credential.
 
-| Path | Contents |
-| --- | --- |
-| `/cloudflare` | Account id, R2 keys, deploy token |
-| `/database` | `DATABASE_URL` (+ `TEST_DATABASE_URL`) |
-| `/<app-name>` | That app's own: session secret, analytics key, mail key |
+Consumer tags should distinguish runtime and release stages, for example
+`api-runtime`, `web-runtime`, `desktop-dev`, `database-tools`, `desktop-signing`,
+and `deploy-api`. **Do not tag signing keys for ordinary desktop development.**
+Libraries are generally not fetch consumers; the executable using them is.
 
-Root holds non-secret per-environment config.
+### Selection is not authorization
 
-**Resist the urge to file everything.** Folders of one or two variables are
-filing for its own sake. In the Kaipu adoption five folders collapsed to four
-once R2 was recognised as part of Cloudflare.
+`--tags api-runtime` limits a particular fetch. The logged-in identity may still
+have authority to request other tags or paths. Configure environment/path/tag
+restrictions in Infisical's permission policy and test denied reads as well as
+allowed ones. Restrict who can change tags and values, too.
 
-**What paths actually buy you.** The usual argument is per-path access control,
-but that benefit is often *deferred*: the strong isolation comes from the
-environment boundary — a laptop identity reads `dev`, CI reads `prod`. If every
-CI workflow shares one GitHub Environment they produce an identical OIDC subject
-and cannot be told apart by identity, however the paths are drawn. Adopt paths
-for organisation and to keep a future split cheap, not on the belief that they
-are isolating anything today.
+Development-scoped identities should not carry production authority. Credential
+permissions at the actual database, storage, deploy, and signing providers matter
+as much as Infisical read permissions. Renaming a folder does not narrow a token.
 
-### What does NOT belong in Infisical
+### Configuration is not automatically a secret
 
-Only what grants access. URLs, flags, labels, bucket names and account
-identifiers are config, not credentials.
+URLs, feature labels, bucket names, account IDs, and client ingestion keys can be
+non-secret configuration. Keep constants in code when changing them should be
+reviewed as code; use `/public` for centrally managed environment-specific values
+when that operational choice is useful. Record which source was chosen.
 
-Two tests settle most arguments:
+Reading a config value may grant no authority while **writing** it changes access
+or routing. An admin user-ID allowlist is the clearest example. Do not treat a
+`/public` label as permission to publish user identifiers or grant everyone write
+access. Never use a personal/admin analytics API key where an embedded client
+ingestion key is expected.
 
-- **Is it already committed in plaintext?** If a workflow hardcodes it, storing
-  it as a secret protects nothing. Kaipu had `R2_BUCKET: kaipu-bucket` written
-  literally in a release workflow while also keeping it as a GitHub Secret.
-- **Does keeping it in Infisical buy operational flexibility?** Usually not.
-  Worker vars resolve at deploy time and desktop vars are inlined at build time,
-  so changing a value in Infisical does nothing until the next deploy or
-  rebuild — exactly what a committed literal already requires. Meanwhile the
-  value stops appearing in pull-request diffs.
+Keeping root empty can make accidental non-recursive root exports return nothing.
+It is not an access-control boundary: recursive unfiltered reads still traverse
+the project. Require consumer selection and validate expected keys.
 
-Roughly half of what a project treats as secret turns out to be config. In Kaipu
-it was 15 of 32 variables.
+## Delivery depends on the consumer runtime
 
-## Wiring it up
+### Process environment
 
-Two mechanisms. Which one you need depends on how the consumer reads its env —
-and this is the decision that shapes the whole migration.
-
-### `infisical run` — anything reading `process.env`
+Use an explicit consumer filter:
 
 ```bash
-infisical run --env=dev --recursive -- <command>
+infisical run --env=dev --recursive --tags api-runtime -- <command>
 ```
 
-Covers repo-root scripts, `vite dev`, test runners, and **Vite-based builds
-including Electron**: Vite's `loadEnv` reads `process.env` *after* the `.env`
-files and lets it win, so prefixed variables (`VITE_*`, `MAIN_VITE_*`) are
-picked up with no integration needed. Verified in
-`vite/dist/node/chunks/config.js`:
+An explicit `--path` is also appropriate for an operation confined to one folder.
+Recursive reads are acceptable **with a deliberate filter**, not as the default
+way to hand an entire project to every process. Pin/test CLI behavior, including
+imports and personal overrides, before relying on exact results.
 
-```js
-for (const [key, value] of Object.entries(parsed))   // .env files first
-  if (prefixes.some(p => key.startsWith(p))) env[key] = value;
-for (const key in process.env)                        // process.env second — wins
-  if (prefixes.some(p => key.startsWith(p))) env[key] = process.env[key];
+Validate required keys after selection. A filter that matches nothing, or misses
+one untagged required variable, need not cause a fetch error. A nonempty result
+is not proof of a complete consumer contract. Reject unexpected duplicate names
+when flattening multiple folders into one process namespace.
+
+### Cloudflare Worker bindings
+
+A Worker reads bindings, not arbitrary parent-process environment variables.
+This applies both to direct `wrangler dev` and SSR with `@cloudflare/vite-plugin`.
+Default Wrangler dev loading uses `.env`/`.dev.vars`; wrapping the Vite host
+alone does not establish that server-side Worker values are present.
+
+For a generated-file adapter, use this contract:
+
+1. Fetch only the selected consumer's values with an explicit format.
+2. On CLI versions such as `0.43.132`, `export` has no `--recursive`; enumerate
+   folders and apply the same tag filter to each. Keep that list in one place.
+3. Stage output in a unique owner-only temporary file in the destination
+   directory. Do not truncate the active file before all fetches succeed.
+4. Validate required keys, collisions, and expected scope without logging values.
+5. Replace the destination atomically after success, clean up on failure, and
+   define concurrent-writer behavior. `install -m 600` restricts permissions but
+   is not by itself an atomic-rename or concurrency guarantee.
+6. Detect competing legacy files. Wrangler can prefer `.dev.vars` over `.env`;
+   Vite/Bun/mode-specific files can add their own precedence.
+7. Verify a synthetic binding **inside the Worker**, including its Node
+   compatibility surface if code reads `process.env` there.
+
+A representative single-folder export is:
+
+```bash
+infisical export --env=dev --path=/database --tags api-runtime --format=dotenv --silent
 ```
 
-The discipline this imposes: names in Infisical must carry the **exact prefix**
-the bundler expects. A mismatched prefix is ignored silently — a mute failure,
-not a loud one. Verify by grepping the built bundle for an expected value, not
-by a green exit code.
+It writes values to stdout: use only with synthetic fixtures or redirect through
+the protected adapter. It is not a diagnostic command to paste into an issue.
+The project must provide and test the adapter; this playbook does not imply any
+named shell helper already implements all guarantees above.
 
-### A generated file — for Cloudflare Workers
+### Build-time configuration and signing
 
-A Worker reads **bindings**, not the parent process environment, so injecting
-into `wrangler`'s process does not reach the Worker. Wrangler populates bindings
-from a file, and modern versions read `.env` as well as `.dev.vars`
-(`--env-file <path>` points at an arbitrary one).
+Vite/electron-vite inline supported public prefixes at build time. Existing
+`process.env` values normally take precedence over dotenv file values in Vite,
+but prefix sets depend on the bundler/process. Verify the exact configured
+prefixes and inspect a public sentinel in the output, not just the build exit.
 
-```json
-"env:pull": "infisical export --env=dev --path=/ --silent > .env && infisical export --env=dev --path=/database --silent >> .env",
-"dev": "bun run env:pull && wrangler dev"
-```
+- Builds consume an explicitly selected environment; do not hide a forced `dev`
+  fetch inside a generic production-capable `build` command.
+- Pass backend credentials to neither desktop/browser builds nor their dev
+  processes. Never put a sensitive credential under an embedded public prefix.
+- Supply signing secrets to the actual packaging/signing process. A completed
+  child's injected environment does not propagate back to its parent or sibling.
+- Document file transformations: a base64 Apple key in CI becomes a temporary
+  `.p8` path, not a literal key string passed as a filename.
+- Resolve and hash approved public config before a cacheable build. Fetching it
+  inside a Turbo task is too late to affect that task's cache key. Track shared
+  wrapper inputs and actual outputs, or disable the affected cache temporarily.
+- Restarting an installed app cannot replace its compiled endpoint. Rebuild,
+  publish, and update; runtime Worker values have a different propagation path.
 
-**`infisical export` has no `--recursive` flag — only `infisical run` does.** So
-exporting across several paths means one invocation per path, concatenated. This
-asymmetry is not documented anywhere obvious and is the most surprising thing in
-the CLI.
+## Precedence and explicit source selection
 
-Prefer writing the generated file somewhere it cannot be mistaken for
-hand-maintained config. Writing it to the app's normal `.env` path works and is
-the smallest change, but six months later nobody remembers which files are
-generated.
+Infisical CLI `0.43.132` copies inherited values and then overwrites same-name
+keys with fetched values. This differs from dotenvx's usual non-overriding mode.
+`--secret-overriding` concerns personal versus shared Infisical secrets, **not**
+preserving a shell-supplied `DATABASE_URL`.
 
-## CI
+Define an explicit supplied-environment mode for operator and CI commands, and
+test both paths. A project's `SKIP_INFISICAL=1` convention is one possible adapter
+interface, not an Infisical CLI feature. Document the exact syntax that exists
+in that project and validate the required consumer keys in either mode.
 
-Use the official action with OIDC, so no long-lived secret lives in GitHub:
+`CI` should describe execution context, not ambiguously select a database target.
+If a wrapper treats every nonempty value as true, `CI=false` and `CI=0` also
+bypass fetching; document that actual behavior until corrected. Never suggest a
+production override that silently changes target. Verify the intended database
+identity with a non-mutating operation before any operator write.
 
-```yaml
-permissions: { id-token: write, contents: read }
-steps:
-  - uses: Infisical/secrets-action@v1
-    with:
-      method: oidc
-      identity-id: <IDENTITY_ID>
-      project-slug: <project-slug>
-      env-slug: prod
-      secret-path: /server
-```
+## CI and migration boundaries
 
-OIDC machine identity configuration:
+PR checks should remain credential-free when their purpose only needs placeholders
+or synthetic fixtures. Their success does not validate a live secret integration.
+Production releases can use OIDC with scoped machine identities instead of a
+long-lived bootstrap secret. Follow the current
+[Infisical GitHub Actions documentation](https://infisical.com/docs/integrations/cicd/githubactions),
+pin the reviewed action revision, and verify its path/filter behavior rather
+than assuming CLI tags map identically to action inputs.
 
-| Field | Value |
-| --- | --- |
-| Issuer | `https://token.actions.githubusercontent.com` |
-| Audience | `https://github.com/<org-or-user>` |
-| Subject | `repo:<owner>/<repo>:environment:<name>` |
+OIDC trust must bind the intended repository and deployment context. A job using
+a GitHub Environment normally has subject
+`repo:<owner>/<repo>:environment:<name>`, replacing the ordinary branch subject.
+Workflows sharing that Environment share that subject; use separate environments
+or supported additional claims/policies if workflow-level isolation is required.
+Configure audience/issuer against the provider's actual expected claims and test
+rejected contexts, not just the successful token exchange.
 
-**On the subject claim:** when a job declares `environment: production`, GitHub
-swaps the default `:ref:refs/...` subject for `:environment:production`. If your
-deploy workflows already use a GitHub Environment, scope the identity to that
-rather than the `:*` wildcard — strictly tighter at no cost. If several
-workflows share one environment they are indistinguishable by subject; separate
-GitHub Environments are what makes them separable.
+**Do not remove existing GitHub Secrets until each replacement release path has
+been exercised successfully.** Document GitHub as the current production source
+until then. A GitHub-to-GitHub token such as release-please can stay in GitHub;
+routing it through another service adds a bootstrap dependency without a useful
+ownership improvement.
 
-**Do not empty GitHub Secrets until each migrated workflow has one verified
-green run on the new path.** Until then both paths work and rollback is a
-`git revert`.
+## Migration and maintenance order
 
-### What stays in GitHub Secrets
+1. Inventory keys and read sites: schemas, inline reads, optional defaults,
+   examples, scripts, workflows, and signing tools. Never import actual values
+   into documentation or generated reports.
+2. Choose folders/tags and policies, link the project, declare tooling, and
+   publish the README links and inventory before claiming migration completion.
+3. Preserve legacy local configuration deliberately in protected, ignored storage
+   while validating. Detect conflicts; do not silently delete developer files.
+4. Migrate one entry point at a time. Validate a meaningful app operation, not
+   merely the fetch or boot. Include clean-checkout and stale-file cases.
+5. Test empty tags, missing required keys, wrong target, interrupted export,
+   duplicates, concurrent writes, secret scope, and cache invalidation with fake
+   values. Include shared scripts in relevant CI path filters.
+6. Migrate releases as a separate milestone, documenting representations and
+   runtime/build/signing lifetimes. Verify before removing the previous source.
+7. Remove obsolete examples/backups only after validation, update the inventory,
+   and mark historical plans/audits with their reviewed revision.
 
-A token that authenticates *to GitHub, from GitHub* — a release-please PAT, for
-instance. Routing it through an external service adds a bootstrap dependency and
-no protection, since GitHub already holds it encrypted. Accept the one non-empty
-secret rather than chase a clean slate.
+Whenever a variable changes, update its one inventory row, schema/read site,
+tag assignment, any exporter folder list, and applicable release mapping. Move
+then verify tags: a move operation may change assignments. Untagged keys should
+be found by inventory validation rather than silently disappearing from consumers.
 
-## Migration order for an existing project
+## Rotation and incident handling
 
-1. Load secrets into Infisical and organise the paths. Commit `.infisical.json`.
-2. Declare the CLI as a required tool
-   ([tool-doctor-pattern](../conventions/tool-doctor-pattern.md)).
-3. **Move existing `.env` files out of the tree** — to a gitignored scratch
-   directory, not deleted. This is both a safety net and what makes the next
-   step meaningful: with the old file still in place you cannot tell whether the
-   app booted on Infisical's values or the leftover file's.
-4. Swap the scripts one consumer at a time. Boot the app after each.
-5. Migrate CI to OIDC; verify one green run per workflow.
-6. Gated cleanup: empty the migrated GitHub Secrets, delete the `.env.example`
-   files the migration made misleading, remove the scratch backups.
+- Record the authoritative store, provider owner, consumers, and required
+  restart/rebuild/redeploy action. A store edit alone is not a completed rotation.
+- Avoid combining transport migration with credential rotation unless an incident
+  requires it; otherwise failures are difficult to attribute.
+- Revoking Infisical access does not invalidate exported provider credentials or
+  running processes. A lost laptop can require rotating multiple credentials,
+  not just revoking its Infisical session.
+- Review audit/version-history availability for the chosen plan and retention
+  requirements. Do not assume a pricing-tier promise is an enduring guarantee.
+- `--silent` suppresses routine messages; it is not a redaction guarantee. Do not
+  record verbose real-secret CLI sessions, full environments, or exported files
+  in diagnostic artifacts.
 
-### Traps found in adoption
+## References and adoption example
 
-- **Hunt down every `.env` consumer before moving the file.** The obvious ones
-  are the app's own env modules — but root-level scripts often load the same
-  file. In Kaipu, seven repo-root `db:*` scripts ran
-  `dotenvx run -f apps/server-hono/.env`. Grep the whole repo for the file
-  **path**, not just the app folder.
-- **Verify against an endpoint that touches the database**, not just a clean
-  boot. A zod env schema failing to parse is loud; a subtly wrong
-  `DATABASE_URL` is not.
-- **Check for values the old file had that Infisical does not.** An optional
-  variable with a production default is the dangerous shape: nothing fails, it
-  quietly uses the production value in local dev. Kaipu nearly regressed an
-  email-verification fix exactly this way.
-- **Do not bundle credential rotation into the migration.** If something breaks
-  you cannot tell which change caused it.
-
-## Security habits
-
-- Machine identities with minimal permissions; a laptop identity must never see
-  `prod`.
-- Keep the credential that grants deploy rights in `prod` only, so a
-  laptop-scoped identity cannot deploy or destroy infrastructure.
-- Losing a laptop means rotating one credential.
-- Enable secret versioning + audit logs (free tier) for rollback of values.
-
-## References
-
-- CLI overview: <https://infisical.com/docs/cli/overview>
-- GitHub Action: <https://infisical.com/docs/integrations/cicd/githubactions>
-- Machine identities: <https://infisical.com/docs/documentation/platform/identities/machine-identities>
-- The declaration layer that was evaluated and dropped:
-  [varlock-evaluation.md](./varlock-evaluation.md)
+- [Environment inventory and README contract](./environment-inventory.md)
+- [Tool doctor](../conventions/tool-doctor-pattern.md)
+- [CLI overview](https://infisical.com/docs/cli/overview)
+- [CLI 0.43.132 source — precedence and flags](https://github.com/Infisical/cli/blob/v0.43.132/packages/cmd/run.go)
+- [Machine identities](https://infisical.com/docs/documentation/platform/identities/machine-identities)
+- [Varlock evaluation — optional, separate](./varlock-evaluation.md)
+- [Kaipu project inventory](https://github.com/csdev19/kaipu-record-monorepo/blob/main/apps/documentation/src/content/docs/deployment/secrets-layout.md)
+  applies this pattern. On the reviewed local branch, tag-scoped development is
+  implemented; its documented gaps and pending production migration remain
+  project-specific. Check the target branch before assuming the linked main
+  reference contains the latest inventory update.
