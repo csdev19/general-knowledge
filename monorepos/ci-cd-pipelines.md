@@ -55,6 +55,10 @@ see [release-automation.md](./release-automation.md).
 
 The version is parsed from the tag: `desktop-v0.1.0` → `0.1.0` (used for the DMG filenames).
 
+What that step actually has to do — the mandatory stage order, the app icon and DMG
+install window, and the toolchain-specific traps — is in
+[distribution/](../distribution/).
+
 ### Web — `release-web.yml`
 
 1. Installs deps, builds the shared `@<scope>/*` packages, then builds the web app.
