@@ -21,7 +21,7 @@ Dos capas:
 
 | Tema | Qué contiene |
 | --- | --- |
-| [architecture/](./architecture/) | DDD + hexagonal, bounded contexts, shared kernel, repository pattern, domain modeling, observabilidad, security hardening, ADRs |
+| [architecture/](./architecture/) | DDD + hexagonal, bounded contexts, shared kernel, repository pattern, domain modeling, observabilidad, security hardening, **persistencia de estado en clientes multi-proceso** (quién es dueño del dato), ADRs |
 | [effect/](./effect/) | Effect as a default backend tool: why adopt it and when not to, adoption as a decision about **reach** (and the one capability that forces the boundary to move), the lazy-service pattern, and the traps — dishonest error channels, cached failures, runtime ownership, guards that pass for the wrong reason |
 | [error-handling/](./error-handling/) | Result types, response helpers, api-response-types, error handlers, retrospectiva de centralización |
 | [web/](./web/) | TanStack Start/Router/Query, data loading, server functions, UI package compartido, bundle splitting |

@@ -16,5 +16,10 @@ and **Android platform gotchas that only reproduce on a real device**.
 | [google-maps.md](./google-maps.md) | `react-native-maps`: iOS Apple Maps vs Android Google Maps, why maps need a **dev build**, injecting the key via `app.config.ts`, the Google Cloud checklist (Maps SDK for Android + billing + restriction), the correct SHA-1 from Expo's keystore, reading logcat. |
 | [android-edge-to-edge-keyboard.md](./android-edge-to-edge-keyboard.md) | **Device-only grey screen**: why `KeyboardAvoidingView` with `behavior="height"` collapses on Android 15+/16 (the IME stopped resizing the window), why an emulator on API ≤34 cannot reproduce it, the one-line fix, a 30-second detection snippet, and the debugging lessons. |
 
+> For **where a persisted setting belongs** once widgets, notification handlers,
+> background tasks or native modules need to read it — and when zustand's
+> `persist` is genuinely the right call — see
+> [`architecture/client-state-persistence.md`](../architecture/client-state-persistence.md).
+
 > For **Convex as the backend** (client connection + Better Auth hosted in Convex), see
 > the [`convex/`](../convex/) topic.
