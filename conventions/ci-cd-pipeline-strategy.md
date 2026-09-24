@@ -158,69 +158,21 @@ prefer date-fns subpath imports, dayjs, or `Intl`). Keep heavy, platform-specifi
 (native/Expo) isolated to their own workspace so the `--filter` split keeps working.
 The script is generic to any Bun workspace monorepo — copy it into a new repo as-is.
 
-## The billing model: minutes are not wall time
+## Runner cost and path fan-out (read this first)
 
-GitHub bills a **multiplier per runner**, so where a job runs matters more than how long
-it takes:
+Where a job runs matters more than how long it takes: `macos-latest` bills at ~10× Linux, so
+the workflow that runs least can be the largest line on the bill. The cost model, the
+multiplier table, the spending-limit ceiling, the `packages/**` shared-filter trap and the
+per-PR → on-merge → nightly → release ladder are all in
+**[monorepos/ci-runner-cost.md](../monorepos/ci-runner-cost.md)** — one source of truth; not
+restated here.
 
-| Runner | Multiplier | 8 wall minutes are billed as |
-| ------ | ---------- | ---------------------------- |
-| `ubuntu-latest` | ×1 | 8 |
-| `windows-latest` | ×2 | 16 |
-| `macos-latest` | **×10** | **80** |
+Two smells that doc does not name, both cheap to fix:
 
-Consequences worth internalising before optimising anything else:
-
-- **The workflow that runs least can still be the largest line on the bill.** A macOS
-  release job firing six times a month at eight minutes is ~480 billed minutes — more
-  than a two-minute Linux PR check running a hundred times.
-- Move anything to macOS **only** for what genuinely needs it (signing, notarisation,
-  a macOS-only build). Lint, type-check and unit tests belong on Linux even for a macOS
-  app.
-- On a macOS release job, the cheapest win is usually building fewer targets
-  (one architecture for pre-releases, both for real ones) rather than shaving steps.
-
-### Diagnosing a "failed" run that never ran
-
-A job that fails in **2–6 seconds with zero steps executed** did not fail — it was never
-started. The usual causes are the account's spending limit or a failed payment; GitHub
-surfaces it as a check-run annotation, not in the (empty) log:
-
-```bash
-gh api repos/<owner>/<repo>/check-runs/<id>/annotations --jq '.[].message'
-```
-
-Recognising this signal is worth minutes of debugging a branch that is perfectly healthy.
-It goes red across *every* workflow at once, including unrelated ones on `main` — that
-simultaneity is the tell.
-
-## Path filters fan out in a monorepo
-
-`paths` filters are listed below as a cost lever, and they are — but in a monorepo with
-one workflow per app they have a failure mode that quietly multiplies cost:
-
-```yaml
-# ci-desktop.yml, ci-web.yml and ci-api.yml each contain:
-paths:
-  - "apps/<this app>/**"
-  - "packages/**"        # ← matches for EVERY app
-```
-
-A two-line change to a shared package — a copy string in an i18n package, say — matches
-all three, so a PR that cannot possibly break the API runs the API's tests. Add the
-repo-wide workflow that has no per-app filter and one trivial PR fires four workflows.
-
-Two fixes, in order of preference:
-
-1. **List the packages each app actually consumes** instead of the blanket glob. Cheap,
-   obvious, and it goes stale — accept that, and let a failed build be the reminder.
-2. **A `paths-filter` job** (e.g. `dorny/paths-filter`) that computes what changed once
-   and gates the rest through `needs` + `if`. One extra ~10 s job replaces N wasted ones,
-   and it can read the real dependency graph rather than a hand-kept list.
-
-While you are in there, check for **the same suite running in two workflows** — a
-repo-wide `test --filter='*'` plus a per-app `test` is easy to end up with and doubles the
-most-run job in the repo. One owner per suite.
+- **The same suite owned by two workflows.** A repo-wide `test --filter='*'` plus a per-app
+  `test` doubles the most-run job in the repo. One owner per suite.
+- **The free gate weaker than the paid one.** If pre-push runs lint + format but leaves types,
+  build and affected tests to CI, the tiers above are inverted — see the pre-push section.
 
 ## Cost levers (apply to whatever still runs in CI)
 1. **Turbo cache** in CI (`actions/cache` for `.turbo`, keyed on `${{ github.sha }}`

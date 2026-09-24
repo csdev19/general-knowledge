@@ -16,6 +16,16 @@ The blocked job was a `release-please` run in a repository whose CI was already
 [path-filtered and release-PR-skipped](./ci-per-project-pipelines.md) — textbook. It was blocked
 by a **different repository's** spending.
 
+**How to recognise it before debugging a branch.** The jobs report `failure` in 2–6 seconds
+with **zero steps executed**, and every workflow goes red at once — including unrelated ones on
+`main`. The log is empty; the reason lives only in the check-run annotation:
+
+```bash
+gh api repos/<owner>/<repo>/check-runs/<check-run-id>/annotations --jq '.[].message'
+```
+
+That simultaneity plus empty logs is the tell. Nothing in the branch is broken.
+
 Billing for the month, account-wide:
 
 | SKU                  | Units       | Price/unit | Gross     |
@@ -215,3 +225,7 @@ Before merging a workflow that names a non-Linux runner:
 - [pr-checks.md](./pr-checks.md) — PR gate shapes, the visible-skip discipline, and the
   `paths`-filter/required-check gotcha.
 - [testing/ci.md](./testing/ci.md) — running the suites themselves in CI.
+- [../conventions/ci-cd-pipeline-strategy.md](../conventions/ci-cd-pipeline-strategy.md) — the
+  local `verify` gate (lefthook pre-push) that earns the right to move suites down the ladder.
+- [../desktop/native-dependencies.md](../desktop/native-dependencies.md) — why a `postinstall`
+  that compiles turns one app's native dep into every workflow's cost.

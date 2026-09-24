@@ -18,6 +18,7 @@ Reusable architecture patterns for building a local-first desktop app with Elect
 ## Native integration
 
 - [permissions-and-onboarding.md](./permissions-and-onboarding.md) — Cross-platform screen/mic/camera permission checks and requests (macOS quirks especially), split into pure renderer logic + thin main-process wiring, and the first-run onboarding flow.
+- [native-dependencies.md](./native-dependencies.md) — A native module's prebuilds target Node's ABI, not Electron's: rebuild explicitly (`rebuild:native`, `npmRebuild: false`, a stamp inside `node_modules` the setup doctor compares), never from `postinstall` — which breaks every unrelated CI job and is the shape of a supply-chain attack. Consumers degrade to "feature off".
 - [library-vault.md](./library-vault.md) — Local-first storage: files as the source of truth, JSON metadata sidecars, a configurable vault directory, and a privileged streamable media protocol for playback.
 
 ## Distribution & product
