@@ -10,3 +10,9 @@ How to build and structure workspace packages in a monorepo: the `infra-*` namin
 | [shared-package-build-strategy.md](./shared-package-build-strategy.md) | Consuming packages as source in dev (HMR) vs built `dist` for prod, the tsdown `devExports` pattern, and the Node main-process gotcha. |
 | [repository-contracts-and-implementations.md](./repository-contracts-and-implementations.md) | Repository contracts (interfaces) live in the domain; implementations live in infrastructure — rules, naming, and examples. |
 | [case-study-design-tokens-package.md](./case-study-design-tokens-package.md) | Worked example: building a shared design-tokens package end to end, with generated committed CSS, drift tests, and phased delivery. |
+
+## Email
+
+- [Transactional email package](./transactional-email-package.md) — Rakoi reference: exported JSX, typed templates, HTML/text rendering, Resend adapter and Kaipu localization boundaries.
+
+- [Transactional email playbook](./transactional-email-playbook.md) — step-by-step package creation with JSX exports, typed registry, renderer, Resend adapter, server wiring and verification.
