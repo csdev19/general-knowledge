@@ -28,12 +28,12 @@ That simultaneity plus empty logs is the tell. Nothing in the branch is broken.
 
 Billing for the month, account-wide:
 
-| SKU                  | Units       | Price/unit | Gross     |
-| -------------------- | ----------- | ---------- | --------- |
-| Actions Linux        | 1,144 min   | $0.006     | $6.86     |
-| Actions macOS 3-core | 103.48 min  | $0.062     | $6.42     |
-| Actions Windows      | 13 min      | $0.010     | $0.13     |
-| Actions storage      | 0.18 GB-hr  | $0.000336  | <$0.01    |
+| SKU                  | Units      | Price/unit | Gross  |
+| -------------------- | ---------- | ---------- | ------ |
+| Actions Linux        | 1,144 min  | $0.006     | $6.86  |
+| Actions macOS 3-core | 103.48 min | $0.062     | $6.42  |
+| Actions Windows      | 13 min     | $0.010     | $0.13  |
+| Actions storage      | 0.18 GB-hr | $0.000336  | <$0.01 |
 
 Read that table twice. **103 minutes of macOS cost the same as 1,144 minutes of Linux.** One
 `macos-latest` job, running per-PR-push in a single repository, consumed roughly **45% of the
@@ -46,11 +46,11 @@ Three facts do most of the work.
 
 **1. Runners are not priced alike.** Published rates:
 
-| Runner            | Price/min | Multiplier vs Linux |
-| ----------------- | --------- | ------------------- |
-| Linux 2-core      | $0.006    | 1×                  |
-| Windows 2-core    | $0.010    | ~1.67×              |
-| macOS 3–4 core    | $0.062    | ~10.3×              |
+| Runner         | Price/min | Multiplier vs Linux |
+| -------------- | --------- | ------------------- |
+| Linux 2-core   | $0.006    | 1×                  |
+| Windows 2-core | $0.010    | ~1.67×              |
+| macOS 3–4 core | $0.062    | ~10.3×              |
 
 A minute is not a minute. Included-minute quotas are consumed at the same multipliers, so
 "2,000 free minutes" means 2,000 Linux minutes — or **194 macOS minutes**.
@@ -77,10 +77,10 @@ signal should not be a failed release.
 
 Cost is `runs × duration × multiplier`. Path filtering only attacks the first term.
 
-| Axis                | Lever                                                    | Covered in                                        |
-| ------------------- | -------------------------------------------------------- | ------------------------------------------------- |
-| **How often**       | path filters, `paths-ignore`, release-PR skips, drafts   | [ci-per-project-pipelines.md](./ci-per-project-pipelines.md) |
-| **What it costs**   | runner OS, job splitting, trigger tier                   | this document                                      |
+| Axis              | Lever                                                  | Covered in                                                   |
+| ----------------- | ------------------------------------------------------ | ------------------------------------------------------------ |
+| **How often**     | path filters, `paths-ignore`, release-PR skips, drafts | [ci-per-project-pipelines.md](./ci-per-project-pipelines.md) |
+| **What it costs** | runner OS, job splitting, trigger tier                 | this document                                                |
 
 A pipeline can score full marks on the first axis and still dominate the bill. Check the second
 whenever a workflow names anything other than `ubuntu-latest`.
@@ -90,6 +90,11 @@ whenever a workflow names anything other than `ubuntu-latest`.
 `concurrency: cancel-in-progress` only kills runs that a **newer push supersedes while they are
 still running**. A PR with four pushes spaced far enough apart pays for four complete runs. At 1×
 nobody notices; at 10× that is a meaningful fraction of a monthly allowance for a single PR.
+
+Bot workflows compound it too. Every job bills a whole minute minimum, so a 45-second
+`release-please` run on every push to `main` — docs merges included — is a minute each; 88 runs
+were 90 minutes, about 11 % of one repository's usage, and the first job the quota block hit.
+Path-filter bots to the paths that can change their outcome.
 
 Shared-path filters compound it. `packages/**` and `bun.lock` sit in every per-project filter by
 design — a shared-package change can break any consumer — which is correct for a Linux suite and
@@ -101,16 +106,20 @@ filter, the expensive job watches only its own app.
 When an expensive suite costs more than its feedback is worth, move it down a rung rather than
 deleting it. Each rung trades feedback latency for cost.
 
-| Rung | Trigger                       | Feedback arrives      | Use when                                                        |
-| ---- | ----------------------------- | --------------------- | --------------------------------------------------------------- |
-| 1    | every PR push                 | before review         | Cheap runner, or the suite is the repo's main risk control.      |
-| 2    | PR, narrow paths only         | before review         | Expensive runner, but the suite guards one app's own code.       |
-| 3    | `push:` to `main`             | at merge              | Expensive runner; a post-merge revert is acceptable.             |
-| 4    | nightly `schedule:`           | next morning          | Slow and broad; catches drift rather than a specific change.     |
-| 5    | before release only           | at the tag            | The suite is really a release gate.                              |
+| Rung | Trigger               | Feedback arrives | Use when                                                     |
+| ---- | --------------------- | ---------------- | ------------------------------------------------------------ |
+| 1    | every PR push         | before review    | Cheap runner, or the suite is the repo's main risk control.  |
+| 2    | PR, narrow paths only | before review    | Expensive runner, but the suite guards one app's own code.   |
+| 3    | `push:` to `main`     | at merge         | Expensive runner; a post-merge revert is acceptable.         |
+| 4    | nightly `schedule:`   | next morning     | Slow and broad; catches drift rather than a specific change. |
+| 5    | before release only   | at the tag       | The suite is really a release gate.                          |
 
 Rungs 3 and below need a named owner for the failure. A red run on `main` that nobody watches is
 not a safety net — it is a decoration. Wire a notification, or stay on rung 2.
+
+Rung 5 is a whole operating model, not just a trigger: the hook, the release PR as candidate and
+the `needs:` gate in the tag workflow are specified in
+[release-gated-verification.md](./release-gated-verification.md).
 
 Record the rung and its reasoning in the workflow header, with the condition that would move it
 back up. A future reader needs to know the choice was deliberate and what would reverse it.
@@ -147,7 +156,7 @@ test("this suite is running on the platform it asserts against", () => {
 ```
 
 This is the same discipline [pr-checks.md](./pr-checks.md) applies to the export test's
-environment gate — *a **visible** skip, never a silent pass*. The rule generalizes: any condition
+environment gate — _a **visible** skip, never a silent pass_. The rule generalizes: any condition
 that can silently reduce what a green check means should be loud somewhere.
 
 ## The trap: the expensive step may not be the only one that has to move
@@ -220,6 +229,8 @@ Before merging a workflow that names a non-Linux runner:
 
 ## Related
 
+- [release-gated-verification.md](./release-gated-verification.md) — the rules: a publish step
+  never runs without a `verify` job on the same SHA; where each check lives; the five-minute audit.
 - [ci-per-project-pipelines.md](./ci-per-project-pipelines.md) — the frequency axis: universal
   fast check plus path-filtered per-project suites, and why docs-only PRs still run the formatter.
 - [pr-checks.md](./pr-checks.md) — PR gate shapes, the visible-skip discipline, and the
