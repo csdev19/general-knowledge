@@ -23,5 +23,9 @@ Reusable architecture patterns for building a local-first desktop app with Elect
 
 ## Distribution & product
 
+Shipping the built app — Developer ID signing, notarization, the DMG install window, and the
+update feed — is toolchain-shaped rather than Electron-shaped and lives in
+[distribution/](../distribution/).
+
 - [filesystem-first-monetization.md](./filesystem-first-monetization.md) — ADR: why filesystem-first (atomic sidecars, metadata inside the vault) and why local-first doesn't hurt monetization — sell the network/cloud layer, never local features.
 - [analytics-and-flags.md](./analytics-and-flags.md) — Analytics architecture (renderer-primary + main-sink), offline-safe feature flags, per-device identity, the two-channel error rule, and a privacy posture for a screen-capable app.
