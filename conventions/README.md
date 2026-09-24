@@ -9,10 +9,13 @@ Reusable, product-agnostic conventions and workflow patterns distilled from real
 - **[schemas-first.md](./schemas-first.md)** — Define Zod (v4) schemas in the domain package and reuse them across backend and frontend.
 - **[tagging-system.md](./tagging-system.md)** — Two-tier tags: default tags in code (slug/label/emoji/color) + per-scope custom tags with a curated color palette. One source of truth across web/mobile/widget.
 
+- **[app-bundle-identifiers.md](./app-bundle-identifiers.md)** — Reverse-DNS bundle IDs under `dev.niway.*` (niway.dev), frozen after first release; why users never see them and why shipped exceptions (Kaipu's `com.niway.*`) are grandfathered rather than migrated.
+
 ## Data & delivery
 
 - **[data-sourcing-and-seeding.md](./data-sourcing-and-seeding.md)** — Filling an app with real, structured, geo-tagged reference data (e.g. attractions): why an agent beats a plain chat, legal sources (Wikidata CC0 primary, never scrape TripAdvisor), the curate→resolve→enrich→normalize→validate→seed pipeline, and provenance as a field.
-- **[ci-cd-pipeline-strategy.md](./ci-cd-pipeline-strategy.md)** — Trunk + tags, one `verify` gate, tiered checks; the native/mobile install is the biggest CI cost (split it out); `deps:weight` protocol to watch dependency weight.
+- **[tool-doctor-pattern.md](./tool-doctor-pattern.md)** — Global tools `bun install` cannot provide (secrets CLI, cloud CLI): one script that **checks and reports, never installs**. Why installing is a supply-chain surface with no checksum to verify against, the presence → version → **access** ladder, and why one check that proves the chain beats two that can disagree.
+- **[ci-cd-pipeline-strategy.md](./ci-cd-pipeline-strategy.md)** — Trunk + tags, one `verify` gate run by **lefthook pre-push** and by the PR as backstop, tiered checks (tests local + at the tag, never per PR); the native/mobile install is the biggest CI cost (split it out); `deps:weight` protocol. Runner pricing itself lives in [monorepos/ci-runner-cost.md](../monorepos/ci-runner-cost.md).
 
 ## Workflow conventions
 

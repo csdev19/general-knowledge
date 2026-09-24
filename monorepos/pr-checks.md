@@ -116,9 +116,14 @@ data directory**.
 
 **Still open:**
 
-- **A `macos-latest` job** (per-PR if the minute budget allows, otherwise nightly or
-  `paths`-gated) to run the export test with a real H.264 encoder — the honest way to get
-  full export coverage in CI, since macOS is the production platform.
+- **A `macos-latest` job** to run the export test with a real H.264 encoder — the honest way to
+  get full export coverage in CI, since macOS is the production platform.
+
+  "If the minute budget allows" is not a plan, and macOS bills at ~10.3× Linux: one such job on
+  every PR push has been measured consuming ~45% of an account's monthly allowance on its own.
+  Pick its rung deliberately — see **[ci-runner-cost.md](./ci-runner-cost.md)** for the
+  per-PR → on-merge → nightly ladder, the split-the-filter-with-the-job rule, and the guard that
+  stops a platform-gated suite from passing silently on the wrong runner.
 
 > **Gotcha — `paths` filters and _required_ checks.** A `paths`-filtered workflow that does not
 > run reports **no status**, and GitHub treats a required-but-absent check as perpetually

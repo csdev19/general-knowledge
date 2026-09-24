@@ -31,7 +31,7 @@ Examples:
 
 - `@scope/infra-db`
 - `@scope/infra-auth`
-- `@scope/infra-email` (future)
+- `@scope/infra-email` — [implemented in Rakoi](./transactional-email-package.md)
 - `@scope/infra-notifications` (future)
 
 Where `<capability>` describes **what the package does**, not **how it does it**.

@@ -21,6 +21,7 @@ antes de decidir entre Electron y Tauri.
 - [Permisos y onboarding](../desktop/permissions-and-onboarding.md) — permisos nativos cross-platform
 - [Library / vault local-first](../desktop/library-vault.md) — storage en filesystem + metadata sidecars
 - [Media / compute pipeline](../desktop/media-pipeline.md) — pipeline pesado fuera de React
+- [Dependencias nativas](../desktop/native-dependencies.md) — rebuild explícito contra el ABI de Electron, nunca en `postinstall`
 - [Filesystem-first & monetización](../desktop/filesystem-first-monetization.md)
 - [Analytics y feature flags](../desktop/analytics-and-flags.md), [filosofía de producto](../desktop/product-philosophy.md)
 

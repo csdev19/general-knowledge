@@ -55,11 +55,26 @@ if the local hook ran.
 
 ## The local pre-push hook
 
-- Commit a hook the whole team inherits: `.githooks/pre-push` → runs `bun run verify`.
-  Enable with `git config core.hooksPath .githooks` (documented in the repo README/setup).
-- **Pre-push, not pre-commit** — pre-commit fires on every tiny commit and gets bypassed;
-  pre-push fires once, when you actually share.
-- Keep it fast (turbo cache) or it gets skipped.
+- Commit a hook the whole team inherits. **[lefthook](https://lefthook.dev)** is the tool
+  of choice: one `lefthook.yml` in the repo, installed by `bun install` (it is a devDep
+  with no compile step), no `core.hooksPath` to remember. The hand-rolled
+  `.githooks/` + `git config core.hooksPath` route works too and needs no dependency.
+- **The contract, per hook:** `pre-commit` fixes what you commit (format `--write`, lint
+  on staged files — cheap, never blocks); `commit-msg` rejects what release automation
+  cannot parse; **`pre-push` runs `bun run verify`** — the *same* script CI runs.
+- **Pre-push is where the cost is saved, not pre-commit** — pre-commit fires on every
+  tiny commit and gets bypassed; pre-push fires once, when you actually share. A push
+  that fails types in CI is a whole CI run wasted, then a second one after the fix.
+- **Run the affected tests there too**, free: `turbo run test --filter='...[origin/main]'`
+  only runs the packages the push touched, from cache. This is what earns the right to
+  take tests off the PR path (tiered gates above) — without a local test gate, dropping
+  PR tests just moves breakage to `main`.
+- Keep it fast (turbo cache) or it gets skipped. `LEFTHOOK=0 git push` is the documented
+  bypass; the PR `verify` backstop is why a bypass is tolerable.
+
+A repo that runs lint + format in pre-push but leaves types and build to CI has the tiers
+inverted: the free gate is weaker than the paid one. Audit the hook, not just the
+workflows.
 
 ## Agents run the same gate
 Autonomous workers (the night-runner / headless agents) MUST run `bun run verify` before
@@ -143,6 +158,22 @@ prefer date-fns subpath imports, dayjs, or `Intl`). Keep heavy, platform-specifi
 (native/Expo) isolated to their own workspace so the `--filter` split keeps working.
 The script is generic to any Bun workspace monorepo — copy it into a new repo as-is.
 
+## Runner cost and path fan-out (read this first)
+
+Where a job runs matters more than how long it takes: `macos-latest` bills at ~10× Linux, so
+the workflow that runs least can be the largest line on the bill. The cost model, the
+multiplier table, the spending-limit ceiling, the `packages/**` shared-filter trap and the
+per-PR → on-merge → nightly → release ladder are all in
+**[monorepos/ci-runner-cost.md](../monorepos/ci-runner-cost.md)** — one source of truth; not
+restated here.
+
+Two smells that doc does not name, both cheap to fix:
+
+- **The same suite owned by two workflows.** A repo-wide `test --filter='*'` plus a per-app
+  `test` doubles the most-run job in the repo. One owner per suite.
+- **The free gate weaker than the paid one.** If pre-push runs lint + format but leaves types,
+  build and affected tests to CI, the tiers above are inverted — see the pre-push section.
+
 ## Cost levers (apply to whatever still runs in CI)
 1. **Turbo cache** in CI (`actions/cache` for `.turbo`, keyed on `${{ github.sha }}`
    with a `turbo-` restore prefix) — replays unchanged `check-types`/`build` outputs.
@@ -179,6 +210,9 @@ red-merges (the failure mode of "no protection": anything can land on the one ma
 - [ ] PR workflow: run `verify` only, cached; drop tests from PR.
 - [ ] Tag workflow(s): build + tests + native builds + e2e + security + deploy + migrate.
 - [ ] Turbo/bun cache + `cancel-in-progress` + `paths` on the surviving jobs.
+- [ ] Audit the runner of every job: nothing on `macos`/`windows` that Linux can run.
+- [ ] Check no shared-package glob (`packages/**`) fans one PR out to every app workflow.
+- [ ] Check no suite runs in two workflows.
 - [ ] Agents call `bun run verify` before push.
 - [ ] Require `verify` on `main`.
 

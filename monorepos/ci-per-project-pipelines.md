@@ -2,6 +2,12 @@
 
 _Split the monolithic PR check into a fast universal compile check plus path-filtered per-project test workflows, skip release PRs, and normalize release-* naming._
 
+> This document covers **how often** each suite runs. It assumes every job is on
+> `ubuntu-latest`, where a minute is a minute. The moment a workflow names `macos-latest` or
+> `windows-latest`, a second axis opens — macOS bills at ~10.3× Linux — and a pipeline that
+> scores full marks here can still dominate the bill. See
+> **[ci-runner-cost.md](./ci-runner-cost.md)**.
+
 ## Problem
 
 CI started as one monolithic workflow, `pr-validation.yml` ("Validate PR"), triggered on **every**
@@ -52,6 +58,11 @@ which match the path filter via `package.json` — run nothing.
 
 `packages/**` is in all three filters on purpose: a shared-package change can break any consumer, so
 all three test suites should run.
+
+**One exception, on cost grounds:** if a suite runs on a non-Linux runner, keep the broad filter on
+its cheap half and narrow the expensive half to the app's own paths. Otherwise every shared-package
+edit pays the multiplier for an app that may not have changed — see
+[ci-runner-cost.md](./ci-runner-cost.md).
 
 **Desktop unit job needs no package build:** if the desktop app's only workspace dep is resolved
 from source (e.g. tsdown devExports), vitest runs directly after install (verify locally).
