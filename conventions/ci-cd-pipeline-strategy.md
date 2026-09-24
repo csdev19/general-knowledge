@@ -55,11 +55,26 @@ if the local hook ran.
 
 ## The local pre-push hook
 
-- Commit a hook the whole team inherits: `.githooks/pre-push` → runs `bun run verify`.
-  Enable with `git config core.hooksPath .githooks` (documented in the repo README/setup).
-- **Pre-push, not pre-commit** — pre-commit fires on every tiny commit and gets bypassed;
-  pre-push fires once, when you actually share.
-- Keep it fast (turbo cache) or it gets skipped.
+- Commit a hook the whole team inherits. **[lefthook](https://lefthook.dev)** is the tool
+  of choice: one `lefthook.yml` in the repo, installed by `bun install` (it is a devDep
+  with no compile step), no `core.hooksPath` to remember. The hand-rolled
+  `.githooks/` + `git config core.hooksPath` route works too and needs no dependency.
+- **The contract, per hook:** `pre-commit` fixes what you commit (format `--write`, lint
+  on staged files — cheap, never blocks); `commit-msg` rejects what release automation
+  cannot parse; **`pre-push` runs `bun run verify`** — the *same* script CI runs.
+- **Pre-push is where the cost is saved, not pre-commit** — pre-commit fires on every
+  tiny commit and gets bypassed; pre-push fires once, when you actually share. A push
+  that fails types in CI is a whole CI run wasted, then a second one after the fix.
+- **Run the affected tests there too**, free: `turbo run test --filter='...[origin/main]'`
+  only runs the packages the push touched, from cache. This is what earns the right to
+  take tests off the PR path (tiered gates above) — without a local test gate, dropping
+  PR tests just moves breakage to `main`.
+- Keep it fast (turbo cache) or it gets skipped. `LEFTHOOK=0 git push` is the documented
+  bypass; the PR `verify` backstop is why a bypass is tolerable.
+
+A repo that runs lint + format in pre-push but leaves types and build to CI has the tiers
+inverted: the free gate is weaker than the paid one. Audit the hook, not just the
+workflows.
 
 ## Agents run the same gate
 Autonomous workers (the night-runner / headless agents) MUST run `bun run verify` before
