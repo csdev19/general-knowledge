@@ -34,6 +34,7 @@ Patterns that span every layer and consumer.
 
 - **[security-hardening.md](./security-hardening.md)** — Reusable patterns for DB-level authorization, soft delete, N+1 elimination, transactional writes, and invite enforcement.
 - **[observability.md](./observability.md)** — Structured error logging, sanitization rules, and a maturity roadmap so users never see internal errors.
+- **[client-state-persistence.md](./client-state-persistence.md)** — Where a client app's persisted state belongs once the app has more than one runtime (Electron main vs renderer, RN JS vs native): why `persist` middleware is the web's right answer and the wrong one here, the owner/mirror split, widgets and background tasks on mobile, and the checklist.
 
 ## Decisions (ADRs)
 
@@ -47,4 +48,5 @@ Patterns that span every layer and consumer.
 2. **domain-architecture-patterns** → **domain-modeling-strategy** — decide how rich your domain should be.
 3. **shared-kernel** → **bounded-contexts-complete-guide** — scale from one domain to many.
 4. **security-hardening** + **observability** — harden and instrument whatever you built.
-5. **decisions/** — the reasoning behind specific technology choices.
+5. **client-state-persistence** — if the consumer is a desktop or mobile client, decide who owns each persisted value before writing the first store.
+6. **decisions/** — the reasoning behind specific technology choices.
