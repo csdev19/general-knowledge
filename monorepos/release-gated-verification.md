@@ -68,16 +68,16 @@ the next one after. Otherwise "we saved 80 %" is a feeling.
 
 Three tiers. Each check has one home, marked ●, and at most one echo, marked ○.
 
-| Check                                | Local push (hook) | Candidate (release PR / dispatch) | Release (tag) |
-| ------------------------------------ | :---------------: | :-------------------------------: | :-----------: |
-| Lint, format check                   | ●                 | ○                                 | ●             |
-| Type-check, all workspaces           | ●                 | ○                                 | ●             |
-| Package builds                       | ●                 | ○                                 | ●             |
-| Unit and component tests             | ●                 | ○                                 | ●             |
-| App builds (web, API bundle)         |                   | ○                                 | ●             |
-| Platform E2E (Electron, mobile)      | on demand         |                                   | ●             |
-| Native rebuilds, signing, notarizing |                   |                                   | ●             |
-| Security scan, dependency audit      |                   | ○                                 | ●             |
+| Check                                | Local push (hook) | Candidate (release PR / dispatch) |   Release (tag)   |
+| ------------------------------------ | :---------------: | :-------------------------------: | :---------------: |
+| Lint, format check                   |         ●         |                 ○                 |         ●         |
+| Type-check, all workspaces           |         ●         |                 ○                 |         ●         |
+| Package builds                       |         ●         |                 ○                 |         ●         |
+| Unit and component tests             |         ●         |                 ○                 |         ●         |
+| App builds (web, API bundle)         |                   |                 ○                 |         ●         |
+| Platform E2E (Electron, mobile)      |     on demand     |                                   |         ●         |
+| Native rebuilds, signing, notarizing |                   |                                   |         ●         |
+| Security scan, dependency audit      |                   |                 ○                 |         ●         |
 | Deploy, upload, migrate              |                   |                                   | ● after all above |
 
 - **Local push** is the Lefthook `pre-push` running `verify`. Free, seconds, bypassable.
@@ -95,12 +95,12 @@ paying for a status icon.
 
 ## Pick the tier by who merges
 
-| Situation                                   | PR-time cloud checks              | Candidate | Release gate |
-| ------------------------------------------- | --------------------------------- | :-------: | :----------: |
-| One owner, no branch protection             | Off; hook + candidate replace them | ●         | ●            |
-| One owner, agents pushing on their behalf   | Off; agents run `verify` too       | ●         | ●            |
-| Two or more people merging                  | `verify` only, required, cached    | ●         | ●            |
-| Public repository with outside contributors | `verify` only, required            | ●         | ●            |
+| Situation                                   | PR-time cloud checks               | Candidate | Release gate |
+| ------------------------------------------- | ---------------------------------- | :-------: | :----------: |
+| One owner, no branch protection             | Off; hook + candidate replace them |     ●     |      ●       |
+| One owner, agents pushing on their behalf   | Off; agents run `verify` too       |     ●     |      ●       |
+| Two or more people merging                  | `verify` only, required, cached    |     ●     |      ●       |
+| Public repository with outside contributors | `verify` only, required            |     ●     |      ●       |
 
 The release gate is in every row. That column is what R1 means.
 
@@ -209,14 +209,14 @@ Retired validation workflows keep `workflow_dispatch:` only and say why in the h
 Kaipu, September 2026, 23 days, single owner, three deployables (desktop, web, API),
 13 releases in the period:
 
-| Item                                 | Before               | After (projected)        |
-| ------------------------------------ | -------------------- | ------------------------ |
-| PR-time Linux minutes, four workflows | 802                  | 0                        |
-| `release-please` Linux minutes       | 90                   | 45–55                    |
-| Release `verify` jobs, Linux         | 0                    | 65–90                    |
-| Release macOS minutes                | 42.5                 | 50–55 (E2E added)        |
-| Repository gross                     | $8.09                | $4.1–4.4                 |
-| Release publishes without a gate     | every release        | none                     |
+| Item                                  | Before        | After (projected) |
+| ------------------------------------- | ------------- | ----------------- |
+| PR-time Linux minutes, four workflows | 802           | 0                 |
+| `release-please` Linux minutes        | 90            | 45–55             |
+| Release `verify` jobs, Linux          | 0             | 65–90             |
+| Release macOS minutes                 | 42.5          | 50–55 (E2E added) |
+| Repository gross                      | $8.09         | $4.1–4.4          |
+| Release publishes without a gate      | every release | none              |
 
 Local `verify`: 27 s cold, 3 s warm. Desktop suite: 17 s locally, 208 s on `ubuntu-latest`.
 The projection is written down before the "after" export exists; replace it when it does.

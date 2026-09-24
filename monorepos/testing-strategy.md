@@ -5,13 +5,13 @@ _A layered testing strategy for a full-stack monorepo — each layer catches a d
 Use a layered testing strategy. Each layer catches a different class of bug; together they cover
 pure logic, real backend behavior, and full-stack user flows.
 
-| Layer             | Runner               | DB        | Scope                                                  |
-| ----------------- | -------------------- | --------- | ------------------------------------------------------ |
-| Domain unit       | Vitest (node)        | none      | Schemas, constants, pure helpers                       |
-| Application unit  | Vitest (node)        | mocked    | Use cases with mocked repositories                     |
-| Component / route | Vitest + jsdom + RTL | mocked    | Web components and route components                    |
-| API integration   | Vitest (node)        | real Neon | API (Hono) routes in-process against a real branch     |
-| E2E               | Playwright           | real Neon | Full-stack golden paths in a real browser              |
+| Layer             | Runner               | DB        | Scope                                              |
+| ----------------- | -------------------- | --------- | -------------------------------------------------- |
+| Domain unit       | Vitest (node)        | none      | Schemas, constants, pure helpers                   |
+| Application unit  | Vitest (node)        | mocked    | Use cases with mocked repositories                 |
+| Component / route | Vitest + jsdom + RTL | mocked    | Web components and route components                |
+| API integration   | Vitest (node)        | real Neon | API (Hono) routes in-process against a real branch |
+| E2E               | Playwright           | real Neon | Full-stack golden paths in a real browser          |
 
 Integration tests for the DB infrastructure package (`@<scope>/infra-db`) are intentionally out of
 scope. You rely on Neon + Drizzle, and exercise the DB through the API integration layer instead.

@@ -23,12 +23,12 @@ backlog/
 
 Emojis para escanear el estado de un vistazo:
 
-| Emoji | Significado                                    |
-| ----- | ---------------------------------------------- |
-| 🟡    | En progreso (posiblemente pausado)             |
-| 🟢    | Listo para validar (mergeado / en prod)        |
-| 🔵    | Propuesto (analizado, aún no empezado)         |
-| ⚪    | Idea (sin análisis todavía)                    |
+| Emoji | Significado                             |
+| ----- | --------------------------------------- |
+| 🟡    | En progreso (posiblemente pausado)      |
+| 🟢    | Listo para validar (mergeado / en prod) |
+| 🔵    | Propuesto (analizado, aún no empezado)  |
+| ⚪    | Idea (sin análisis todavía)             |
 
 Se puede extender con estados terminales (`✅ Decidido y cerrado`) o de seguimiento (`A vigilar`), pero estos cuatro son la base. Un ítem `✅` que ya está validado se **saca del mapa** y su aprendizaje se mueve al doc de feature/arquitectura correspondiente.
 

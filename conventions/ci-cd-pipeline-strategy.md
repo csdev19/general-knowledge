@@ -23,7 +23,7 @@ exhausted the monthly Actions minutes)._
   are that discipline**, without the weight of an extra long-lived branch.
 
 The cost problem is not "too many checks" — several gates protecting one main is
-*healthy*. The waste is treating every check as equal and running all of them, cold,
+_healthy_. The waste is treating every check as equal and running all of them, cold,
 on every push. Fix: **split checks by cost × purpose, and pay for each where it's worth it.**
 
 ## One shared gate: `verify`
@@ -44,19 +44,21 @@ bun run verify   # = turbo check-types + lint + format-check + build packages
 
 ## Tiered gates (where each check runs)
 
-| Stage | What runs | Cost | Who/when |
-| --- | --- | --- | --- |
-| **Local pre-push hook** | `verify` (types + lint + format + build) | free (your machine) | every human push |
-| **Local on-demand** | `bun run test` (web/backend/mobile) | free | before pushing risky changes |
-| **PR → main (CI)** | `pr-verify` (`verify` minus native) always + `pr-native` (native type-check) paths-gated — **no tests** | cheap (non-native never installs Expo) | backstop on every PR |
-| **Tag → prod (CI)** | full: build + **tests** + EAS native + e2e + security scan + deploy + migrate | expensive, but rare | on promotion |
+| Stage                   | What runs                                                                                               | Cost                                   | Who/when                     |
+| ----------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------- | ---------------------------- |
+| **Local pre-push hook** | `verify` (types + lint + format + build + fast tests)                                                   | free (your machine)                    | every human push             |
+| **Local on-demand**     | the suites too slow for the hook (mobile, integration)                                                  | free                                   | before pushing risky changes |
+| **PR → main (CI)**      | `pr-verify` (`verify` minus native) always + `pr-native` (native type-check) paths-gated — **no tests** | cheap (non-native never installs Expo) | backstop on every PR         |
+| **Tag → prod (CI)**     | full: build + **tests** + EAS native + e2e + security scan + deploy + migrate                           | expensive, but rare                    | on promotion                 |
 
-Rationale: the cheap gate (`verify`) runs *everywhere* so `main` stays releasable and
-breakage is caught at the smallest unit (1 PR, 1 cause). The expensive gate runs *only
-when you promote*, where the minutes are worth it. Tests are the slow part → local +
-tag, never per-PR.
+Rationale: the cheap gate (`verify`) runs _everywhere_ so `main` stays releasable and
+breakage is caught at the smallest unit (1 PR, 1 cause). The expensive gate runs _only
+when you promote_, where the minutes are worth it. Whether tests sit in the cheap gate is
+a measurement, not a rule — see the `verify` bullet above; only the suites you measured as
+slow drop to local-on-demand + tag.
 
 ### Why keep a PR backstop (not 100% local)
+
 A local hook is advice, not a guarantee: it's skippable (`--no-verify`), it doesn't run
 for autonomous agents unless wired in, and "works on my machine" ≠ "works in CI". So the
 PR runs `verify` once as a cheap backstop. It's the same script, so it almost never fails
@@ -64,13 +66,29 @@ if the local hook ran.
 
 ## The local pre-push hook
 
-- Commit a hook the whole team inherits: `.githooks/pre-push` → runs `bun run verify`.
-  Enable with `git config core.hooksPath .githooks` (documented in the repo README/setup).
-- **Pre-push, not pre-commit** — pre-commit fires on every tiny commit and gets bypassed;
-  pre-push fires once, when you actually share.
-- Keep it fast (turbo cache) or it gets skipped.
+- Commit a hook the whole team inherits. **[lefthook](https://lefthook.dev)** is the tool
+  of choice: one `lefthook.yml` in the repo, installed by `bun install` (it is a devDep
+  with no compile step), no `core.hooksPath` to remember. The hand-rolled
+  `.githooks/` + `git config core.hooksPath` route works too and needs no dependency.
+- **The contract, per hook:** `pre-commit` fixes what you commit (format `--write`, lint
+  on staged files — cheap, never blocks); `commit-msg` rejects what release automation
+  cannot parse; **`pre-push` runs `bun run verify`** — the _same_ script CI runs.
+- **Pre-push is where the cost is saved, not pre-commit** — pre-commit fires on every
+  tiny commit and gets bypassed; pre-push fires once, when you actually share. A push
+  that fails types in CI is a whole CI run wasted, then a second one after the fix.
+- **Run the affected tests there too**, free: `turbo run test --filter='...[origin/main]'`
+  only runs the packages the push touched, from cache. This is what earns the right to
+  take tests off the PR path (tiered gates above) — without a local test gate, dropping
+  PR tests just moves breakage to `main`.
+- Keep it fast (turbo cache) or it gets skipped. `LEFTHOOK=0 git push` is the documented
+  bypass; the PR `verify` backstop is why a bypass is tolerable.
+
+A repo that runs lint + format in pre-push but leaves types and build to CI has the tiers
+inverted: the free gate is weaker than the paid one. Audit the hook, not just the
+workflows.
 
 ## Agents run the same gate
+
 Autonomous workers (the night-runner / headless agents) MUST run `bun run verify` before
 pushing — the exact same script as humans and CI. One gate, one meaning of "green". See
 [[ai-agent-delegation]].
@@ -81,26 +99,26 @@ In an Expo/React Native monorepo the dominant CI cost is **not the build and not
 tests — it's `bun install` of the native app's dependencies.** Measured on trip-planner
 with the `deps:weight apps` script below (Bun 1.3, macOS/mini, `--filter` on install):
 
-| Install | Size | Files |
-| --- | --- | --- |
-| Full (`bun install`) | 1.97 GB | 123k |
-| Non-native (`bun install --filter '!native'`) | **1.71 GB** | 107k |
-| Native only (`bun install --filter native`) | 1.18 GB | 74k |
-| Web only (`--filter web`) | 1.37 GB | 91k |
-| Docs only (`--filter docs`) | 0.42 GB | 22k |
+| Install                                       | Size        | Files |
+| --------------------------------------------- | ----------- | ----- |
+| Full (`bun install`)                          | 1.97 GB     | 123k  |
+| Non-native (`bun install --filter '!native'`) | **1.71 GB** | 107k  |
+| Native only (`bun install --filter native`)   | 1.18 GB     | 74k   |
+| Web only (`--filter web`)                     | 1.37 GB     | 91k   |
+| Docs only (`--filter docs`)                   | 0.42 GB     | 22k   |
 
-Two honesty notes, both learned by *actually measuring* rather than trusting a figure:
+Two honesty notes, both learned by _actually measuring_ rather than trusting a figure:
 
 1. **Numbers are platform-dependent — measure on the target.** React Native ships Android
    build artifacts inside its npm tarballs (e.g. a `libreactnative.so`/`libhermesvm.so`
    under `android/build/…`). On **macOS** those largely do not materialise, so the mini
    shows native adding only ~0.26 GB over `!native`. On a **Linux CI runner** the native
    tree is materially larger (it writes those Android `.so` files and uses none of them).
-   So the split's payoff is *bigger on CI than the mini table suggests* — but treat any
+   So the split's payoff is _bigger on CI than the mini table suggests_ — but treat any
    single number as environment-specific and re-measure where it runs. (An earlier
    "4.6 GB / 195k" figure quoted for the full install was never reproduced on the mini —
    exactly the kind of stale claim the weight script exists to catch.)
-2. **The cost is *materialising* files, not fetching them.** A `~/.bun/install/cache` step
+2. **The cost is _materialising_ files, not fetching them.** A `~/.bun/install/cache` step
    restored 533 MB in 16s to save only ~23s of a ~230s install → **not worth it**. Caching
    the download does little when the time goes into writing 100k+ files.
 
@@ -108,7 +126,7 @@ Two honesty notes, both learned by *actually measuring* rather than trusting a f
 
 - **`pr-verify`** (every PR): `bun install --frozen-lockfile --filter '!native'` then
   `oxlint && oxfmt --check && turbo run check-types build --filter='!native'`.
-  **Never installs Expo.** `oxlint`/`oxfmt` read *source files*, not `node_modules`, so
+  **Never installs Expo.** `oxlint`/`oxfmt` read _source files_, not `node_modules`, so
   native source is still linted/formatted here without its deps. (Note: `apps/native`
   has **no `build` task** anyway, so `turbo build` never touches the mobile app.)
 - **`pr-native`** (paths-gated): `on.pull_request.paths` lists `apps/native/**` **and
@@ -119,8 +137,8 @@ Two honesty notes, both learned by *actually measuring* rather than trusting a f
   shared-package change breaking native, so its `paths` list must stay complete.
 
 **Net:** a non-native PR (the common case, docs included) never pays the Expo install.
-**Tradeoff (accept it consciously):** a non-native PR that breaks native *through a
-shared package not in `pr-native`'s paths* is caught at tag, not per-PR. Widening
+**Tradeoff (accept it consciously):** a non-native PR that breaks native _through a
+shared package not in `pr-native`'s paths_ is caught at tag, not per-PR. Widening
 coverage = one line in `paths`.
 
 Proof it works (measured on the mini, warm store): `--filter '!native'` install →
@@ -131,7 +149,7 @@ Proof it works (measured on the mini, warm store): `--filter '!native'` install 
 ## Protocol: watch dependency weight (don't let a fat dep slip in)
 
 Big dependencies are the thing that makes installs — and therefore CI — expensive, so
-make their weight *visible* instead of discovering it after the minutes are gone. Ship a
+make their weight _visible_ instead of discovering it after the minutes are gone. Ship a
 small audit script and run it before adding or bumping a heavy dep.
 
 `scripts/dep-weight.sh` (wired as `bun run deps:weight`), two modes:
@@ -152,13 +170,30 @@ prefer date-fns subpath imports, dayjs, or `Intl`). Keep heavy, platform-specifi
 (native/Expo) isolated to their own workspace so the `--filter` split keeps working.
 The script is generic to any Bun workspace monorepo — copy it into a new repo as-is.
 
+## Runner cost and path fan-out (read this first)
+
+Where a job runs matters more than how long it takes: `macos-latest` bills at ~10× Linux, so
+the workflow that runs least can be the largest line on the bill. The cost model, the
+multiplier table, the spending-limit ceiling, the `packages/**` shared-filter trap and the
+per-PR → on-merge → nightly → release ladder are all in
+**[monorepos/ci-runner-cost.md](../monorepos/ci-runner-cost.md)** — one source of truth; not
+restated here.
+
+Two smells that doc does not name, both cheap to fix:
+
+- **The same suite owned by two workflows.** A repo-wide `test --filter='*'` plus a per-app
+  `test` doubles the most-run job in the repo. One owner per suite.
+- **The free gate weaker than the paid one.** If pre-push runs lint + format but leaves types,
+  build and affected tests to CI, the tiers above are inverted — see the pre-push section.
+
 ## Cost levers (apply to whatever still runs in CI)
+
 1. **Turbo cache** in CI (`actions/cache` for `.turbo`, keyed on `${{ github.sha }}`
    with a `turbo-` restore prefix) — replays unchanged `check-types`/`build` outputs.
    A **bun install cache** (`~/.bun/install/cache` keyed on `bun.lock`) sounds like the
    same win but was **measured not worth it** for the native tree (see above): the cost
-   is materialising files, not downloading them. *Cache is a deliberate, separate step —
-   ship a clean no-cache baseline first to measure the real per-PR cost, then add it.*
+   is materialising files, not downloading them. _Cache is a deliberate, separate step —
+   ship a clean no-cache baseline first to measure the real per-PR cost, then add it._
 2. **`concurrency: cancel-in-progress`** per PR — superseded pushes don't keep running.
 3. **`paths` filters** — a docs-only PR shouldn't run native/backend jobs. (This is what
    makes `pr-native` cheap — it only fires when native or its deps change.)
@@ -167,11 +202,12 @@ The script is generic to any Bun workspace monorepo — copy it into a new repo 
    with required checks = real branch protection on the one `main`.
 5. **Self-hosted runner** (optional, nuclear) — an always-on machine (e.g. a Mac mini)
    runs CI for $0 GitHub minutes. **The silver bullet for the native install specifically:**
-   on a persistent runner `node_modules` + the bun store *survive between runs*, so the
+   on a persistent runner `node_modules` + the bun store _survive between runs_, so the
    Expo install is near-instant after the first time (no re-materialising). Private repo →
    acceptable risk. Needs a runner registration token from the repo owner.
 
 ## Deploy ordering (a trap worth documenting)
+
 `convex deploy` (schema) runs before `migrations:runAll` in the release pipeline. A
 schema change that narrows a validator will FAIL the deploy if existing rows violate it —
 before the migration can fix them. **Two-step promotion:** release once that runs the
@@ -179,10 +215,12 @@ data migration while the schema still accepts old values, then release the narro
 Use the pipeline's existing `db:migrate`; don't invent a second path.
 
 ## Minimal branch protection
+
 Require only `verify` on `main` (via the PR backstop / merge queue). That alone stops
 red-merges (the failure mode of "no protection": anything can land on the one main).
 
 ## Checklist to adopt this in a repo
+
 - [ ] Add `verify` script (types + lint + format + build; NO tests) to root `package.json`.
 - [ ] Add `.githooks/pre-push` running `bun run verify`; document `core.hooksPath`.
 - [ ] PR workflow: run `verify` only, cached; drop tests from PR.
@@ -191,10 +229,14 @@ red-merges (the failure mode of "no protection": anything can land on the one ma
 - [ ] Non-zero Actions spending limit and usage alerts on the account.
 - [ ] Bot workflows (`release-please`) path-filtered; every job bills a whole minute.
 - [ ] Turbo/bun cache + `cancel-in-progress` + `paths` on the surviving jobs.
+- [ ] Audit the runner of every job: nothing on `macos`/`windows` that Linux can run.
+- [ ] Check no shared-package glob (`packages/**`) fans one PR out to every app workflow.
+- [ ] Check no suite runs in two workflows.
 - [ ] Agents call `bun run verify` before push.
 - [ ] Require `verify` on `main`.
 
 ## See also
+
 - [[ai-agent-delegation]] — agents share the same `verify` gate.
 - [[specs-and-plans-workflow]] · [[plan-to-backlog]] — how this gets specced and shipped.
 - [[changelog-pattern]] — releases (tags) are where the changelog + heavy pipeline land.

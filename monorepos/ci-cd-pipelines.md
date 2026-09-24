@@ -12,7 +12,7 @@ Example with three deployables (a desktop app, a web app, an API):
 | ------------------------- | ---------------- | --------------------------------------- | ------------------------------------------------------- |
 | **Desktop** (Electron)    | `desktop-v*.*.*` | `.github/workflows/release-desktop.yml` | Signed macOS DMG/zip → Cloudflare R2 + a GitHub Release |
 | **Web** (landing + proxy) | `web-v*.*.*`     | `.github/workflows/release-web.yml`     | Cloudflare Worker (`<app>-web`) → `<app>.example`       |
-| **API** (backend)         | `api-v*.*.*`     | `.github/workflows/release-api.yml`     | Cloudflare Worker (`<app>-api`)                          |
+| **API** (backend)         | `api-v*.*.*`     | `.github/workflows/release-api.yml`     | Cloudflare Worker (`<app>-api`)                         |
 
 Each also has a `workflow_dispatch` trigger, so you can run any of them manually from the **Actions**
 tab without cutting a tag.
@@ -55,6 +55,10 @@ see [release-automation.md](./release-automation.md).
 
 The version is parsed from the tag: `desktop-v0.1.0` → `0.1.0` (used for the DMG filenames).
 
+What that step actually has to do — the mandatory stage order, the app icon and DMG
+install window, and the toolchain-specific traps — is in
+[distribution/](../distribution/).
+
 ### Web — `release-web.yml`
 
 1. Installs deps, builds the shared `@<scope>/*` packages, then builds the web app.
@@ -78,11 +82,11 @@ first deploy of each, they ship independently in any order.
 
 ## Domains
 
-| Host                    | Serves                                              | DNS provisioning                                                          |
-| ----------------------- | --------------------------------------------------- | ------------------------------------------------------------------------- |
-| `<app>.example` + `www` | web Worker (landing)                                | Auto on `wrangler deploy` (custom_domain routes)                          |
-| `updates.<app>.example` | R2 bucket (update feed + DMGs + `version-gate.json`)| R2 → Settings → Custom Domains                                            |
-| `api.<app>.example`     | _(optional)_                                        | Only if exposing the API directly; today it's reached via Service Binding |
+| Host                    | Serves                                               | DNS provisioning                                                          |
+| ----------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------- |
+| `<app>.example` + `www` | web Worker (landing)                                 | Auto on `wrangler deploy` (custom_domain routes)                          |
+| `updates.<app>.example` | R2 bucket (update feed + DMGs + `version-gate.json`) | R2 → Settings → Custom Domains                                            |
+| `api.<app>.example`     | _(optional)_                                         | Only if exposing the API directly; today it's reached via Service Binding |
 
 ## Secrets & variables (GitHub `production` environment)
 

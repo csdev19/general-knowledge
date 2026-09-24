@@ -8,12 +8,12 @@ contexto previo pueda implementar la delegación leyendo solo esto.
 
 ## Los dos modos
 
-| | **Modo A — rápido, medianamente caro** | **Modo B — lento, barato** |
-| --- | --- | --- |
-| Modelos | Opus 4.8 | Sonnet + Haiku |
-| Cuándo | Estás esperando el resultado, sesión interactiva | No estás mirando: corre en background, en una máquina siempre encendida (p. ej. un Mac mini) |
-| Criterio de elección | El costo del tiempo de espera humano supera el costo de tokens | El trabajo puede tardar; nadie está bloqueado |
-| Riesgo | Gasto | Que un modelo barato se atasque y nadie lo note → hace falta un heartbeat o un review final |
+|                      | **Modo A — rápido, medianamente caro**                         | **Modo B — lento, barato**                                                                   |
+| -------------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Modelos              | Opus 4.8                                                       | Sonnet + Haiku                                                                               |
+| Cuándo               | Estás esperando el resultado, sesión interactiva               | No estás mirando: corre en background, en una máquina siempre encendida (p. ej. un Mac mini) |
+| Criterio de elección | El costo del tiempo de espera humano supera el costo de tokens | El trabajo puede tardar; nadie está bloqueado                                                |
+| Riesgo               | Gasto                                                          | Que un modelo barato se atasque y nadie lo note → hace falta un heartbeat o un review final  |
 
 La regla operativa: **el modo lo elige quién está esperando, no la dificultad de la
 tarea.** Una tarea difícil que nadie está mirando va en modo B con un review final
@@ -24,13 +24,13 @@ caro; una tarea trivial que bloquea a una persona va en modo A.
 Cualquiera de los dos modos usa la misma forma. Lo que cambia es qué modelo ocupa
 cada casilla.
 
-| Rol | Qué hace | Modo A | Modo B |
-| --- | --- | --- | --- |
-| **Orquestador** | Lee el plan, despacha, revisa entre tareas, mantiene el ledger | Opus 4.8 | Opus 4.8 (el orquestador nunca baja de tier: es quien decide) |
-| **Implementador mecánico** | El plan ya trae el código/YAML/JSON completo → transcribir + validar | Haiku | Haiku |
-| **Implementador con juicio** | Lógica real, verificar afirmaciones contra archivos, formatos delicados | Opus 4.8 | Sonnet |
-| **Reviewer por tarea** | Un diff acotado contra su brief | Sonnet | Sonnet |
-| **Review final de rama** | Decide si algo rompe producción | Opus 4.8 | Opus 4.8 (**nunca** se abarata) |
+| Rol                          | Qué hace                                                                | Modo A   | Modo B                                                        |
+| ---------------------------- | ----------------------------------------------------------------------- | -------- | ------------------------------------------------------------- |
+| **Orquestador**              | Lee el plan, despacha, revisa entre tareas, mantiene el ledger          | Opus 4.8 | Opus 4.8 (el orquestador nunca baja de tier: es quien decide) |
+| **Implementador mecánico**   | El plan ya trae el código/YAML/JSON completo → transcribir + validar    | Haiku    | Haiku                                                         |
+| **Implementador con juicio** | Lógica real, verificar afirmaciones contra archivos, formatos delicados | Opus 4.8 | Sonnet                                                        |
+| **Reviewer por tarea**       | Un diff acotado contra su brief                                         | Sonnet   | Sonnet                                                        |
+| **Review final de rama**     | Decide si algo rompe producción                                         | Opus 4.8 | Opus 4.8 (**nunca** se abarata)                               |
 
 Las dos casillas que no se abaratan nunca son el **orquestador** y el **review final
 de rama**. Todo lo demás sí.
@@ -40,10 +40,10 @@ de rama**. Todo lo demás sí.
 Datos medidos en una sesión real: 21 subagentes, 10 tareas de configuración de CI
 (YAML + JSON + docs), plan con el código completo inline.
 
-| Implementadores | Duración media | Tool calls por tarea |
-| --- | --- | --- |
-| Haiku (6 tareas) | 94 s | 10–17 |
-| Sonnet (3 tareas) | 75 s | 10–11 |
+| Implementadores   | Duración media | Tool calls por tarea |
+| ----------------- | -------------- | -------------------- |
+| Haiku (6 tareas)  | 94 s           | 10–17                |
+| Sonnet (3 tareas) | 75 s           | 10–11                |
 
 Haiku dio más vueltas — el efecto conocido de "el modelo barato usa más turnos" —
 pero fue leve. **Pasar las 6 tareas mecánicas de Haiku a Sonnet habría ahorrado unos

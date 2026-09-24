@@ -12,14 +12,20 @@ Reusable architecture patterns for building a local-first desktop app with Elect
 ## IPC & process model
 
 - [ipc-contract.md](./ipc-contract.md) — The main↔renderer bridge: `contextBridge` preload, channels grouped by subsystem, `invoke` vs `send`, and the TypeScript-verified shared types as the source of truth.
+- [../architecture/client-state-persistence.md](../architecture/client-state-persistence.md) — Which process owns a persisted setting, and why the renderer's `localStorage` is the wrong home for anything main acts on (engines, providers, launch-time jobs). The owner/mirror split, and why the mirror carries no `persist` middleware.
 - [media-pipeline.md](./media-pipeline.md) — A heavy media/compute pipeline in Electron: engine as a module-singleton outside React, positional disk writes, cross-window state via a main-process hub, hardware encode, and robust failure recovery.
 
 ## Native integration
 
 - [permissions-and-onboarding.md](./permissions-and-onboarding.md) — Cross-platform screen/mic/camera permission checks and requests (macOS quirks especially), split into pure renderer logic + thin main-process wiring, and the first-run onboarding flow.
+- [native-dependencies.md](./native-dependencies.md) — A native module's prebuilds target Node's ABI, not Electron's: rebuild explicitly (`rebuild:native`, `npmRebuild: false`, a stamp inside `node_modules` the setup doctor compares), never from `postinstall` — which breaks every unrelated CI job and is the shape of a supply-chain attack. Consumers degrade to "feature off".
 - [library-vault.md](./library-vault.md) — Local-first storage: files as the source of truth, JSON metadata sidecars, a configurable vault directory, and a privileged streamable media protocol for playback.
 
 ## Distribution & product
+
+Shipping the built app — Developer ID signing, notarization, the DMG install window, and the
+update feed — is toolchain-shaped rather than Electron-shaped and lives in
+[distribution/](../distribution/).
 
 - [filesystem-first-monetization.md](./filesystem-first-monetization.md) — ADR: why filesystem-first (atomic sidecars, metadata inside the vault) and why local-first doesn't hurt monetization — sell the network/cloud layer, never local features.
 - [analytics-and-flags.md](./analytics-and-flags.md) — Analytics architecture (renderer-primary + main-sink), offline-safe feature flags, per-device identity, the two-channel error rule, and a privacy posture for a screen-capable app.

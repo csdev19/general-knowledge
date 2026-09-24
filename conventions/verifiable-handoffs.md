@@ -20,21 +20,21 @@ that — but "here is how you check me", with everything else as context.
 
 ## The three failures it prevents
 
-| Failure | What it looks like | Why it costs |
-| --- | --- | --- |
-| **Unverifiable claim** | "Tests pass." No command, no exit code, no counts. | The reader cannot tell a real green from a misread one. A pipe like `test \| tail -5` reports the exit status of `tail`, so a failing run looks clean. |
-| **Buried behaviour change** | The architecture story leads; the removed fallback is in paragraph six, or absent. | The reader finds it by hitting it, in the middle of something else. |
-| **File list instead of a review plan** | Fifteen changed files, no word on what to do with them. | The triage that was the writer's job is handed to the reader. |
+| Failure                                | What it looks like                                                                 | Why it costs                                                                                                                                           |
+| -------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Unverifiable claim**                 | "Tests pass." No command, no exit code, no counts.                                 | The reader cannot tell a real green from a misread one. A pipe like `test \| tail -5` reports the exit status of `tail`, so a failing run looks clean. |
+| **Buried behaviour change**            | The architecture story leads; the removed fallback is in paragraph six, or absent. | The reader finds it by hitting it, in the middle of something else.                                                                                    |
+| **File list instead of a review plan** | Fifteen changed files, no word on what to do with them.                            | The triage that was the writer's job is handed to the reader.                                                                                          |
 
 ## Required sections
 
-| Section | Answers |
-| --- | --- |
-| What this does | What the work is, in the reader's terms |
-| Why | The problem it solves — for a defect, the concrete input and wrong output, never the category |
-| What changes for you | Every observable behaviour change: before, after, and what to do instead |
-| Verify it yourself | Setup, numbered steps, expected result, and the failure mode — ordered by risk |
-| What I did not verify | Paths not exercised, things asserted from reading rather than running, known flakiness |
+| Section               | Answers                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------- |
+| What this does        | What the work is, in the reader's terms                                                       |
+| Why                   | The problem it solves — for a defect, the concrete input and wrong output, never the category |
+| What changes for you  | Every observable behaviour change: before, after, and what to do instead                      |
+| Verify it yourself    | Setup, numbered steps, expected result, and the failure mode — ordered by risk                |
+| What I did not verify | Paths not exercised, things asserted from reading rather than running, known flakiness        |
 
 "Verify it yourself" is the section the rest exists for. The others are
 context that makes it followable.
