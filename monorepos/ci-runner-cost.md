@@ -81,6 +81,11 @@ whenever a workflow names anything other than `ubuntu-latest`.
 still running**. A PR with four pushes spaced far enough apart pays for four complete runs. At 1×
 nobody notices; at 10× that is a meaningful fraction of a monthly allowance for a single PR.
 
+Bot workflows compound it too. Every job bills a whole minute minimum, so a 45-second
+`release-please` run on every push to `main` — docs merges included — is a minute each; 88 runs
+were 90 minutes, about 11 % of one repository's usage, and the first job the quota block hit.
+Path-filter bots to the paths that can change their outcome.
+
 Shared-path filters compound it. `packages/**` and `bun.lock` sit in every per-project filter by
 design — a shared-package change can break any consumer — which is correct for a Linux suite and
 expensive for a macOS one. **Split the filter with the job:** the cheap job keeps the broad
@@ -101,6 +106,10 @@ deleting it. Each rung trades feedback latency for cost.
 
 Rungs 3 and below need a named owner for the failure. A red run on `main` that nobody watches is
 not a safety net — it is a decoration. Wire a notification, or stay on rung 2.
+
+Rung 5 is a whole operating model, not just a trigger: the hook, the release PR as candidate and
+the `needs:` gate in the tag workflow are specified in
+[release-gated-verification.md](./release-gated-verification.md).
 
 Record the rung and its reasoning in the workflow header, with the condition that would move it
 back up. A future reader needs to know the choice was deliberate and what would reverse it.
@@ -210,6 +219,8 @@ Before merging a workflow that names a non-Linux runner:
 
 ## Related
 
+- [release-gated-verification.md](./release-gated-verification.md) — the rules: a publish step
+  never runs without a `verify` job on the same SHA; where each check lives; the five-minute audit.
 - [ci-per-project-pipelines.md](./ci-per-project-pipelines.md) — the frequency axis: universal
   fast check plus path-filtered per-project suites, and why docs-only PRs still run the formatter.
 - [pr-checks.md](./pr-checks.md) — PR gate shapes, the visible-skip discipline, and the

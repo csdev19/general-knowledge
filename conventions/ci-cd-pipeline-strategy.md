@@ -5,6 +5,14 @@ run the cheap gate everywhere (local + PR), run the expensive gate only when you
 promote. Distilled from a real cost blow-up (a burst of stacked PRs + many merges
 exhausted the monthly Actions minutes)._
 
+> **Read [release-gated-verification.md](../monorepos/release-gated-verification.md) first
+> (2026-09-24).** It is the normative version of this page after the same account exhausted
+> its Actions quota twice with this strategy written down. Two things below are corrected
+> there: the release gate is a **precondition** of every publish step (not a checklist item),
+> and "no tests in `verify`" only holds if you measured them as slow — on a Bun + Turbo
+> monorepo the full suite ran in 18 s locally. The PR backstop is optional by who merges;
+> the release gate is not.
+
 ## The mental model
 
 - **`main` is not prod.** `main` is the current state of the code (integration).
@@ -26,9 +34,10 @@ A single script is the source of truth for "is this code OK to share":
 bun run verify   # = turbo check-types + lint + format-check + build packages
 ```
 
-- **NO tests in `verify`.** Full test suites (web + backend + mobile) are slow; running
-  them on every push/PR is the main cost sink. Tests run **locally on demand** and in the
-  **promotion (tag) pipeline** — not per-PR.
+- **Tests in `verify` only if they are fast — measure first.** Measured on a Bun + Turbo
+  monorepo, 1,167 tests ran in 18 s cold and were cached warm, so they belong in the hook.
+  Where a suite is genuinely slow (mobile, integration against a database), it runs
+  **locally on demand** and in the **promotion (tag) pipeline** — never per feature-PR push.
 - Cacheable and fast (turbo skips unchanged packages).
 - **The same `verify` is used by all three consumers** below — humans, agents, and CI —
   so "green" means the same thing everywhere.
@@ -177,7 +186,10 @@ red-merges (the failure mode of "no protection": anything can land on the one ma
 - [ ] Add `verify` script (types + lint + format + build; NO tests) to root `package.json`.
 - [ ] Add `.githooks/pre-push` running `bun run verify`; document `core.hooksPath`.
 - [ ] PR workflow: run `verify` only, cached; drop tests from PR.
-- [ ] Tag workflow(s): build + tests + native builds + e2e + security + deploy + migrate.
+- [ ] Tag workflow(s): a `verify` job that the publish job `needs:` — **do this before removing
+      anything from PRs** — then build + tests + native builds + e2e + security + deploy + migrate.
+- [ ] Non-zero Actions spending limit and usage alerts on the account.
+- [ ] Bot workflows (`release-please`) path-filtered; every job bills a whole minute.
 - [ ] Turbo/bun cache + `cancel-in-progress` + `paths` on the surviving jobs.
 - [ ] Agents call `bun run verify` before push.
 - [ ] Require `verify` on `main`.
