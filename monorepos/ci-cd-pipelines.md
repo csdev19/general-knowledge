@@ -12,7 +12,7 @@ Example with three deployables (a desktop app, a web app, an API):
 | ------------------------- | ---------------- | --------------------------------------- | ------------------------------------------------------- |
 | **Desktop** (Electron)    | `desktop-v*.*.*` | `.github/workflows/release-desktop.yml` | Signed macOS DMG/zip → Cloudflare R2 + a GitHub Release |
 | **Web** (landing + proxy) | `web-v*.*.*`     | `.github/workflows/release-web.yml`     | Cloudflare Worker (`<app>-web`) → `<app>.example`       |
-| **API** (backend)         | `api-v*.*.*`     | `.github/workflows/release-api.yml`     | Cloudflare Worker (`<app>-api`)                         |
+| **API** (backend)         | `api-v*.*.*`     | `.github/workflows/release-api.yml`     | Cloudflare Worker (`<app>-api`)                          |
 
 Each also has a `workflow_dispatch` trigger, so you can run any of them manually from the **Actions**
 tab without cutting a tag.
@@ -82,11 +82,11 @@ first deploy of each, they ship independently in any order.
 
 ## Domains
 
-| Host                    | Serves                                               | DNS provisioning                                                          |
-| ----------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------- |
-| `<app>.example` + `www` | web Worker (landing)                                 | Auto on `wrangler deploy` (custom_domain routes)                          |
-| `updates.<app>.example` | R2 bucket (update feed + DMGs + `version-gate.json`) | R2 → Settings → Custom Domains                                            |
-| `api.<app>.example`     | _(optional)_                                         | Only if exposing the API directly; today it's reached via Service Binding |
+| Host                    | Serves                                              | DNS provisioning                                                          |
+| ----------------------- | --------------------------------------------------- | ------------------------------------------------------------------------- |
+| `<app>.example` + `www` | web Worker (landing)                                | Auto on `wrangler deploy` (custom_domain routes)                          |
+| `updates.<app>.example` | R2 bucket (update feed + DMGs + `version-gate.json`)| R2 → Settings → Custom Domains                                            |
+| `api.<app>.example`     | _(optional)_                                        | Only if exposing the API directly; today it's reached via Service Binding |
 
 ## Secrets & variables (GitHub `production` environment)
 

@@ -109,9 +109,9 @@ Entrada **no** (release-please ya lo registra):
 
 Dos capas complementarias, sin solaparse:
 
-| Capa                   | Quién la escribe                          | Qué cuenta                          |
-| ---------------------- | ----------------------------------------- | ----------------------------------- |
-| `CHANGELOG.md` por app | release-please (automático)               | Qué commits entraron en qué versión |
-| `docs/changelog/`      | el autor o el agente (manual, con listón) | Por qué, qué se descartó, lecciones |
+| Capa                | Quién la escribe             | Qué cuenta                          |
+| ------------------- | ---------------------------- | ----------------------------------- |
+| `CHANGELOG.md` por app | release-please (automático) | Qué commits entraron en qué versión |
+| `docs/changelog/`   | el autor o el agente (manual, con listón) | Por qué, qué se descartó, lecciones |
 
 Si un cambio no tiene "por qué" que contar, no duplica capa: vive solo en la de release-please.

@@ -56,11 +56,11 @@ deployed consumer**.
 
 3. **Intersect them** and pick a topology:
 
-| Situation                                                                | Topology                                                                                   |
-| ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
-| Closures **intersect** (typical web + api sharing `domain`)              | **A — single version line.** One component, one tag, several deploy workflows on that tag. |
-| Closures **disjoint** (genuinely separate products in one repo)          | **B — independent version lines**, one component per deployable.                           |
-| Consumer you **cannot force to update** (mobile, desktop, published SDK) | **Always its own line**, plus a compatibility contract — see below.                        |
+| Situation                                                     | Topology                                                    |
+| ------------------------------------------------------------- | ----------------------------------------------------------- |
+| Closures **intersect** (typical web + api sharing `domain`)   | **A — single version line.** One component, one tag, several deploy workflows on that tag. |
+| Closures **disjoint** (genuinely separate products in one repo) | **B — independent version lines**, one component per deployable. |
+| Consumer you **cannot force to update** (mobile, desktop, published SDK) | **Always its own line**, plus a compatibility contract — see below. |
 
 ### The one exception: a compatibility contract
 
@@ -313,16 +313,16 @@ jobs:
 
 ## Gotchas
 
-| Symptom                                                     | Cause                                                                                                                                                                                                   |
-| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Tag created, no deploy ran                                  | Default `GITHUB_TOKEN` — use the PAT (Step 3).                                                                                                                                                          |
-| No release PR at all                                        | The batch is only `chore`/`docs`/`refactor`/`ci` — nothing releasable. Land a `feat`/`fix`.                                                                                                             |
-| No release PR after a `packages/*`-only change              | Topology B: shared-package commits belong to no component by path. This is the closure rule biting — see Step 1.                                                                                        |
-| First release PR contains hundreds of commits               | Missing `bootstrap-sha`.                                                                                                                                                                                |
-| `Cannot read properties of undefined (reading 'version')`   | The released `package.json` has no `version` field.                                                                                                                                                     |
-| An app you never deploy keeps cutting releases              | Add it to `exclude-paths`.                                                                                                                                                                              |
-| Want a specific next version (e.g. declare `1.0.0`)         | `Release-As: 1.0.0` footer in a commit body.                                                                                                                                                            |
-| Considering `node-workspace` / `linked-versions` on **Bun** | Bun's root `workspaces` is an **object** (`{ packages: [], catalog: {} }`), not the array these plugins expect. Verify with a dry run before committing to it; Topology A avoids the question entirely. |
+| Symptom                                                        | Cause                                                                                          |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Tag created, no deploy ran                                     | Default `GITHUB_TOKEN` — use the PAT (Step 3).                                                 |
+| No release PR at all                                           | The batch is only `chore`/`docs`/`refactor`/`ci` — nothing releasable. Land a `feat`/`fix`.     |
+| No release PR after a `packages/*`-only change                 | Topology B: shared-package commits belong to no component by path. This is the closure rule biting — see Step 1. |
+| First release PR contains hundreds of commits                  | Missing `bootstrap-sha`.                                                                       |
+| `Cannot read properties of undefined (reading 'version')`      | The released `package.json` has no `version` field.                                            |
+| An app you never deploy keeps cutting releases                 | Add it to `exclude-paths`.                                                                     |
+| Want a specific next version (e.g. declare `1.0.0`)            | `Release-As: 1.0.0` footer in a commit body.                                                   |
+| Considering `node-workspace` / `linked-versions` on **Bun**    | Bun's root `workspaces` is an **object** (`{ packages: [], catalog: {} }`), not the array these plugins expect. Verify with a dry run before committing to it; Topology A avoids the question entirely. |
 
 Commit type → bump table: see
 [release-automation.md § Commit → bump reference](./release-automation.md#commit--bump-reference).

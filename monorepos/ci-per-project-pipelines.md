@@ -1,6 +1,6 @@
 # Per-project CI pipelines
 
-_Split the monolithic PR check into a fast universal compile check plus path-filtered per-project test workflows, skip release PRs, and normalize release-\* naming._
+_Split the monolithic PR check into a fast universal compile check plus path-filtered per-project test workflows, skip release PRs, and normalize release-* naming._
 
 > This document covers **how often** each suite runs. It assumes every job is on
 > `ubuntu-latest`, where a minute is a minute. The moment a workflow names `macos-latest` or
@@ -47,11 +47,11 @@ desktop. **No tests.** ~1–1.5 min. This is `pr-validation` minus the desktop t
 
 ### Per-project tests (path-filtered, skip release PRs)
 
-| Workflow         | Name              | Paths                                              | Jobs                                                       |
-| ---------------- | ----------------- | -------------------------------------------------- | ---------------------------------------------------------- |
-| `ci-desktop.yml` | **Desktop Tests** | `apps/desktop/**`, `packages/**`, `bun.lock`, self | `unit` (vitest) + `e2e` (Electron/Playwright), in parallel |
-| `ci-web.yml`     | **Web Tests**     | `apps/web/**`, `packages/**`, `bun.lock`, self     | `test` — runs the web app's `test` script when present     |
-| `ci-api.yml`     | **API Tests**     | `apps/api/**`, `packages/**`, `bun.lock`, self     | `test` — runs the api app's `test` script when present     |
+| Workflow         | Name              | Paths                                             | Jobs                                                        |
+| ---------------- | ----------------- | ------------------------------------------------- | ----------------------------------------------------------- |
+| `ci-desktop.yml` | **Desktop Tests** | `apps/desktop/**`, `packages/**`, `bun.lock`, self| `unit` (vitest) + `e2e` (Electron/Playwright), in parallel  |
+| `ci-web.yml`     | **Web Tests**     | `apps/web/**`, `packages/**`, `bun.lock`, self    | `test` — runs the web app's `test` script when present      |
+| `ci-api.yml`     | **API Tests**     | `apps/api/**`, `packages/**`, `bun.lock`, self    | `test` — runs the api app's `test` script when present      |
 
 Each test job carries `if: ${{ !startsWith(github.head_ref, 'release-please--') }}` so release PRs —
 which match the path filter via `package.json` — run nothing.
@@ -107,10 +107,10 @@ human reviewer never notices.
 
 So the split is by **cost**, not by file type:
 
-| Half      | Contents                       | Runs on       | Why                                                       |
-| --------- | ------------------------------ | ------------- | --------------------------------------------------------- |
-| Fast gate | lint, format check, type-check | **every** PR  | Seconds. Covers markdown. Nothing here is worth skipping. |
-| Slow half | test suites, builds            | code PRs only | Minutes. A changelog edit cannot break a test.            |
+| Half           | Contents                       | Runs on             | Why                                                              |
+| -------------- | ------------------------------ | ------------------- | ---------------------------------------------------------------- |
+| Fast gate      | lint, format check, type-check | **every** PR        | Seconds. Covers markdown. Nothing here is worth skipping.        |
+| Slow half      | test suites, builds            | code PRs only       | Minutes. A changelog edit cannot break a test.                   |
 
 Two workflows is enough for a small monorepo — a `pr-validation.yml` holding the fast gate and a
 `pr-tests.yml` holding the rest, the latter carrying the `paths-ignore`. Scale up to the

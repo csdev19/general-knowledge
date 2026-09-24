@@ -22,12 +22,12 @@ against a real source.
 
 ## Sources — legality first
 
-| Source                                    | License                  | Use for                                                                 | Notes                                                                     |
-| ----------------------------------------- | ------------------------ | ----------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| **Wikidata**                              | **CC0** (no attribution) | **primary** — coords (`P625`), canonical name, category (`instance of`) | Query via SPARQL or `wbgetentities`. Structured + free. The mine of gold. |
-| **Wikipedia**                             | CC BY-SA                 | descriptions / context                                                  | Attribution required — keep the source URL.                               |
-| **OpenStreetMap / Nominatim**             | ODbL                     | geocoding / addresses                                                   | Attribution + usage policy (≤1 req/s, cache results).                     |
-| Official place APIs (Google Places, etc.) | proprietary              | only if licensed                                                        | Pay + ToS; fine when you have a key and a budget.                         |
+| Source | License | Use for | Notes |
+| --- | --- | --- | --- |
+| **Wikidata** | **CC0** (no attribution) | **primary** — coords (`P625`), canonical name, category (`instance of`) | Query via SPARQL or `wbgetentities`. Structured + free. The mine of gold. |
+| **Wikipedia** | CC BY-SA | descriptions / context | Attribution required — keep the source URL. |
+| **OpenStreetMap / Nominatim** | ODbL | geocoding / addresses | Attribution + usage policy (≤1 req/s, cache results). |
+| Official place APIs (Google Places, etc.) | proprietary | only if licensed | Pay + ToS; fine when you have a key and a budget. |
 
 **Do NOT scrape** TripAdvisor / Google Maps / Yelp: their ToS prohibit it, they fight
 scrapers, the HTML is fragile, and it is legal risk for zero upside when Wikidata already
@@ -62,12 +62,11 @@ whatever the destination app uses ([[schemas-first]]).
 
 ## Where to start
 
-**Japan first** for trip-planner — dual purpose: it fills the app _and_ feeds a real
+**Japan first** for trip-planner — dual purpose: it fills the app *and* feeds a real
 upcoming trip. Then Perú (Lima/Cusco), then broaden. Generate a small sample (~12 places)
 first to lock the shape before scaling a country.
 
 ## See also
-
 - [[tagging-system]] — the category slugs attractions map onto.
 - [[schemas-first]] — the shape is the schema; validate against it.
 - [[ci-cd-pipeline-strategy]] — keep any scraper/enricher deps light ([deps weight](../conventions/ci-cd-pipeline-strategy.md)).

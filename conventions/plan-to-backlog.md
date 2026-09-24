@@ -38,7 +38,7 @@ salida (épica + P-docs + filas del índice), las reglas de conversión pre-deci
 verificación (build de la app de docs antes de commitear).
 
 **Evidencia de que vale la pena** (test TDD de la skill, 2026-07-21, language-cards):
-un agente _sin_ la skill logró la conversión correcta — el patrón es descubrible desde
+un agente *sin* la skill logró la conversión correcta — el patrón es descubrible desde
 los ejemplares del repo — pero gastó ~100k tokens y 30 tool uses en redescubrir
 convenciones y tomó decisiones de juicio sobre la marcha. Con la skill: cumplimiento
 estructural con 1 tool use y ~⅓ de los tokens, y las decisiones de juicio quedaron
@@ -46,14 +46,14 @@ fijadas. La skill no corrige errores: **elimina redescubrimiento y varianza**.
 
 ## Decisiones pre-tomadas (no re-litigar en cada conversión)
 
-| Decisión     | Regla                                                                                                                |
-| ------------ | -------------------------------------------------------------------------------------------------------------------- |
-| Idioma       | Prosa en inglés; tokens de estado/esfuerzo en el idioma de la leyenda del índice (`🔵 Propuesto`, `Bajo/Medio/Alto`) |
-| Dependencias | Derivadas de los bloques **Interfaces** del plan, no del diagrama de carriles                                        |
-| Paralelismo  | Solo por conjuntos de archivos disjuntos, justificado explícitamente en la épica                                     |
-| Ramas        | Integración nombrada en el plan; runs paralelos en `feat/<épica>-p<N>` que mergean de vuelta                         |
-| Estados      | 🔵 Propuesto → 🟡 En progreso → 🟢 Hecho; la épica pasa a 🟢 Listo para validar cuando todos los P-docs están 🟢     |
-| Índice       | Filas insertadas aditivamente; los estados de otras épicas los actualiza su propio trabajo                           |
+| Decisión | Regla |
+| --- | --- |
+| Idioma | Prosa en inglés; tokens de estado/esfuerzo en el idioma de la leyenda del índice (`🔵 Propuesto`, `Bajo/Medio/Alto`) |
+| Dependencias | Derivadas de los bloques **Interfaces** del plan, no del diagrama de carriles |
+| Paralelismo | Solo por conjuntos de archivos disjuntos, justificado explícitamente en la épica |
+| Ramas | Integración nombrada en el plan; runs paralelos en `feat/<épica>-p<N>` que mergean de vuelta |
+| Estados | 🔵 Propuesto → 🟡 En progreso → 🟢 Hecho; la épica pasa a 🟢 Listo para validar cuando todos los P-docs están 🟢 |
+| Índice | Filas insertadas aditivamente; los estados de otras épicas los actualiza su propio trabajo |
 
 ## Ejemplares reales
 
