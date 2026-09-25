@@ -6,7 +6,7 @@ that flow does not happen by itself: at the end of a session the lesson is
 obvious, and by the next session it is gone.
 
 The executable version of this convention is the
-[`distill-lesson` skill](https://github.com/niway-dev/skills/tree/main/skills/distill-lesson). This page is the reasoning;
+[`cs-distill-lesson` skill](https://github.com/niway-dev/skills/tree/main/skills/cs-distill-lesson). This page is the reasoning;
 the skill is the procedure.
 
 ## The rule
