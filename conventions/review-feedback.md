@@ -7,7 +7,7 @@ as a task produces performative agreement, reverted decisions and code that
 is worse after the review than before it.
 
 The executable version of this convention is the
-[`address-review-feedback` skill](https://github.com/niway-dev/skills/tree/main/skills/address-review-feedback). This page
+[`cs-address-review-feedback` skill](https://github.com/niway-dev/skills/tree/main/skills/cs-address-review-feedback). This page
 is the reasoning; the skill is the procedure.
 
 ## The rule

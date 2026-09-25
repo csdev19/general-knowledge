@@ -6,7 +6,7 @@ report are all the same artifact: a handoff. Its job is to let the reader
 decide whether to trust the work.
 
 The executable version of this convention is the
-[`write-handoff` skill](https://github.com/niway-dev/skills/tree/main/skills/write-handoff).
+[`cs-write-handoff` skill](https://github.com/niway-dev/skills/tree/main/skills/cs-write-handoff).
 This page is the reasoning; the skill is the procedure.
 
 ## The rule

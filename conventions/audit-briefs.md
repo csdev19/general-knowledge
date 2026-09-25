@@ -6,7 +6,7 @@ needs the intent, the evidence, and the writer's own weakest points, or they
 will audit the wrong thing.
 
 The executable version of this convention is the
-[`write-audit-brief` skill](https://github.com/niway-dev/skills/tree/main/skills/write-audit-brief).
+[`cs-write-audit-brief` skill](https://github.com/niway-dev/skills/tree/main/skills/cs-write-audit-brief).
 This page is the reasoning; the skill is the procedure. Its sibling,
 [verifiable-handoffs](./verifiable-handoffs.md), is for a **person deciding
 whether to trust finished work**; an audit brief is for an **agent sent to

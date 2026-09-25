@@ -7,7 +7,7 @@ An audit applies the bar in both directions: delete what cannot fail, and add
 what is missing for the failures the owner actually fears.
 
 The executable version of this convention is the
-[`audit-tests` skill](https://github.com/niway-dev/skills/tree/main/skills/audit-tests). This page is the reasoning; the
+[`cs-audit-tests` skill](https://github.com/niway-dev/skills/tree/main/skills/cs-audit-tests). This page is the reasoning; the
 skill is the procedure. The junk patterns and retention bar descend from
 OpenClaw's `test-audit` skill; the gap hunt is our addition.
 
