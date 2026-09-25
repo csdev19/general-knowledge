@@ -197,6 +197,12 @@ run, not an incident.
   per-PR → on-merge → nightly ladder, the split-the-filter-with-the-job rule, and the guard that
   stops a platform-gated suite from passing silently on the wrong runner.
 
+> **Gotcha — a stacked PR runs nothing.** `branches:` in a `pull_request` trigger filters the
+> PR's **base**, not its head, so a PR targeting another feature branch matches no trigger and
+> its `statusCheckRollup` is empty — not red, not pending, absent. An empty check list renders
+> as an untroubled PR page, which is how it gets read as green. See
+> [branch-rulesets.md](./branch-rulesets.md#trap-3-a-stacked-pr-is-not-protected-and-has-no-checks-at-all).
+
 > **Gotcha — `paths` filters and _required_ checks.** A `paths`-filtered workflow that does not
 > run reports **no status**, and GitHub treats a required-but-absent check as perpetually
 > pending — which would **block merge** on any PR that doesn't touch the filtered paths. So a

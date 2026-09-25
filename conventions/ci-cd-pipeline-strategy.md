@@ -216,14 +216,31 @@ Use the pipeline's existing `db:migrate`; don't invent a second path.
 
 ## Minimal branch protection
 
-Require only `verify` on `main` (via the PR backstop / merge queue). That alone stops
-red-merges (the failure mode of "no protection": anything can land on the one main).
+Require one check on `main`. That alone stops red-merges — the failure mode of "no
+protection" being that anything can land on the one trunk.
+
+**Which check, though, depends on what still runs per PR.** If the PR backstop survived,
+require it. If it did not — the normative page's "who merges" question can retire it — then
+the only check left that runs on every PR is the release-candidate **gate job**, and that is
+the one to require. Requiring a check that does not always report blocks merges forever
+rather than protecting anything.
+
+The mechanism, the `gh api` call, and the two ways enabling it breaks working PRs are in
+[monorepos/branch-rulesets.md](../monorepos/branch-rulesets.md). Read it before enabling,
+not after: it is retroactive, and it blocks every open PR whose head predates the check.
 
 ## Checklist to adopt this in a repo
 
-- [ ] Add `verify` script (types + lint + format + build; NO tests) to root `package.json`.
-- [ ] Add `.githooks/pre-push` running `bun run verify`; document `core.hooksPath`.
-- [ ] PR workflow: run `verify` only, cached; drop tests from PR.
+- [ ] Add a `verify` script (lint + format check + build + types + **tests**) to root
+      `package.json`. The banner at the top of this page corrects the original "NO tests"
+      advice, and the checklist now matches it: exclude the tests only if you **measured**
+      them as slow. On a Bun + Turbo monorepo the full suite is seconds, and a `verify`
+      without tests forces every release gate to bolt its own test step on — which is a
+      second definition of "verified", and the thing that drifts.
+- [ ] Add a pre-push hook running `bun run verify` (lefthook, or `.githooks/` +
+      `core.hooksPath`). One job, not `verify` plus a separate affected-tests job.
+- [ ] PR workflow, **if you keep one**: run `bun run verify`, cached. Whether to keep it is
+      the "who merges" question in the normative page, not a default.
 - [ ] Tag workflow(s): a `verify` job that the publish job `needs:` — **do this before removing
       anything from PRs** — then build + tests + native builds + e2e + security + deploy + migrate.
 - [ ] Non-zero Actions spending limit and usage alerts on the account.
@@ -233,7 +250,12 @@ red-merges (the failure mode of "no protection": anything can land on the one ma
 - [ ] Check no shared-package glob (`packages/**`) fans one PR out to every app workflow.
 - [ ] Check no suite runs in two workflows.
 - [ ] Agents call `bun run verify` before push.
-- [ ] Require `verify` on `main`.
+- [ ] Require a check on `main` that runs on **every** PR to it — see
+      [monorepos/branch-rulesets.md](../monorepos/branch-rulesets.md). Pin it to the Actions
+      app, list the open PRs first, and expect each of them to need one push afterwards.
+- [ ] Never read a stacked PR's empty check list as a pass: `branches:` in a `pull_request`
+      trigger filters the PR's **base**, so a PR targeting anything but the trunk runs no
+      workflow at all.
 
 ## See also
 
