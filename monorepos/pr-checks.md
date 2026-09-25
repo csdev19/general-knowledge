@@ -110,6 +110,78 @@ data directory**.
   coverage: the `corsEnabled` and `Range` fixes are still guarded on Linux by the playback
   Range-fetch test.
 
+## Making a sometimes-skipped job a required check
+
+The gotcha above says a required check that never reports blocks merge forever. The same
+bites a job that is present but **skipped by an `if:`** — and that is the normal shape of
+an expensive job you only want on some PRs. You cannot require it directly: on every PR
+where it is skipped, the merge is either blocked or (depending on how the skip is
+reported) silently waved through, and neither is what you meant.
+
+The pattern is a **gate job**: cheap, always runs, reads the expensive job's result and
+reports for it. The gate is what you mark required.
+
+```yaml
+jobs:
+  verify:                      # expensive; skipped on most PRs
+    if: ${{ <the narrow condition> }}
+    # …
+
+  gate:
+    name: Release candidate verified   # ← the required check
+    runs-on: ubuntu-latest
+    needs: [verify]
+    if: always() && github.event_name == 'pull_request'
+    steps:
+      - env:
+          APPLIES: ${{ <the narrow condition> }}
+          RESULT: ${{ needs.verify.result }}
+        run: |
+          [ "$APPLIES" != "true" ] && { echo "Not applicable."; exit 0; }
+          [ "$RESULT" = "success" ] && exit 0
+          echo "::error::Not verified (verify job: $RESULT)."
+          exit 1
+```
+
+`if: always()` is load-bearing: without it the gate is skipped whenever its dependency is,
+which is the failure it exists to prevent. The cost is one billed minute per PR — GitHub
+rounds a five-second job up to a whole minute — so count it before adding one to a
+high-traffic repository.
+
+### A label as the trigger _and_ the gate
+
+Combining this with a label turns a manual decision into an enforceable precondition, the
+same shape as a review approval:
+
+```yaml
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled, unlabeled]
+```
+
+`labeled`/`unlabeled` are not in the default event set; adding them is what lets a label
+start a run. Then the expensive job refuses to run without the label — **failing, not
+skipping**, in a step placed before checkout so the refusal costs seconds:
+
+```yaml
+      - name: Require the label
+        if: ${{ github.event_name == 'pull_request' &&
+                !contains(github.event.pull_request.labels.*.name, 'verify') }}
+        run: |
+          echo "::error::Add the 'verify' label to run this."
+          exit 1
+```
+
+What this buys, on a release PR that a bot rewrites on every merge to the trunk: nothing
+runs while merges accumulate, the label says "I am releasing this", and from then on
+every update is verified until it merges. Keeping `synchronize` in the event list is what
+makes that last part work.
+
+Forgetting the label must not be dangerous. Check that the thing being gated has a second
+gate behind it — a release pipeline whose deploy job sits behind `needs: verify` fails at
+the tag, before anything is signed or published. Then a forgotten label costs a failed
+run, not an incident.
+
 ## Follow-ups
 
 **Done:** the `paths:` filter on E2E Desktop and bun dependency caching in both workflows.

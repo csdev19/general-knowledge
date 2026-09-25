@@ -204,6 +204,34 @@ The four numbers that decide the fix:
 Then compare against the repository's share of the account bill — GitHub's billing page breaks
 usage down by repository, which is the fastest way to find which repo to look at first.
 
+## Measure at the step level, not the workflow level
+
+Timing whole workflows tells you which one to attack; it does not tell you what inside it
+to attack, and the intuition ("the tests are the slow part") is often wrong. One job,
+opened up:
+
+| Step           | Time     | Share    |
+| -------------- | -------- | -------- |
+| Type check     | 1 m 05 s | **38 %** |
+| Build packages | 36 s     | 21 %     |
+| Build web app  | 19 s     | 11 %     |
+| Install        | 18 s     | 11 %     |
+| Format check   | 9 s      | 5 %      |
+| **Tests**      | **8 s**  | **5 %**  |
+
+The plan built on workflow-level numbers proposed deduplicating the test suite: an
+eight-second saving. Type-check and the builds were 71 %. Open the job before ranking the
+cuts.
+
+The cause there was a missing build-tool cache: the workflows cached the package manager's
+downloads but not turbo's task outputs, so every cloud run recomputed from zero while the
+same tasks replayed in seconds locally. Add it — with the key caveat below.
+
+**A release-automation bump defeats the task cache for the package it bumps.** Turbo (or
+nx) hashes each package's own files; `release-please` writes the new version into that
+package's `package.json`, so its hash changes and every task for it re-runs. Unchanged
+packages still hit. Expect a partial win on release runs, not the local warm-cache number.
+
 ## Artifacts and storage
 
 Storage is billed by GB-hour, so **retention is a multiplier on size**. A 500 MB desktop
