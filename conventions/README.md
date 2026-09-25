@@ -23,8 +23,23 @@ Reusable, product-agnostic conventions and workflow patterns distilled from real
 - **[backlog-pattern.md](./backlog-pattern.md)** — How a `backlog/` folder maps deferred work: status legend, index table, one item per file. _(Spanish)_
 - **[changelog-pattern.md](./changelog-pattern.md)** — Docs-app changelog as a decision journal: one file per entry, auto-generated index (no manual index = no merge conflicts), entry bar, and how it complements release-please. _(Spanish)_
 - **[specs-and-plans-workflow.md](./specs-and-plans-workflow.md)** — The brainstorm → spec → plan → archive flow, naming convention, and how it pairs with the backlog. _(Spanish)_
-- **[verifiable-handoffs.md](./verifiable-handoffs.md)** — Finished work is handed back with the means to check it: what changed, why, what changes for the reader, how to verify it by hand, and what was not verified. Capture exit codes, verify against a clean checkout, and treat reading a file as a verification step rather than shipping a file list.
 - **[plan-to-backlog.md](./plan-to-backlog.md)** — Converting an approved plan into self-sufficient backlog deliverables that runner agents execute in parallel; the plan becomes superseded. _(Spanish)_
+
+## Agent skills
+
+Each convention below has an executable counterpart in the
+[skills repo](https://github.com/niway-dev/skills): the page here is the
+reasoning, the skill is the procedure, and they link both ways. When a skill
+changes because something worked or failed in practice, its page here changes
+with it.
+
+- **[repo-briefings.md](./repo-briefings.md)** — A repo explains itself to each kind of reader from its own truth: audience-split briefings, a per-repo binding file, date stamps as promises, audit mode that writes nothing. Skill: `generate-briefings`.
+- **[verifiable-handoffs.md](./verifiable-handoffs.md)** — Finished work handed back with the means to check it. Skill: `write-handoff`.
+- **[audit-briefs.md](./audit-briefs.md)** — Work briefed for a fresh-context agent to attack: intent, claims sorted by how they are known, decisions with owners, and the writer's own weakest points. Skill: `write-audit-brief`.
+- **[cross-machine-sessions.md](./cross-machine-sessions.md)** — Parking a session on one machine and picking it up on another through the repo: a fixed restart file, one disposable checkpoint commit, explicit restore. Skills: `cs-park`, `cs-pickup`.
+- **[lesson-distillation.md](./lesson-distillation.md)** — What a session taught goes to exactly one home: the skill, the hub page, a new skill, or the project. As a conditional, not a story; tested on a fresh agent before shipping. Skill: `distill-lesson`.
+- **[review-feedback.md](./review-feedback.md)** — A review comment is a claim to verify: six kinds, one treatment each; settled decisions are escalated, not reopened; replies cite commits. Skill: `address-review-feedback`.
+- **[test-audits.md](./test-audits.md)** — Trimming tautological and change-detector tests and adding the ones that catch the failures the owner fears; the failure list comes before the test. Skill: `audit-tests`.
 
 ## Agent delegation
 
