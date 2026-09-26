@@ -167,3 +167,4 @@ Todos en `src/shared/types/`, puros (sin `electron`/`node:*`):
 - [Main Process Architecture](./main-process-architecture.md) — quién registra los handlers
 - [Library Vault](./library-vault.md) — qué hacen los handlers `library:*`
 - [Permissions & Onboarding](./permissions-and-onboarding.md) — los handlers `permissions:*`
+- [[local-speech-to-text]] — what crosses this bridge from a transcription sidecar, and why a detected language is absent rather than guessed.

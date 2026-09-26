@@ -104,3 +104,4 @@ is a feature that quietly does nothing, and nobody connects it to an install.
 
 - [[tool-doctor-pattern]] — check, never install; this is its compilation counterpart.
 - [[ci-cd-pipeline-strategy]] — why an install-time compile is a cross-app CI cost.
+- [[local-speech-to-text]] — the same ABI boundary where no rebuild helps: the speech addon cannot run inside Electron, so the engine is a sidecar.
