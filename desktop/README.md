@@ -1,9 +1,10 @@
-# Desktop (Electron) Knowledge Hub
+# Desktop Knowledge Hub
 
-Reusable architecture patterns for building a local-first desktop app with Electron: main/renderer/preload split, a type-safe IPC contract, native OS permissions, a filesystem-first storage vault, a heavy media/compute pipeline, distribution, and feature flags. Generalized from a real screen-capture app — product names stripped, patterns kept.
+Reusable architecture patterns for building a local-first desktop app with Electron: main/renderer/preload split, a type-safe IPC contract, native OS permissions, a filesystem-first storage vault, a heavy media/compute pipeline, distribution, and feature flags. Generalized from a real screen-capture app — product names stripped, patterns kept. Most docs are Electron-specific; [tauri-architecture.md](./tauri-architecture.md) covers the Tauri 2 split between the webview and the Rust core.
 
 ## Architecture
 
+- [tauri-architecture.md](./tauri-architecture.md) — Tauri 2: where business logic and data live (SQL from the webview, all-Rust core, JS sidecar, or the hybrid of TS use cases over Rust-owned storage), what each implies, and the default for a TypeScript domain.
 - [electron-vs-tauri.md](./electron-vs-tauri.md) — ADR: why a media-heavy app can stay on Electron; the real perf gap is the capture/encode pipeline, not the framework, plus the triggers for reconsidering Tauri.
 - [main-process-architecture.md](./main-process-architecture.md) — How the Electron main process boots, the `register*` subsystem pattern, window/tray lifecycle, and the one-renderer-two-windows trick.
 - [renderer-architecture.md](./renderer-architecture.md) — Renderer folder layout (pages/features/ui/shell), the three-step legacy-screen migration workflow, and the CSS-tokens + `cx()`/`data-*` house style.

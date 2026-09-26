@@ -15,6 +15,7 @@ de ensamblaje propias del stack.
 | [service-only-hono](./service-only-hono.md) | — | Hono + oRPC | — | Servicio backend compartido por varios productos (p. ej. auth centralizado) |
 | [mobile-expo](./mobile-expo.md) | Expo RN | (consume API) | — | App móvil sobre el domain + API compartidos |
 | [desktop-electron](./desktop-electron.md) | Electron renderer | IPC / opcional API | — | App de escritorio local-first |
+| [desktop-tauri](./desktop-tauri.md) | Tauri webview | Rust commands / optional API | — | Lightweight local-first desktop app |
 
 ## Base común a todas las recetas
 
