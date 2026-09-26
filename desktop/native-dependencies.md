@@ -28,6 +28,15 @@ download binaries, or run anything nobody read.**
 
 3. **It runs constantly and silently.** Most installs do not need a rebuild.
 
+4. **Downloading counts too, not only compiling.** `electron` ships no `postinstall` of its
+   own, so the tempting fix for "Electron failed to install" is a root
+   `"postinstall": "install-electron"`. It runs in every job that installs — a Tauri job
+   included — and it is a network fetch nobody reviewed. It is not necessarily slow: measured
+   at 1.75 s inside a 2-minute Linux install, where the workspace size was the real cost. Remove
+   it for the rule, and do not expect it to fix install time. Give the app an idempotent
+   `"electron:install": "install-electron"` and call it from `dev`, `start`, `package:*` and
+   the release workflow. Tests, type-check and the electron-vite build need no binary.
+
 ## The pattern
 
 **An explicit script**, called by every path that needs it:
@@ -84,7 +93,7 @@ is a feature that quietly does nothing, and nobody connects it to an install.
 
 ## Checklist
 
-- [ ] No `postinstall` anywhere in the repo.
+- [ ] No `postinstall` anywhere in the repo. Not even one that only downloads a binary.
 - [ ] `rebuild:native` script + `npmRebuild: false`.
 - [ ] A stamp under `node_modules`, compared by the setup doctor.
 - [ ] Every packaging and release path calls the rebuild explicitly.
