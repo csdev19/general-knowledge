@@ -95,6 +95,32 @@ Eviction does not know that a 340 MB install cache saves 40 s and a 2 MB task ca
 3 s. Keeping the total well under the ceiling is what protects the expensive entries. In
 practice that means: clean up on PR close, and do not mint entries per push.
 
+## Rule 4: who can read a cache decides who should write it
+
+Rule 1 has a second half. A run can restore caches from **its own ref and the default
+branch** — nothing else. So:
+
+| Cache written by          | Readable by                           |
+| ------------------------- | ------------------------------------- |
+| `main`                    | every branch, PR and tag run          |
+| a PR (`refs/pull/<n>/merge`) | later runs of that same PR only    |
+| a tag (`refs/tags/<t>`)   | a re-run of that same tag — in practice nobody |
+
+Two consequences for pipelines that stop running on every PR:
+
+- **A release run on a tag should restore, never save.** Its entry is unreadable by the next
+  tag. Use `actions/cache/restore` (or `save-if: false`) in release workflows; saving there
+  only spends the 10 GB budget.
+- **Something must write to `main`, or everything starts cold.** Once PR-time CI is off, no
+  job may run on `main` at all. Pick the writer on purpose: a dispatch of the on-demand CI on
+  `main` after the lockfile changes is enough for a cache that only moves with its lockfile.
+
+**Heavy compiler caches follow the same rule, harder.** A Rust `target/` for a Tauri app is
+hundreds of MB per entry, so a per-PR save is the fastest way to the ceiling.
+`Swatinem/rust-cache` takes `save-if: ${{ github.ref == 'refs/heads/main' }}` — PRs and tags
+restore main's entry and write nothing. Its key already hashes `Cargo.lock` and the toolchain,
+never the SHA.
+
 ## Checking a repository
 
 ```bash
@@ -117,6 +143,8 @@ repository's spending blocks another's releases.
 
 - [ ] A `pull_request: closed` workflow deletes the PR's caches, by id filtered on ref.
 - [ ] No cache key contains `github.sha`.
+- [ ] Release (tag) workflows restore caches and never save them.
+- [ ] Compiler caches (Rust `target/`) save only from `main`.
 - [ ] Cache usage checked after a busy week; the ceiling is 10 GB.
 - [ ] Artifact retention reviewed separately — _that_ one is billed.
 
