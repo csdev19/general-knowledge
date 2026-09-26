@@ -33,6 +33,12 @@ reader is building a different product. The product a lesson came from can appea
 evidence is — a section explicitly labelled as a measured example, with its numbers — never in
 the rule itself. A rule that names one product reads as that product's configuration.
 
+That exception covers only the owner's own products. The hub is public, and much of what reaches
+it is learned at an employer's or a client's: their name, products, repositories, people, ticket
+systems and internal tooling never appear in it, not even as evidence. They become placeholders,
+a real name survives only when the owner explicitly asks for it, and the owner sees the final
+text before it is pushed. [lesson-distillation.md](./lesson-distillation.md) carries the rule.
+
 ## Extend before adding
 
 Most new knowledge is a missing section of a page that exists, or a slot a folder index already

@@ -25,6 +25,25 @@ Product-agnostic knowledge lives in the hub; a project's application of it
 lives in the project. Never both, because two copies drift and the reader
 cannot tell which one is current.
 
+## Company work stays with the company
+
+Much of what is worth keeping is learned at an employer's or a client's, and the homes above —
+this hub, which is public, and the skills repo — are the owner's personal repositories. A
+company's name, products, repositories, people, ticket systems and internal tooling do not move
+into them.
+
+- The lesson is rewritten with placeholders (`<company>`, `<product>`, `<repo>`, a role instead
+  of a name). A real name stays only when the owner explicitly says so.
+- If nothing is left once the specifics are gone, the lesson was the company's: it belongs in
+  the company's repository, where its details are at home.
+- The two sides do not reference each other. A PR in a personal repository does not name the
+  company repository or its PR, and the reverse.
+- The owner reads the final text before anything reaches a personal repository.
+
+Where the work happened is observable, not a judgement call: the SSH host alias of the
+repository's `origin` says whether it is personal or a company's. A shared skill with a
+company's process written into it as a "project variant" is exactly the failure this prevents.
+
 ## Why the pair stays in sync
 
 A skill is a procedure; its page is the reasoning. When a rule changes, the
