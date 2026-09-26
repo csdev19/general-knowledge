@@ -40,6 +40,7 @@ with it.
 - **[lesson-distillation.md](./lesson-distillation.md)** — What a session taught goes to exactly one home: the skill, the hub page, a new skill, or the project. As a conditional, not a story; tested on a fresh agent before shipping. Skill: `cs-distill-lesson`.
 - **[review-feedback.md](./review-feedback.md)** — A review comment is a claim to verify: six kinds, one treatment each; settled decisions are escalated, not reopened; replies cite commits. Skill: `cs-address-review-feedback`.
 - **[test-audits.md](./test-audits.md)** — Trimming tautological and change-detector tests and adding the ones that catch the failures the owner fears; the failure list comes before the test. Skill: `cs-audit-tests`.
+- **[knowledge-hub-maintenance.md](./knowledge-hub-maintenance.md)** — The hub is linked, not copied: renaming a page breaks URLs in other repositories, so the old path keeps a stub and reachable consumers are updated in the same sitting. Generalise the rule, label the evidence, extend before adding, index every page, write in English. Skill: `cs-update-knowledge-hub`.
 
 ## Agent delegation
 

@@ -39,6 +39,17 @@ that — but "here is how you check me", with everything else as context.
 "Verify it yourself" is the section the rest exists for. The others are
 context that makes it followable.
 
+## The repo's format wins on shape
+
+A repository that documents how it wants pull requests — in its `CLAUDE.md`, `CONTRIBUTING.md` or
+PR template — gets them in that form: its title convention, its body length, its split between
+body and comments. The evidence does not shrink with the format; what the repo's shape has no
+place for (how to verify, what was not verified) moves to a comment, never out of the handoff.
+
+That format lives in the repository that wants it. The shared skill carries no per-project
+variants: a variant written into it follows the user into every other repository, and when the
+project is an employer's or a client's, it carries their process into a personal one.
+
 ## Three rules that carry most of the value
 
 **Capture the exit code.** Never claim a check passed without having read its
