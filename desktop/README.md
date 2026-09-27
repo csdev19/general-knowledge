@@ -1,6 +1,6 @@
 # Desktop Knowledge Hub
 
-Reusable architecture patterns for building a local-first desktop app with Electron: main/renderer/preload split, a type-safe IPC contract, native OS permissions, a filesystem-first storage vault, a heavy media/compute pipeline, distribution, and feature flags. Generalized from a real screen-capture app — product names stripped, patterns kept. Most docs are Electron-specific; [tauri-architecture.md](./tauri-architecture.md) covers the Tauri 2 split between the webview and the Rust core.
+Reusable architecture patterns for building a local-first desktop app with Electron: main/renderer/preload split, a type-safe IPC contract, native OS permissions, a filesystem-first storage vault, a heavy media/compute pipeline, distribution, and feature flags. Generalized from a real screen-capture app — product names stripped, patterns kept. Most docs are Electron-specific; [tauri-architecture.md](./tauri-architecture.md) covers the Tauri 2 split between the webview and the Rust core, and [swift-macos-app-lifecycle.md](./swift-macos-app-lifecycle.md) covers native Swift.
 
 ## Architecture
 
@@ -17,6 +17,8 @@ Reusable architecture patterns for building a local-first desktop app with Elect
 - [media-pipeline.md](./media-pipeline.md) — A heavy media/compute pipeline in Electron: engine as a module-singleton outside React, positional disk writes, cross-window state via a main-process hub, hardware encode, and robust failure recovery.
 
 ## Native integration
+
+- [swift-macos-app-lifecycle.md](./swift-macos-app-lifecycle.md) — Native Swift: the SwiftUI `App` is created before `NSApplication` finishes launching, so the composition root only builds and the app delegate acts — an AppKit side effect taken too early (a global event monitor) silently stops mouse delivery to the app's own windows. The probe-build diagnosis (separate bundle id, one synthetic click, three logged stages), the facts it settled about non-activating panels and event monitors, and a measured example.
 
 - [permissions-and-onboarding.md](./permissions-and-onboarding.md) — Cross-platform screen/mic/camera permission checks and requests (macOS quirks especially), split into pure renderer logic + thin main-process wiring, and the first-run onboarding flow.
 - [native-dependencies.md](./native-dependencies.md) — A native module's prebuilds target Node's ABI, not Electron's: rebuild explicitly (`rebuild:native`, `npmRebuild: false`, a stamp inside `node_modules` the setup doctor compares), never from `postinstall` — which breaks every unrelated CI job and is the shape of a supply-chain attack. Consumers degrade to "feature off".

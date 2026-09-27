@@ -16,6 +16,7 @@ de ensamblaje propias del stack.
 | [mobile-expo](./mobile-expo.md) | Expo RN | (consume API) | — | App móvil sobre el domain + API compartidos |
 | [desktop-electron](./desktop-electron.md) | Electron renderer | IPC / opcional API | — | App de escritorio local-first |
 | [desktop-tauri](./desktop-tauri.md) | Tauri webview | Rust commands / optional API | — | Lightweight local-first desktop app |
+| [desktop-swift](./desktop-swift.md) | SwiftUI + AppKit | — (local, no server) | — | Native macOS menu bar app with desktop panels; signed DMG + Sparkle |
 
 ## Base común a todas las recetas
 
