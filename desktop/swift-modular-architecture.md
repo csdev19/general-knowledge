@@ -141,3 +141,7 @@ when files are added; the app target does.
 
 Shipping the app — signing, notarization, DMG, Sparkle feed — is
 [distribution/swift-xcode-macos.md](../distribution/swift-xcode-macos.md).
+
+## Related
+
+- [swift-macos-app-lifecycle.md](./swift-macos-app-lifecycle.md) — the composition root builds, the app delegate acts: AppKit side effects taken in the `App` initializer silently stop mouse delivery.

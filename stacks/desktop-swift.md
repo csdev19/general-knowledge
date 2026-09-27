@@ -19,6 +19,9 @@ also run on Windows/Linux or share a TypeScript domain with web and mobile.
 **1 · Architecture**
 - [DDD layering in Swift with SwiftPM modules](../desktop/swift-modular-architecture.md) —
   per-feature targets, which parts of hexagonal to keep, the Swift details that make it hold
+- [The AppKit lifecycle under SwiftUI](../desktop/swift-macos-app-lifecycle.md) — the
+  composition root builds, the app delegate acts; why an AppKit side effect taken in the `App`
+  initializer silently stops mouse delivery, and the probe-build diagnosis for that class of failure
 - [Domain-layer contracts](../architecture/domain-layer-contracts.md) and
   [repository pattern](../architecture/repository-pattern.md) — the ports, language-agnostic
 - [Bounded contexts](../architecture/bounded-contexts-complete-guide.md) — when a second feature
@@ -45,3 +48,14 @@ also run on Windows/Linux or share a TypeScript domain with web and mobile.
 - **The DMG window design is per app.** The template ships a plain DMG; the committed
   `.DS_Store` stores the volume name and icon positions, so capture it after the app has its
   final name.
+- **One instance per bundle id.** `LSMultipleInstancesProhibited` makes a second copy started
+  from Xcode exit at once with *Finished running*. Build probes under a separate bundle id
+  (`PRODUCT_BUNDLE_IDENTIFIER=<id>.probe`; never override `PRODUCT_NAME` on the command line),
+  and never launch the app from an agent session while the developer runs it from Xcode.
+- **Click smoke test.** Keep a `scripts/click-smoke.sh` (build under a smoke id, launch by pid,
+  one synthetic click on a window, grep the `input` log, exit 1 on silence) and run it before
+  merging changes to windows, events or launch. It is the only automated check that catches
+  silent AppKit input failures — see the lifecycle page.
+- **Sandbox and permissions.** Mouse-down global monitors work sandboxed without a prompt; key
+  monitors need accessibility, and the supported sandboxed path for keys is `CGEventTap` with
+  Input Monitoring. Verify permission behaviour on a Mac that has never seen the app.
