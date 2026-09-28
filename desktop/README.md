@@ -4,7 +4,7 @@ Reusable architecture patterns for building a local-first desktop app with Elect
 
 ## Architecture
 
-- [swift-modular-architecture.md](./swift-modular-architecture.md) — Native macOS in Swift: DDD layering as per-feature SwiftPM targets the compiler enforces, which parts of hexagonal to keep (driven ports) and drop (driving ports, DTOs) until a second entry point appears, versioned persistence records, and menu bar app notes.
+- [swift-modular-architecture.md](./swift-modular-architecture.md) — Native macOS in Swift: DDD layering as per-feature SwiftPM targets the compiler enforces, which parts of hexagonal to keep (driven ports) and drop (driving ports, DTOs) until a second entry point appears, versioned persistence records, a system-SQLite wrapper (lock held across transactions, transient binds, pragmas, `user_version` steps), and menu bar app notes.
 - [tauri-architecture.md](./tauri-architecture.md) — Tauri 2: where business logic and data live (SQL from the webview, all-Rust core, JS sidecar, or the hybrid of TS use cases over Rust-owned storage), what each implies, and the default for a TypeScript domain.
 - [electron-vs-tauri.md](./electron-vs-tauri.md) — ADR: why a media-heavy app can stay on Electron; the real perf gap is the capture/encode pipeline, not the framework, plus the triggers for reconsidering Tauri.
 - [main-process-architecture.md](./main-process-architecture.md) — How the Electron main process boots, the `register*` subsystem pattern, window/tray lifecycle, and the one-renderer-two-windows trick.

@@ -365,3 +365,4 @@ The Repository pattern abstracts away data access concerns, allowing the domain 
 - [Application Services Layer](./application-services-layer.md)
 - [Bounded Contexts Complete Guide](./bounded-contexts-complete-guide.md)
 - [Domain Layer Contracts](./domain-layer-contracts.md)
+- [Migrating a Local Store Without Losing Data](./local-store-migration.md)

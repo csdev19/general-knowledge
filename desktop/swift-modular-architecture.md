@@ -88,6 +88,41 @@ struct TodoFile: Codable {          // infrastructure only
 This is the one mapper worth its lines in a desktop app, for the same reason a server keeps DB
 rows apart from domain types.
 
+## SQLite with the system library
+
+When state outgrows one JSON file, `import SQLite3` is already on every Mac. A small wrapper
+class in infrastructure, about 170 lines, covers a few tables with no package dependency:
+open, `execute`, `run(sql, bindings)`, `query(sql, bindings, map)`, `transaction { }` and
+`userVersion`. The repositories stay plain structs over one shared connection, and the domain
+never learns the store changed. The details that bite:
+
+- **Hold the lock across the whole transaction.** A class that owns the connection pointer
+  and claims `@unchecked Sendable` needs a lock. A plain `NSLock` taken per statement leaves a
+  gap between `BEGIN` and `COMMIT`, and SQLite transactions are connection-wide, so another
+  thread's statement lands inside yours. Use an `NSRecursiveLock` held from `BEGIN IMMEDIATE`
+  to `COMMIT` or `ROLLBACK`: the body's own `run`/`query` calls re-enter it on the same thread.
+- **Bind text as transient.** Pass `unsafeBitCast(-1, to: sqlite3_destructor_type.self)`
+  (`SQLITE_TRANSIENT`) so SQLite copies the Swift string's bytes.
+- **Finalize on every path**, including a failed bind inside `prepare`; `defer { sqlite3_finalize }`
+  right after a successful prepare covers the rest.
+- **Set the pragmas on open**: `busy_timeout` (a second writer waits instead of failing),
+  `foreign_keys = ON`, `journal_mode = WAL`. `journal_mode` is the first statement that reads
+  the file header, so a file that is not a database fails there with `SQLITE_NOTADB`.
+- **A throwing class `init` still closes the handle.** Once every stored property is set, a
+  throw runs `deinit`, so `sqlite3_close_v2` in `deinit` covers a failed open.
+- **Version with `PRAGMA user_version`** and an append-only array of SQL steps. Apply each step
+  in a transaction that re-reads the version under the write lock. Two copies of the app can
+  share one container (an Xcode build and an installed copy), see
+  [local-store-migration.md](../architecture/local-store-migration.md).
+- **Store dates as ISO 8601 text** with `Date.ISO8601FormatStyle`, a `Sendable` value. A
+  `static let` `ISO8601DateFormatter` inside a `Sendable` struct is rejected by Swift 6.
+- **Settings as a key–JSON table behind a `SettingsStore` port** in the shared kernel. A new
+  preference is then a key, not a schema step.
+
+Reach for GRDB when queries need joins, observation or record types. SwiftData and Core Data
+replace plain structs and explicit repositories with managed classes, which undoes the layering
+above.
+
 ## Swift details that make the layers hold
 
 - **Value objects with typed throws.** `init(_ raw: String) throws(TodosError)` means a
@@ -145,3 +180,4 @@ Shipping the app — signing, notarization, DMG, Sparkle feed — is
 ## Related
 
 - [swift-macos-app-lifecycle.md](./swift-macos-app-lifecycle.md) — the composition root builds, the app delegate acts: AppKit side effects taken in the `App` initializer silently stop mouse delivery.
+- [../architecture/local-store-migration.md](../architecture/local-store-migration.md) — moving saved state into a new store (JSON and preference keys into SQLite) without losing it on a partial failure, a second running copy or an unreadable file.

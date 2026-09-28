@@ -22,6 +22,8 @@ also run on Windows/Linux or share a TypeScript domain with web and mobile.
 - [The AppKit lifecycle under SwiftUI](../desktop/swift-macos-app-lifecycle.md) — the
   composition root builds, the app delegate acts; why an AppKit side effect taken in the `App`
   initializer silently stops mouse delivery, and the probe-build diagnosis for that class of failure
+- [Migrating a local store](../architecture/local-store-migration.md) — before moving saved
+  state into SQLite (or changing its schema): the rules that keep a partial failure from losing it
 - [Domain-layer contracts](../architecture/domain-layer-contracts.md) and
   [repository pattern](../architecture/repository-pattern.md) — the ports, language-agnostic
 - [Bounded contexts](../architecture/bounded-contexts-complete-guide.md) — when a second feature

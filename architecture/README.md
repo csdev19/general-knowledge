@@ -35,6 +35,7 @@ Patterns that span every layer and consumer.
 - **[security-hardening.md](./security-hardening.md)** — Reusable patterns for DB-level authorization, soft delete, N+1 elimination, transactional writes, and invite enforcement.
 - **[observability.md](./observability.md)** — Structured error logging, sanitization rules, and a maturity roadmap so users never see internal errors.
 - **[client-state-persistence.md](./client-state-persistence.md)** — Where a client app's persisted state belongs once the app has more than one runtime (Electron main vs renderer, RN JS vs native): why `persist` middleware is the web's right answer and the wrong one here, the owner/mirror split, widgets and background tasks on mobile, and the checklist.
+- **[local-store-migration.md](./local-store-migration.md)** — Moving a client's saved state into a new store (a JSON file and preference keys into SQLite, or one schema version to the next) without data loss: gate each item on "not yet in the destination", delete sources only after a confirmed write, never seed defaults over a pending source, move a file aside only when it is unusable, and re-read the schema version under the write lock. A failure table and a measured example.
 
 ## Decisions (ADRs)
 
