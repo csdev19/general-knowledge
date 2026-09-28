@@ -26,6 +26,6 @@ Todos los stacks comparten los mismos cimientos:
 2. **Packages** — [convención `infra-*`](../packages/infrastructure-naming.md) y [build strategy](../packages/shared-package-build-strategy.md).
 3. **Monorepo** — [Turborepo + Bun workspaces](../monorepos/monorepo-structure.md).
 4. **Error handling** — [Result types](../error-handling/result-types.md) y helpers de respuesta.
-5. **Convenciones** — [schemas-first](../conventions/schemas-first.md), [constants](../conventions/constants-pattern.md), [backlog](../conventions/backlog-pattern.md).
+5. **Convenciones** — [schemas-first](../conventions/schemas-first.md), [constants](../conventions/constants-pattern.md), [backlog and roadmap](../conventions/backlog-and-roadmap.md).
 
 Cada receta asume esta base y solo detalla lo específico del stack.

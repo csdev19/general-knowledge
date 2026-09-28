@@ -48,5 +48,5 @@ from the owner, never promoted from a plan.
 
 - [verifiable-handoffs](./verifiable-handoffs.md): a briefing refresh is
   handed back like any other work.
-- [specs-and-plans-workflow](./specs-and-plans-workflow.md): the plans a
+- [design-workflow](./design-workflow.md): the plans a
   briefing must not quote as status.

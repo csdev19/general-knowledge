@@ -2,10 +2,15 @@
 
 _Cómo convertir un plan de implementación aprobado en documentos de backlog autosuficientes que varios agentes runner pueden ejecutar en paralelo — y por qué el backlog, no el plan, es la fuente de ejecución._
 
-Extiende el [workflow specs + plans](./specs-and-plans-workflow.md): entre **plan** y
+> **Note (English, added later):** the `backlog/` folder this page produces is a
+> parallel-execution artifact generated from an already-approved plan — it is not the same
+> thing as the personal item-capture backlog, which is now GitHub Issues. See
+> [backlog-and-roadmap.md](./backlog-and-roadmap.md) for that pattern and how the two relate.
+
+Extiende el [workflow de diseño](./design-workflow.md): entre **plan** y
 **ship** se inserta una conversión. El plan (un solo documento lineal) se transforma en
 una **épica** + **un doc por entregable** dentro del `backlog/` de la app de
-documentación, siguiendo el [patrón backlog](./backlog-pattern.md).
+documentación — carpeta hoy documentada en [backlog-and-roadmap.md](./backlog-and-roadmap.md).
 
 ```
 brainstorm → spec → plan → [CONVERSIÓN] → backlog épica + P1..PN → runners en paralelo → ship
