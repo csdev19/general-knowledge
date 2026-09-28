@@ -240,3 +240,4 @@ one, so the gap between them is not cosmetic.
 - [`../desktop/ipc-contract.md`](../desktop/ipc-contract.md) — the typed bridge the mirror's setters cross.
 - [`../mobile/mobile-app.md`](../mobile/mobile-app.md) — Expo/RN app structure.
 - [`./security-hardening.md`](./security-hardening.md) — where secrets belong.
+- [`./local-store-migration.md`](./local-store-migration.md) — changing where that state lives (a file and preference keys into a database) without losing it.
