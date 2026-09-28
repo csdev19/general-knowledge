@@ -33,7 +33,7 @@ Dos capas:
 | [infra/](./infra/)                   | Domains, DNS, and Cloudflare edge routing; the standalone **[Infisical playbook](./infra/infisical-secrets.md)** with risk-based folders, consumer tags, Worker/build/signing boundaries, and explicit CI migration status; the **[README and variable-inventory contract](./infra/environment-inventory.md)**; and the separate optional Varlock evaluation.        |
 | [monorepos/](./monorepos/)           | Turborepo + Bun workspaces, CI/CD por proyecto, PR checks, **costo de runners (macOS ×10, escalera per-PR → merge → nightly → release)**, **ciclo de vida de la caché de Actions (tope de 10 GB, limpieza al cerrar un PR)**, release-please, estrategia de testing                                                                                                  |
 | [packages/](./packages/)             | Convención `infra-*`, build strategy (src vs dist), repository contracts, caso de estudio de un package                                                                                                                                                                                                                                                              |
-| [conventions/](./conventions/)       | Constants/enums-as-const, schemas-first, **patrón backlog**, workflow specs+plans, **delegación a agentes**, **tool doctor** (chequea, nunca instala), **CI/CD: un gate `verify` local (lefthook) + tiers**, handoffs verificables, **conventions behind each agent skill** (briefings, audit briefs, cross-machine sessions, test audits) |
+| [conventions/](./conventions/)       | Constants/enums-as-const, schemas-first, **backlog and roadmap** (issues as backlog, promise-only roadmap, derived status), **design workflow** (capture → design → spec + ADR PR → ephemeral plan → ship) and **ADR pattern**, **feature docs as memory** (flat file per feature, generated index), **delegación a agentes**, **tool doctor** (chequea, nunca instala), **CI/CD: un gate `verify` local (lefthook) + tiers**, handoffs verificables, **conventions behind each agent skill** (briefings, audit briefs, cross-machine sessions, test audits) |
 
 ## Stacks (recetas listas)
 
@@ -58,13 +58,19 @@ Ver **[stacks/](./stacks/)** para las guías de ensamblaje:
 
 ## Convenciones que vale la pena adoptar desde el día 1
 
-- **[Patrón backlog](./conventions/backlog-pattern.md)** — carpeta `backlog/` con el mapa
-  de "lo que viene"; nunca pierdes trabajo diferido.
+- **[Backlog and roadmap](./conventions/backlog-and-roadmap.md)** — el backlog es la lista de
+  GitHub Issues con label `backlog`; el roadmap por producto es solo la promesa (fase + link al
+  issue), editado al prometer, nunca al shippear; el estado siempre se deriva.
 - **[Patrón changelog](./conventions/changelog-pattern.md)** — diario de decisiones en el
   docs app: un archivo por entrada, índice auto-generado (cero merge conflicts),
   complementa el `CHANGELOG.md` de release-please.
-- **[Workflow specs + plans](./conventions/specs-and-plans-workflow.md)** — brainstorm →
-  spec (diseño) → plan (implementación) → archivo al shippear.
+- **[Design workflow](./conventions/design-workflow.md)** — idea capturada → diseño (research,
+  chequeo contra ADRs existentes, opciones en prosa, hard gate) → spec + ADRs en su propio PR →
+  plan efímero en la rama de código, borrado al shippear.
+- **[ADR pattern](./conventions/adr-pattern.md)** — formato de una ADR (contexto, decisión,
+  alternativas, consecuencias, no-objetivos, condición de reapertura) y cuándo hace falta una.
+- **[Feature docs as memory](./conventions/feature-docs-as-memory.md)** — un archivo plano por
+  feature (transversal a capas), índice generado, tabla de paths como contrato, `lastVerified`.
 - **[Plan → backlog](./conventions/plan-to-backlog.md)** — convertir un plan aprobado en
   entregables autosuficientes del backlog, ejecutables por agentes en paralelo.
 - **[Delegación a agentes](./conventions/ai-agent-delegation.md)** — los dos modos

@@ -76,7 +76,7 @@ entirely: the diff already enumerates, and enumeration is not guidance.
 
 - [english-only](./english-only.md) — the handoff artifact is English whatever
   language the conversation is in.
-- [specs-and-plans-workflow](./specs-and-plans-workflow.md) — what precedes
+- [design-workflow](./design-workflow.md) — what precedes
   the work this hands back.
 - [ci-cd-pipeline-strategy](./ci-cd-pipeline-strategy.md) — the `verify` gate
   whose exit code a handoff quotes.

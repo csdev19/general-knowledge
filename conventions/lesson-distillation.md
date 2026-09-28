@@ -78,5 +78,5 @@ right unprompted, the words are not binding yet.
 
 - [verifiable-handoffs](./verifiable-handoffs.md): the PR that ships a
   distilled lesson names the event it protects against.
-- [specs-and-plans-workflow](./specs-and-plans-workflow.md): a lesson that
-  becomes a new skill goes through the brainstorm first.
+- [design-workflow](./design-workflow.md): a lesson that
+  becomes a new skill goes through design first.

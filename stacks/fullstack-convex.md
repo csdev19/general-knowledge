@@ -25,7 +25,7 @@ Si no necesitas realtime, el default sigue siendo [hono-orpc](./fullstack-hono-o
 
 **4 · Mobile (opcional)** — si sumas app Expo sobre este Convex: [mobile-expo](./mobile-expo.md), [dev builds & Metro](../mobile/expo-dev-builds-and-metro.md)
 
-**5 · Convenciones** — [constants](../conventions/constants-pattern.md), [backlog](../conventions/backlog-pattern.md)
+**5 · Convenciones** — [constants](../conventions/constants-pattern.md), [backlog and roadmap](../conventions/backlog-and-roadmap.md)
 
 ## Notas de ensamblaje (lo específico de este stack)
 

@@ -20,10 +20,9 @@ Reusable, product-agnostic conventions and workflow patterns distilled from real
 ## Workflow conventions
 
 - **[mvp-first-then-refactor.md](./mvp-first-then-refactor.md)** — Two-phase feature workflow: ship an inline MVP end-to-end first, then extract the domain/application/infra layers once it's stable. When to refactor.
-- **[backlog-pattern.md](./backlog-pattern.md)** — How a `backlog/` folder maps deferred work: status legend, index table, one item per file. _(Spanish)_
 - **[changelog-pattern.md](./changelog-pattern.md)** — Docs-app changelog as a decision journal: one file per entry, auto-generated index (no manual index = no merge conflicts), entry bar, and how it complements release-please. _(Spanish)_
-- **[specs-and-plans-workflow.md](./specs-and-plans-workflow.md)** — The brainstorm → spec → plan → archive flow, naming convention, and how it pairs with the backlog. _(Spanish)_
 - **[plan-to-backlog.md](./plan-to-backlog.md)** — Converting an approved plan into self-sufficient backlog deliverables that runner agents execute in parallel; the plan becomes superseded. _(Spanish)_
+- **[working-with-the-owner.md](./working-with-the-owner.md)** — How the hub's owner thinks, decides, and wants to be worked with: context dumped in one pass and expected processed, prose options with a counterargument, one free-text reply, coarse-grained approval, decisions written down with a reopen condition.
 
 ## Agent skills
 
@@ -33,8 +32,12 @@ reasoning, the skill is the procedure, and they link both ways. When a skill
 changes because something worked or failed in practice, its page here changes
 with it.
 
+- **[design-workflow.md](./design-workflow.md)** — Capture → roadmap promise → design (research always, an ADR-contradiction check, options in prose, a hard gate) → spec + 0..n ADRs in their own PR → an ephemeral plan deleted at ship. Skill: `cs-design` (**planned**).
+- **[adr-pattern.md](./adr-pattern.md)** — Format (context, decision, alternatives rejected, consequences, non-goals, reopen condition), when a decision needs one, and how it links to the spec and the feature doc. Paired reasoning for whichever skill writes ADRs (`cs-design`, **planned**).
+- **[backlog-and-roadmap.md](./backlog-and-roadmap.md)** — The backlog is the GitHub issue list (label `backlog`, `gh issue list --label backlog --author @me` as the index); the roadmap per product is promise-only, edited when promising and never at ship; status is always derived. Skill: `cs-capture` (**planned**).
+- **[feature-docs-as-memory.md](./feature-docs-as-memory.md)** — One flat file per feature even across layers, generated index, the "Where it lives" paths table as a contract the ship step checks, `lastVerified` stamp. Skill: `cs-document-feature` (**planned**; replaces the template `feature-docs` skill and `save-feature` command).
 - **[repo-briefings.md](./repo-briefings.md)** — A repo explains itself to each kind of reader from its own truth: audience-split briefings, a per-repo binding file, date stamps as promises, audit mode that writes nothing. Skill: `cs-generate-briefings`.
-- **[verifiable-handoffs.md](./verifiable-handoffs.md)** — Finished work handed back with the means to check it. Skill: `cs-write-handoff`.
+- **[verifiable-handoffs.md](./verifiable-handoffs.md)** — Finished work handed back with the means to check it. Skill: `cs-write-handoff` (gaining a ship step — feature doc update, plan deletion, closing the backlog issue — **planned**).
 - **[audit-briefs.md](./audit-briefs.md)** — Work briefed for a fresh-context agent to attack: intent, claims sorted by how they are known, decisions with owners, and the writer's own weakest points. Skill: `cs-write-audit-brief`.
 - **[cross-machine-sessions.md](./cross-machine-sessions.md)** — Parking a session on one machine and picking it up on another through the repo: a fixed restart file, one disposable checkpoint commit, explicit restore. Skills: `cs-park`, `cs-pickup`.
 - **[lesson-distillation.md](./lesson-distillation.md)** — What a session taught goes to exactly one home: the skill, the hub page, a new skill, or the project. As a conditional, not a story; tested on a fresh agent before shipping. Skill: `cs-distill-lesson`.

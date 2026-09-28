@@ -216,7 +216,7 @@ Para implementar esta delegación en un proyecto nuevo:
 
 ## Ver también
 
-- [specs-and-plans-workflow.md](./specs-and-plans-workflow.md) — de dónde sale el plan
+- [design-workflow.md](./design-workflow.md) — de dónde sale el plan
   que esta delegación ejecuta.
 - [plan-to-backlog.md](./plan-to-backlog.md) — convertir un plan aprobado en
   entregables autosuficientes para agentes en paralelo.
