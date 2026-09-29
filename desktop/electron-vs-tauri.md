@@ -109,6 +109,20 @@ Tauri tiene ventajas reales que podrían importar más adelante:
 
 **El umbral sugerido:** "Si el Electron optimizado idlea bajo ~150 MB y hace la operación pesada (p. ej. graba 1080p60) bajo ~15% CPU con encode por hardware, el delta de Tauri no justifica reescribir."
 
+**How to measure the threshold** — the numbers only mean something when everyone measures them the same way:
+
+- **Idle memory is the whole process tree.** Sum `phys_footprint` over the Electron main process and
+  every descendant — GPU, network service, one renderer per window — about 20 s after launch with no
+  work running. On macOS, `footprint -p <pid>` reports it; RSS under-counts because of memory
+  compression and is not comparable.
+- **Idle CPU must be ~0 %**, summed over the same tree. An app that stays resident all day fails the
+  threshold on this alone, whatever its memory. Non-zero idle CPU is a defect to diagnose first (a
+  performance trace per renderer) — it is not evidence against the framework until its cause is known.
+- **Memory scales with windows.** Each renderer stays resident while hidden (measured at 40–60 MB on
+  Electron 44), so the window count is the first lever, before any framework change.
+- **Local models are reported separately.** An STT or LLM runtime the app keeps loaded costs the same
+  under any framework; charging it to Electron distorts the comparison.
+
 ---
 
 ## Secuencia recomendada
@@ -116,5 +130,5 @@ Tauri tiene ventajas reales que podrían importar más adelante:
 1. **Ahora:** entregá el Electron que existe (filesystem-first + lo que ya funciona).
 2. **Optimización #1:** pipeline FFmpeg + encode por hardware. Es el 80% del "feel".
 3. **Optimización #2:** single-window estricto, matar renderers idle, trimming de bundle.
-4. **Medí** contra el umbral.
+4. **Medí** contra el umbral, como se define arriba.
 5. **Solo si** no pasás el umbral, o querés mobile, o el footprint se vuelve queja real → spike de Tauri.
