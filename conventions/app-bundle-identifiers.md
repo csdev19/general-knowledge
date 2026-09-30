@@ -50,6 +50,38 @@ name and the signing identity (the developer name in the Gatekeeper prompt),
 never the bundle ID. Consistency here is for the org's own hygiene, not for
 users.
 
+## Renaming the app is not renaming the identifier — except in Electron's data folder
+
+The display name (`CFBundleName` / `CFBundleDisplayName`, the Dock, the
+permission prompts) can change at any time: the identifier stays frozen, so
+the OS keeps treating it as the same app and its granted permissions carry
+over.
+
+Electron has one trap here. `app.getPath('userData')` is **not** derived from
+`appId`; it is `<appData>/<app name>`, and the app name is electron-builder's
+`productName` in a packaged build but `package.json#name` in a dev run. So:
+
+- renaming `productName` silently points a packaged app at a new, empty data
+  folder — every session, profile and setting looks gone, with no error;
+- dev and packaged runs may already be using **different** folders
+  (`…/desktop` versus `…/<Product Name>`), so check which one holds the real
+  data before deciding anything (`ls ~/Library/Application\ Support/`).
+
+Pin the folder before the rename, in the main process, before anything reads
+`userData` (the single-instance lock is usually the first consumer):
+
+```ts
+// Keep the data folder independent of the display name.
+if (!app.commandLine.hasSwitch("user-data-dir")) {
+  app.setPath("userData", join(app.getPath("appData"), "<stable-folder>"));
+}
+```
+
+Let an explicit `--user-data-dir` win: e2e suites pass one to get a throwaway
+folder, and pinning over it would run tests against real data. Record the
+chosen folder name next to the identifier; from then on it is frozen for the
+same reasons.
+
 ## Recorded exceptions
 
 - **Kaipu** shipped as `com.niway.kaipu-record` before this convention was
@@ -62,6 +94,9 @@ users.
   prefixes across apps are harmless.
 
 ## Related
+
+- [Main-process architecture](../desktop/main-process-architecture.md) — where
+  the `userData` pin runs: at module load, before `app.whenReady()`.
 
 - Signing identity is separate from the identifier: Niway apps sign under the
   personal Apple Developer team `K9TKC5GG76` (Cristian Sotomayor); "Niway" is

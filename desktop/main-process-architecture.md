@@ -70,4 +70,5 @@ La app no tiene dos bundles de renderer: tiene **uno solo cargado con un query d
 - [Renderer Architecture](./renderer-architecture.md) — el otro lado
 - [IPC Contract](./ipc-contract.md) — los canales main ↔ renderer
 - [Media Pipeline](./media-pipeline.md) — el core de captura/encode
+- [App bundle identifiers](../conventions/app-bundle-identifiers.md) — pin `userData` before a display-name rename; Electron derives it from the name, not `appId`.
 - [[local-speech-to-text]] — a transcription sidecar as one `register*` subsystem: its lifecycle stays separate from capture.
