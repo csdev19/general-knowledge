@@ -96,6 +96,23 @@ Bot workflows compound it too. Every job bills a whole minute minimum, so a 45-s
 were 90 minutes, about 11 % of one repository's usage, and the first job the quota block hit.
 Path-filter bots to the paths that can change their outcome.
 
+### The per-job minimum is its own budget line
+
+"Every job bills a whole minute minimum" deserves treating as a line item rather than a footnote,
+because the jobs it hits are the ones nobody thinks of as expensive: a required-check reporter, a
+gate that only reads `needs.*.result`, a transitional alias kept while a ruleset is renamed, a
+cache-cleanup hook. Each takes about three seconds and costs sixty.
+
+Measured over one week on a repository with a two-job PR gate: **81 jobs, 32 real minutes of
+execution, 106 billed minutes.** About 70% of that row was the rounding, and it was the third
+largest item in the account — behind only the two macOS jobs.
+
+Faster hardware cannot help: the minimum is below the job's floor already. The levers are to
+**delete** the job, **merge** it into one that had to run anyway, or move to a provider that bills
+per second (see [ci-runner-hosting.md](./ci-runner-hosting.md)). Count the jobs a single PR event
+starts, multiply by the number of events in a busy week, and compare that to the suite you were
+about to optimize.
+
 Shared-path filters compound it. `packages/**` and `bun.lock` sit in every per-project filter by
 design — a shared-package change can break any consumer — which is correct for a Linux suite and
 expensive for a macOS one. **Split the filter with the job:** the cheap job keeps the broad
@@ -263,6 +280,10 @@ Before merging a workflow that names a non-Linux runner:
   fast check plus path-filtered per-project suites, and why docs-only PRs still run the formatter.
 - [pr-checks.md](./pr-checks.md) — PR gate shapes, the visible-skip discipline, and the
   `paths`-filter/required-check gotcha.
+- [ci-runner-hosting.md](./ci-runner-hosting.md) — the provenance axis: managed third-party
+  runners, self-hosted runners, and why a faster runner is usually the wrong purchase.
+- [actions-cache-lifecycle.md](./actions-cache-lifecycle.md) — why a "slow runner" is often a
+  cache that never restores.
 - [testing/ci.md](./testing/ci.md) — running the suites themselves in CI.
 - [../conventions/ci-cd-pipeline-strategy.md](../conventions/ci-cd-pipeline-strategy.md) — the
   local `verify` gate (lefthook pre-push) that earns the right to move suites down the ladder.

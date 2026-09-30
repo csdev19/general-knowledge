@@ -115,6 +115,28 @@ Two consequences for pipelines that stop running on every PR:
   job may run on `main` at all. Pick the writer on purpose: a dispatch of the on-demand CI on
   `main` after the lockfile changes is enough for a cache that only moves with its lockfile.
 
+**Measured, so the shape is recognisable.** A repository that had moved verification to the
+release boundary held exactly this:
+
+```
+Linux-turbo-<hash>  ref=refs/tags/<app>-v0.9.0   655 KB
+Linux-turbo-<hash>  ref=refs/tags/<app>-v0.8.0   655 KB
+```
+
+Same key, one entry per release, **neither visible to the other**, and nothing on
+`refs/heads/main` to read from. The configuration was correct and the cache was inert. The job
+took **361 s in CI against 27 s cold on a developer's machine**, which reads as a slow runner and
+is not one — see [ci-runner-hosting.md](./ci-runner-hosting.md).
+
+**The one-second diagnostic: if the restore step reports 0 s, nothing was downloaded.** A miss and
+a slow network look nothing alike in the log, and no amount of cache bandwidth — including a
+vendor's "4× faster cache" — changes a miss.
+
+**The escape from ref scoping entirely** is a content-addressed remote cache: Turborepo's or Nx's
+own, backed by object storage. It keys on each task's input hash rather than on a git ref, so
+which branch wrote an entry stops mattering. It costs a bucket and a token, and it is the right
+answer when the default-branch writer would otherwise be a job invented purely to warm a cache.
+
 **Heavy compiler caches follow the same rule, harder.** A Rust `target/` for a Tauri app is
 hundreds of MB per entry, so a per-PR save is the fastest way to the ceiling.
 `Swatinem/rust-cache` takes `save-if: ${{ github.ref == 'refs/heads/main' }}` — PRs and tags

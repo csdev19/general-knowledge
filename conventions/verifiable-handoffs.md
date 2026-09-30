@@ -50,7 +50,7 @@ That format lives in the repository that wants it. The shared skill carries no p
 variants: a variant written into it follows the user into every other repository, and when the
 project is an employer's or a client's, it carries their process into a personal one.
 
-## Three rules that carry most of the value
+## Four rules that carry most of the value
 
 **Capture the exit code.** Never claim a check passed without having read its
 status directly. Redirect to a file and echo `$?`; never pipe the command
@@ -59,6 +59,16 @@ whose status you are about to report.
 **Verify against a clean checkout.** When the working tree holds anything
 uncommitted, a local pass proves nothing about what CI will build. A
 `git worktree` is the cheap way to check the branch as it actually stands.
+
+**A check that could not have failed proves nothing.** Capturing the exit code
+guards against misreading a status; this guards against reading the right status
+of the wrong check. Before offering one as evidence, say what it would have
+reported *before* the fix. If the answer is "the same thing", it shows only that
+the check ran. Undoing the fix and watching it go red is the cheap confirmation,
+and it is the same discipline as writing a failing test first. The trap is
+strongest across a boundary the suite does not cross — a bundle, a boot path, a
+rendered page — where every unit test stays green while the product is broken,
+so the check has to exercise the layer that actually failed.
 
 **Reading a file is a verification step.** When the thing to check is a
 judgement call — a contract, a refusal, a default — name the file and the

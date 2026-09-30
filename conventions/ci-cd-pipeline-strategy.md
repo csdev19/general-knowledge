@@ -205,6 +205,11 @@ Two smells that doc does not name, both cheap to fix:
    on a persistent runner `node_modules` + the bun store _survive between runs_, so the
    Expo install is near-instant after the first time (no re-materialising). Private repo →
    acceptable risk. Needs a runner registration token from the repo owner.
+   The ephemeral-vs-persistent trade this glosses over, the tooling per platform, and the
+   managed alternatives (Depot, Blacksmith, Namespace) are in
+   [monorepos/ci-runner-hosting.md](../monorepos/ci-runner-hosting.md). Note the tension: the
+   warm state that makes a persistent runner fast is exactly what a release gate exists to not
+   have.
 
 ## Deploy ordering (a trap worth documenting)
 
