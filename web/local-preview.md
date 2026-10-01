@@ -71,6 +71,32 @@ Use `preview:local` before opening a PR whenever:
 - You're working on layout/styling and want to confirm it matches prod
 - A visual bug only reproduces in prod and you need a fast iteration loop
 
+## Checking the preview without a browser session
+
+An agent with no interactive browser can still judge the preview: headless Chrome writes a PNG
+the agent can read and compare against the design.
+
+```bash
+"<chrome>" --headless=new --disable-gpu --hide-scrollbars \
+  --window-size=1440,950 --virtual-time-budget=4000 --screenshot=out.png http://localhost:4173/
+```
+
+Two things make the capture lie:
+
+- **Narrow widths are clamped.** Headless Chrome enforces a minimum window width (about 500px),
+  so `--window-size=375,…` lays the page out wider and then crops the PNG to 375px. The tell is
+  centred text sitting off-centre and cut at the right edge. To see a real phone width, screenshot
+  a local HTML file that embeds the page in `<iframe style="width:375px">`; the iframe's viewport
+  is exactly that wide.
+- **Content gated on hydration may be missing.** `--virtual-time-budget` fast-forwards timers, not
+  hydration. Anything that starts at `opacity: 0` and waits for JavaScript (an
+  IntersectionObserver reveal, for example) can be captured invisible. Prefer CSS-only reveals
+  (`animation-timeline: view()` under `@supports`) so prerendered content is visible without JS.
+
+A build, a type-check and a unit suite can all pass while the rendered page is wrong, so a
+screenshot compared against the design is the check that reaches the layer that matters for
+styling work.
+
 ## See also
 
 The canonical prod-only styling bug this catches:
