@@ -58,7 +58,28 @@ Cloudflare's own guidance moved; designing from older material picks the wrong o
 | **Wrangler environments** (`deploy --env`) | persistent, deploys a `name-env` Worker | when an environment needs persistent Workers with different settings, routes or domains. This is shape 2. |
 | **Version URLs** | ephemeral, per version | inspecting one uploaded version before promoting it. The docs say explicitly **not** to use these for branch or PR testing. |
 
-Two mechanics worth knowing before choosing:
+Three mechanics worth knowing before choosing:
+
+**The Version URL switch is server-side state, not config.** `wrangler versions upload`
+only *reads* the Worker's `previews_enabled` flag and prints a URL when it is already on;
+the flag is *written* by a deploy (`wrangler deploy` / `triggers deploy`, computed from
+config) or immediately by the dashboard toggle under the Worker's domains settings. So an
+upload that prints no URL after a config edit is not broken — the edit has not reached the
+server yet, and the dashboard toggle is the no-deploy way to apply it. `preview_urls` is
+independent of `workers_dev` once written explicitly: a Worker serving only custom domains
+can keep `workers_dev` off (no second public origin for production) and still give every
+uploaded version its own URL. Wrangler leaves either key unchanged when it is absent from
+config. (Read from wrangler 4.63 source; the docs leave the timing unstated.)
+
+What a Version URL is, operationally: `<first-8-of-version-id>-<worker>.<subdomain>.workers.dev`
+per version, or a stable `<alias>-…` name with `--preview-alias`. It runs with the Worker's
+**real secrets and service bindings** — production data, not a sandbox. It is public unless
+Cloudflare Access is put in front, carries `x-robots-tag: noindex` (so it cannot create a
+duplicate-content problem), emits no logs, and is not generated for Workers with Durable
+Objects. Retention: the 100 most recent versions, the 1000 most recent aliases — so record
+the commit next to anything measured on one, not just the URL. Measuring against one
+honestly — including what an access gate does to the numbers — is
+[core web vitals](../web/core-web-vitals.md)' territory.
 
 **Bindings and vars are not inherited between Wrangler environments.** Each environment
 redeclares them. The failure this produces is the nastiest kind: a binding added to production
