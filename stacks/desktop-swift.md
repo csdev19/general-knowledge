@@ -19,6 +19,9 @@ also run on Windows/Linux or share a TypeScript domain with web and mobile.
 **1 · Architecture**
 - [DDD layering in Swift with SwiftPM modules](../desktop/swift-modular-architecture.md) —
   per-feature targets, which parts of hexagonal to keep, the Swift details that make it hold
+- [From React/TypeScript to Swift](../desktop/swift-from-react-equivalences.md) — what each
+  piece of a Zod/Zustand/TanStack stack becomes in SwiftUI, and the rule against rebuilding the
+  JS stack library by library
 - [The AppKit lifecycle under SwiftUI](../desktop/swift-macos-app-lifecycle.md) — the
   composition root builds, the app delegate acts; why an AppKit side effect taken in the `App`
   initializer silently stops mouse delivery, and the probe-build diagnosis for that class of failure
@@ -59,5 +62,10 @@ also run on Windows/Linux or share a TypeScript domain with web and mobile.
   merging changes to windows, events or launch. It is the only automated check that catches
   silent AppKit input failures — see the lifecycle page.
 - **Sandbox and permissions.** Mouse-down global monitors work sandboxed without a prompt; key
-  monitors need accessibility, and the supported sandboxed path for keys is `CGEventTap` with
-  Input Monitoring. Verify permission behaviour on a Mac that has never seen the app.
+  monitors (`NSEvent.addGlobalMonitorForEvents` for keys) need Accessibility, and reading every
+  keystroke needs `CGEventTap` with Input Monitoring. **A global hot key is different:** Carbon
+  `RegisterEventHotKey` fires only for the registered combination, works inside the sandbox
+  with no entitlement and no prompt, and is what shipped menu bar apps use. It is deprecated
+  with no replacement; suppress the warning at the call site. For a user-editable combination,
+  `KeyboardShortcuts` (sindresorhus) wraps the same API and adds the recorder, storage and
+  system-conflict check. Verify permission behaviour on a Mac that has never seen the app.
