@@ -71,6 +71,10 @@ take to run — so blocking time and interactivity stay expensive no matter how 
 gzips. Treat the compressed size as the network cost and the raw size as the CPU cost; they
 are two different problems that happen to share a file.
 
+One measured case of the whole correction, same commit, same instrument: mobile 57 against
+the uncompressed localhost preview, **71** against the CDN serving brotli over a real edge —
+fourteen points that belong to the serving conditions, not to any code change.
+
 **What a local run can never tell you:** edge TTFB, cache behaviour, HTTP/2 or /3
 multiplexing, TLS cost, and real-user field data. Those need a deployed URL. Deploying a
 known-imperfect page to a staging URL purely to measure it is a reasonable thing to do —
@@ -110,6 +114,29 @@ made — you darkened the text and the contrast ratio *fell* — stop and audit 
 before touching the page again. A check that fails falsely is as expensive as a check that
 cannot fail: one hides a real defect, the other invents one and charges you a change to
 "fix" it.
+
+## Confirm which page the number describes
+
+An unauthenticated measurer follows redirects and scores whatever it lands on, without
+complaint. Point PageSpeed Insights or Lighthouse at a URL behind an auth wall — a
+Cloudflare Access login, an SSO gate — and it returns confident numbers *for the login
+page*. Measured once: a PSI run against a protected preview URL reported the access
+provider's domain as the analyzed page, and nothing in the score table said so out loud.
+
+Two checks before believing any number taken against a URL you do not fully control:
+
+- the report's final/displayed URL must match the URL you asked for — a redirect to
+  another host means the wrong page was scored;
+- `curl -I` the URL first: a `3xx` to an auth provider means every unauthenticated tool
+  will measure the gate, and the fix is a measurement window with the gate off (or a
+  service token), not a different tool. Which preview mechanism to measure against in the
+  first place is [deploy environments](../infra/deploy-environments.md)' question.
+
+The same discipline applies to category scores on preview infrastructure: a platform that
+stamps `x-robots-tag: noindex` on preview URLs (Cloudflare does, by design) tanks the SEO
+category through its crawlability audit. Before treating a category drop as a regression,
+open the category and read **which audit** failed — an environment-caused failure is a
+property of the URL, not of the page.
 
 ## Record a baseline before optimizing, and pin the method to it
 
