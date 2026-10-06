@@ -11,6 +11,12 @@
 The executable version of the capture half of this convention is the `cs-capture` skill
 (**planned** — not built yet). This page is the reasoning; the skill is the procedure.
 
+> **Superseded for adopting repositories (2026-10-05).** Repositories that adopt
+> [linear-workflow.md](./linear-workflow.md) capture ideas and track status in Linear, and
+> retire `docs/roadmap.md` in favour of Linear projects and milestones. The GitHub-issues
+> path below remains the convention where outsiders file issues and for repositories that
+> have not adopted Linear.
+
 ## Backlog: capture as a GitHub issue
 
 Capture runs `gh issue create` and touches nothing else on disk — no branch, no worktree, the
@@ -100,6 +106,8 @@ becomes a spec and a plan; that plan, if it needs to fan out to several agents a
 
 ## Related
 
+- [linear-workflow.md](./linear-workflow.md) — the Linear-based capture and status flow that
+  supersedes this page's capture half on adopting repositories.
 - [design-workflow.md](./design-workflow.md) — what a backlog item becomes once picked up.
 - [changelog-pattern.md](./changelog-pattern.md) — the earlier lesson (a hand-kept index is a
   merge-conflict magnet) that the promise-only, derived-status roadmap applies again here.

@@ -109,6 +109,9 @@ feature doc; both are meant to join it.
 
 ## Related
 
+- [linear-workflow.md](./linear-workflow.md) — on adopting repositories the "already
+  promised?" check and the capture read Linear instead of GitHub issues.
+
 - [adr-pattern.md](./adr-pattern.md) — the format a spec's decisions become, and when a
   decision needs one at all.
 - [backlog-and-roadmap.md](./backlog-and-roadmap.md) — where a design's input comes from, and
