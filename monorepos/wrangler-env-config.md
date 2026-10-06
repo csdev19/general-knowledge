@@ -16,9 +16,11 @@ versions auto-load `.env` (and `.dev.vars` for local Worker secrets) at dev and 
 
 - **Local:** each app has its own `.env` (public/build vars) and `.dev.vars` (local Worker
   secrets). Copy the app's `.env.example` and fill it in.
-- **Production:** values are injected as Wrangler secrets by `cloudflare/wrangler-action` in CI
-  (`secrets:` list + matching `env:` block), not committed anywhere. See
-  [ci-cd-pipelines.md](./ci-cd-pipelines.md) for the secret/variable matrix.
+- **Production:** values travel in the same `wrangler deploy` as the code, through
+  `--secrets-file` — never as a separate `secret put` step and never through the action's
+  `secrets:` input, which deploys on its own and is refused once a version has been uploaded
+  without being deployed. See [worker-secrets-with-deploy.md](./worker-secrets-with-deploy.md);
+  the secret/variable matrix is in [ci-cd-pipelines.md](./ci-cd-pipelines.md).
 
 ## Deploy with Wrangler, not a parallel deploy path
 
@@ -30,8 +32,9 @@ both "deploy the Worker" drift and one silently wins.
 
 Wrangler is pinned in the root `package.json` → `workspaces.catalog.wrangler`, and every app
 references it as `"wrangler": "catalog:"`. Bump it in the catalog (one edit) and mirror that version
-in the CI step that installs it globally (`bun add -g wrangler@<version>` in the deploy workflow), so
-every app and CI resolve the same Wrangler.
+in **every** CI step that installs it globally (`bun add -g wrangler@<version>`): the release
+workflows and any preview that stands in for them. An unpinned `bun add -g wrangler` installs
+whatever is latest on the day, so two runs of the same tag can deploy with different tools.
 
 ## Keep `compatibility_date` current and identical
 
