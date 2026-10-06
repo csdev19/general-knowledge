@@ -56,7 +56,7 @@ Cloudflare's own guidance moved; designing from older material picks the wrong o
 | --- | --- | --- |
 | **Previews** (`wrangler preview`) | ephemeral, per branch | Cloudflare's stated recommended way to test changes before production. Own vars, secrets and bindings; custom domains supported. This is shape 1. |
 | **Wrangler environments** (`deploy --env`) | persistent, deploys a `name-env` Worker | when an environment needs persistent Workers with different settings, routes or domains. This is shape 2. |
-| **Version URLs** | ephemeral, per version | inspecting one uploaded version before promoting it. The docs say explicitly **not** to use these for branch or PR testing. |
+| **Version URLs** | ephemeral, per version | inspecting one uploaded version before promoting it. The docs say explicitly **not** to use these for branch or PR testing. An upload leaves the Worker's latest version undeployed, and from then on any separate secrets edit is refused — the release has to ship its secrets inside the deploy ([worker-secrets-with-deploy](../monorepos/worker-secrets-with-deploy.md)). |
 
 Two mechanics worth knowing before choosing:
 

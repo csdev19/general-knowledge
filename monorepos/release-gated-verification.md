@@ -231,5 +231,8 @@ The projection is written down before the "after" export exists; replace it when
   why a `paths`-filtered check must not be required.
 - [release-please-playbook.md](./release-please-playbook.md) — the release PR this page
   turns into the candidate tier.
+- [public-repo-production-protection.md](./public-repo-production-protection.md) — which refs
+  may reach the secrets the publish step holds, and the settings to audit when a repository
+  goes public.
 - Lefthook playbook — pre-commit, commit-msg and the migration from husky. Merged in hub
   PR #19 onto the `docs/english-only` branch, not yet on `main`.

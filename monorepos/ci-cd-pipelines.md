@@ -90,7 +90,11 @@ first deploy of each, they ship independently in any order.
 
 ## Secrets & variables (GitHub `production` environment)
 
-Deploys read from the repo's **`production`** Environment:
+Deploys read from the repo's **`production`** Environment. That Environment is restricted to
+`main` and the release tags, and PR-time checks never declare it — see
+[public-repo-production-protection.md](./public-repo-production-protection.md). The Worker
+secrets below reach the Worker inside the deploy itself, never as a separate step — see
+[worker-secrets-with-deploy.md](./worker-secrets-with-deploy.md).
 
 | Name                                                                                    | Kind     | Used by                          |
 | --------------------------------------------------------------------------------------- | -------- | -------------------------------- |
