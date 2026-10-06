@@ -128,5 +128,7 @@ the fix is one line in the array. Nobody has to notice a paragraph went stale.
 
 - [Infisical secrets playbook](../infra/infisical-secrets.md) — the first tool
   this pattern was built to cover.
+- [Infisical playbook — Convex deployment env](../infra/infisical-secrets.md#convex-deployment-env) —
+  the doctor's probes for a Convex backend, where no secrets fetch is involved.
 - [Environment inventory and README contract](../infra/environment-inventory.md) —
   link the setup checker to the project's actual key and consumer requirements.

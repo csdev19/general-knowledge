@@ -19,7 +19,7 @@ Si no necesitas realtime, el default sigue siendo [hono-orpc](./fullstack-hono-o
 - [schemas-first](../conventions/schemas-first.md) — los schemas Zod siguen siendo la fuente de verdad
 - [Monorepo](../monorepos/monorepo-structure.md)
 
-**2 · Convex** — [conexión del cliente](../convex/client-connection.md) (las dos URLs, `useQuery` reactivo, API generada), [Better Auth en Convex](../convex/better-auth.md)
+**2 · Convex** — [conexión del cliente](../convex/client-connection.md) (las dos URLs, `useQuery` reactivo, API generada), [Better Auth en Convex](../convex/better-auth.md), [module paths](../convex/module-paths.md)
 
 **3 · Web** — [data loading](../web/data-loading.md), [UI package](../web/web-ui-package.md), [bundle splitting](../web/bundle-splitting.md), [local preview pre-prod](../web/local-preview.md)
 

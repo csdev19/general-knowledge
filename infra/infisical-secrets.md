@@ -173,6 +173,47 @@ the protected adapter. It is not a diagnostic command to paste into an issue.
 The project must provide and test the adapter; this playbook does not imply any
 named shell helper already implements all guarantees above.
 
+### Convex deployment env
+
+Convex functions read secrets from the **deployment's own environment store**
+(`npx convex env set NAME value`), not from files or the parent process. For a Convex
+backend the deployment _is_ the runtime secret store: `infisical run` and the
+generated-dotenv adapter above do not reach it at all. Unlike a Worker, there is no
+local file to generate.
+
+**Local development needs no secrets manager.** Each developer gets a personal dev
+deployment, which the Convex CLI records in a gitignored `.env.local`
+(`CONVEX_DEPLOYMENT`, `CONVEX_URL`). Secrets such as `BETTER_AUTH_SECRET` or a token
+pepper are per-deployment random values with no reason to be shared, and the web
+client's `VITE_*` values are public URLs derived from that deployment. There is nothing
+for Infisical to deliver; adopting it for local Convex development adds a tool to the
+bootstrap and protects nothing. Keep it for shared environments.
+
+Where Infisical does earn its place in this shape:
+
+1. **Staging and production: a sync script.** It runs in the reverse direction of a
+   fetch-and-run wrapper: read one consumer tag (for example `convex-api`) from Infisical
+   and apply each key with `npx convex env set` to the target deployment. Make it
+   idempotent, target the deployment explicitly, and never print values. Rotation is
+   "change the value in Infisical, re-run the sync". Whether running functions pick up a
+   changed variable on their next invocation without a redeploy is Convex behavior —
+   verify it against the current Convex docs before relying on it in a rotation runbook.
+2. **CI deploy credentials.** `CONVEX_DEPLOY_KEY` and, if the web app ships to Cloudflare,
+   `CLOUDFLARE_API_TOKEN` become workflow secrets sourced from Infisical, under the
+   [CI and migration boundaries](#ci-and-migration-boundaries) below.
+
+**Reopen the local-development decision** when the values stop being per-person: a shared
+dev deployment, or several developers sharing one third-party sandbox credential (a mail
+provider key, for example). Then a shared store is protecting something again.
+
+The [tool doctor](../conventions/tool-doctor-pattern.md) still applies, with Convex
+probes in place of a secrets fetch: `bun` present, the Convex CLI logged in (`~/.convex`
+exists, or a cheap `npx convex` probe succeeds), and `.env.local` present. Each failure
+prints the exact next command — `npx convex login`, then
+`npx convex dev --configure=existing --until-success`, which links the folder to a
+project already created in the dashboard. The deployment variables Better Auth needs are
+listed in [Better Auth in Convex](../convex/better-auth.md#deployment-env).
+
 ### Build-time configuration and signing
 
 Vite/electron-vite inline supported public prefixes at build time. Existing
@@ -279,6 +320,8 @@ be found by inventory validation rather than silently disappearing from consumer
 
 - [Environment inventory and README contract](./environment-inventory.md)
 - [Tool doctor](../conventions/tool-doctor-pattern.md)
+- [Convex module paths](../convex/module-paths.md) and
+  [Better Auth in Convex](../convex/better-auth.md) — the Convex side of deployment env
 - [CLI overview](https://infisical.com/docs/cli/overview)
 - [CLI 0.43.132 source — precedence and flags](https://github.com/Infisical/cli/blob/v0.43.132/packages/cmd/run.go)
 - [Machine identities](https://infisical.com/docs/documentation/platform/identities/machine-identities)

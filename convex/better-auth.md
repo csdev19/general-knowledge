@@ -74,9 +74,31 @@ authComponent.registerRoutes(http, createAuth);
 export default http;
 ```
 
-**Deployment env:** set `SITE_URL` on the deployment to its `.convex.site` origin
-(`npx convex env set SITE_URL https://<deployment>.convex.site`). Better Auth serves
-its routes there; the client talks to it (see [client-connection](./client-connection.md)).
+## Deployment env
+
+Convex functions read these from the deployment's env store (`npx convex env set`), not
+from a local file. Two variables are hard requirements:
+
+| Variable | Value | Why |
+| --- | --- | --- |
+| `SITE_URL` | The deployment's `.convex.site` origin | Better Auth serves its routes there; the client talks to it (see [client-connection](./client-connection.md)) |
+| `BETTER_AUTH_SECRET` | A random value per deployment | Signs sessions; Better Auth reads it from the environment |
+
+```bash
+npx convex env set SITE_URL https://<deployment>.convex.site
+npx convex env set BETTER_AUTH_SECRET "$(openssl rand -base64 32)"
+```
+
+Everything else can be optional if the code is written for it:
+
+- **Email provider key absent:** let the mail adapter log the message and mark it
+  suppressed instead of failing, so a fresh dev deployment works without a mail account.
+- **A seed guard** (for example `SEED_ENABLED`, accepted only as the literal `"true"`)
+  unlocks dev seed functions. Never set it on a production deployment.
+
+How these values reach shared deployments — and why a personal dev deployment needs no
+secrets manager — is in the
+[Infisical playbook](../infra/infisical-secrets.md#convex-deployment-env).
 
 ## ⚠️ The version constraints (do not drift)
 
@@ -152,3 +174,6 @@ If a client sits forever on "loading" (`useConvexAuth().isLoading` never `false`
 - [Convex client connection](./client-connection.md) — the client side (`authClient`,
   `ConvexBetterAuthProvider`, env, monorepo Metro resolution).
 - [Expo dev builds & Metro](../mobile/expo-dev-builds-and-metro.md) — running the app.
+- [Convex module paths](./module-paths.md) — why a first push can fail on file names.
+- [Infisical secrets playbook](../infra/infisical-secrets.md#convex-deployment-env) —
+  delivering deployment env to staging and production.
