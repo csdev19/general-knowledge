@@ -104,6 +104,11 @@ cd packages/backend && npx convex env set SITE_URL https://<deployment>.convex.s
 cp apps/mobile/.env.example apps/mobile/.env  # fill CONVEX_URL (.cloud) + SITE_URL (.site)
 ```
 
+The first push is also when Convex validates module paths: a hyphen in any file name under
+`convex/` fails it, even though type-check and tests passed — see
+[module paths](./module-paths.md). The full deployment env Better Auth needs is in
+[Better Auth in Convex](./better-auth.md#deployment-env).
+
 ## Sanity checks
 
 ```bash
@@ -115,3 +120,4 @@ curl -s <deployment>.convex.site/api/auth/get-session  # 200 "null" → auth dep
 
 - [Better Auth in Convex](./better-auth.md) — the server + the auth version constraints.
 - [Expo dev builds & Metro](../mobile/expo-dev-builds-and-metro.md) — running it on device.
+- [Convex module paths](./module-paths.md) — the naming rule the first push enforces.
