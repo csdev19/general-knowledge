@@ -179,5 +179,6 @@ Shipping the app — signing, notarization, DMG, Sparkle feed — is
 
 ## Related
 
+- [swift-tooling.md](./swift-tooling.md) — the verify gate (`swift format`, `swift test`, an app build with warnings as errors) that keeps this layout fast to check.
 - [swift-macos-app-lifecycle.md](./swift-macos-app-lifecycle.md) — the composition root builds, the app delegate acts: AppKit side effects taken in the `App` initializer silently stop mouse delivery.
 - [../architecture/local-store-migration.md](../architecture/local-store-migration.md) — moving saved state into a new store (JSON and preference keys into SQLite) without losing it on a partial failure, a second running copy or an unreadable file.

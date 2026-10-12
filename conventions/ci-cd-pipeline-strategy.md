@@ -245,3 +245,4 @@ red-merges (the failure mode of "no protection": anything can land on the one ma
 - [[ai-agent-delegation]] — agents share the same `verify` gate.
 - [[specs-and-plans-workflow]] · [[plan-to-backlog]] — how this gets specced and shipped.
 - [[changelog-pattern]] — releases (tags) are where the changelog + heavy pipeline land.
+- [Swift tooling](../desktop/swift-tooling.md) — this model applied to a native macOS app: the gate script, lefthook, and the macOS runner choice.

@@ -1,6 +1,6 @@
 # Desktop Knowledge Hub
 
-Reusable architecture patterns for building a local-first desktop app with Electron: main/renderer/preload split, a type-safe IPC contract, native OS permissions, a filesystem-first storage vault, a heavy media/compute pipeline, distribution, and feature flags. Generalized from a real screen-capture app — product names stripped, patterns kept. Most docs are Electron-specific; [tauri-architecture.md](./tauri-architecture.md) covers the Tauri 2 split between the webview and the Rust core, and [swift-modular-architecture.md](./swift-modular-architecture.md), [swift-from-react-equivalences.md](./swift-from-react-equivalences.md) and [swift-macos-app-lifecycle.md](./swift-macos-app-lifecycle.md) cover native macOS apps in Swift.
+Reusable architecture patterns for building a local-first desktop app with Electron: main/renderer/preload split, a type-safe IPC contract, native OS permissions, a filesystem-first storage vault, a heavy media/compute pipeline, distribution, and feature flags. Generalized from a real screen-capture app — product names stripped, patterns kept. Most docs are Electron-specific; [tauri-architecture.md](./tauri-architecture.md) covers the Tauri 2 split between the webview and the Rust core, and [swift-modular-architecture.md](./swift-modular-architecture.md), [swift-from-react-equivalences.md](./swift-from-react-equivalences.md) and [swift-macos-app-lifecycle.md](./swift-macos-app-lifecycle.md) and [swift-tooling.md](./swift-tooling.md) cover native macOS apps in Swift.
 
 ## Architecture
 
@@ -11,6 +11,10 @@ Reusable architecture patterns for building a local-first desktop app with Elect
 - [main-process-architecture.md](./main-process-architecture.md) — How the Electron main process boots, the `register*` subsystem pattern, window/tray lifecycle, and the one-renderer-two-windows trick.
 - [renderer-architecture.md](./renderer-architecture.md) — Renderer folder layout (pages/features/ui/shell), the three-step legacy-screen migration workflow, and the CSS-tokens + `cx()`/`data-*` house style.
 - [product-philosophy.md](./product-philosophy.md) — Local-first product principles: the artifact is the product, cloud is a capability, hide successful infrastructure, and the three-axis state model.
+
+## Tooling
+
+- [swift-tooling.md](./swift-tooling.md) — Native Swift: the toolchain's `swift format` for format and lint, the Swift 6 compiler as the main linter with warnings as errors in one `scripts/verify.sh` gate, lefthook hooks, Periphery and sanitizers by hand, choosing the macOS CI runner by deployment target, and a measured example.
 
 ## IPC & process model
 
