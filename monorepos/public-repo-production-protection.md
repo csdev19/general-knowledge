@@ -15,7 +15,7 @@ it actually happens:
 | Way in | Closed by |
 | --- | --- |
 | A fork's pull request edits a workflow to print the secrets | `pull_request` runs with no Environment secrets and a read-only token. Keep it that way: never `pull_request_target`, `workflow_run` or `issue_comment` for anything that checks out the PR's code. |
-| Code that runs during CI exfiltrates — a `postinstall`, a build script, a mutated action tag | No install scripts ([native-dependencies](../desktop/native-dependencies.md)); pin third-party actions to a full SHA where the job holds a secret. |
+| Code that runs during CI exfiltrates — a `postinstall`, a build script, a mutated action tag | No install scripts ([native-dependencies](../desktop/native-dependencies.md)); pin third-party actions to a full SHA where the job holds a secret ([why, and how to keep the pins current](./dependabot-and-pinned-actions.md)). |
 | A job on an ordinary branch declares the production Environment | Deployment branch policy, below. |
 | The owner's account, or a PAT with bypass rights | 2FA; the release bot's PAT scoped to contents + pull requests, no ruleset bypass. |
 | A secret pasted into a commit | Secret scanning with push protection (free on public repositories). |
@@ -109,6 +109,8 @@ gh api $R -q '.security_and_analysis'
 
 - [release-gated-verification.md](./release-gated-verification.md) — the `verify` job a
   publish step sits behind; this page is about who may reach the publish step's secrets.
+- [dependabot-and-pinned-actions.md](./dependabot-and-pinned-actions.md) — the SHA pin that closes
+  the mutated-tag row, and the bot that keeps it current.
 - [pr-checks.md](./pr-checks.md) — the PR-time jobs that must not declare `production`.
 - [worker-secrets-with-deploy.md](./worker-secrets-with-deploy.md) — how the secrets a release
   job holds reach the Worker.
