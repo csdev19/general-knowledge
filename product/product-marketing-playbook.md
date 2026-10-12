@@ -472,3 +472,4 @@ The reported result of one team working two or three sprints ahead is evidence f
 
 - [Design workflow](../conventions/design-workflow.md) — how product-specific decisions become specs and ADRs before implementation.
 - [Core Web Vitals](../web/core-web-vitals.md) — how to measure site performance without overstating what local results prove.
+- [Writing with AI](../conventions/writing-with-ai.md) — publishing AI-drafted technical posts without losing the author's voice or the reader's trust.

@@ -102,3 +102,5 @@ already triggered (and resolved in the same sitting) from one still open, rather
   feature ships, never copied.
 - [knowledge-hub-maintenance.md](./knowledge-hub-maintenance.md) — an ADR that records
   reusable, product-agnostic knowledge belongs here in the hub, not only in the project.
+- [writing-with-ai.md](./writing-with-ai.md) — adopting that writing model in a project is
+  recorded as an ADR.

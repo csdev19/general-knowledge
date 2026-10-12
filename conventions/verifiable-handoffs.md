@@ -90,3 +90,5 @@ entirely: the diff already enumerates, and enumeration is not guidance.
   the work this hands back.
 - [ci-cd-pipeline-strategy](./ci-cd-pipeline-strategy.md) — the `verify` gate
   whose exit code a handoff quotes.
+- [writing-with-ai](./writing-with-ai.md) — the same checks-over-claims rule applied to
+  published writing: the author's words are verified against their raw input.
