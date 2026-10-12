@@ -32,7 +32,11 @@ also run on Windows/Linux or share a TypeScript domain with web and mobile.
 - [Bounded contexts](../architecture/bounded-contexts-complete-guide.md) — when a second feature
   needs data from the first
 
-**2 · Distribution**
+**2 · Tooling**
+- [Swift tooling](../desktop/swift-tooling.md) — `swift format`, warnings as errors in one
+  verify gate, lefthook, Periphery, and which macOS runner CI needs
+
+**3 · Distribution**
 - [Distribution spine](../distribution/README.md) — sign → notarize → staple → DMG → feed → publish
 - [Swift / Xcode + Sparkle](../distribution/swift-xcode-macos.md) — the traps, as symptoms
 - [App icon and DMG window](../distribution/macos-app-icon-and-dmg.md)
