@@ -98,6 +98,10 @@ same reasons.
 - [Main-process architecture](../desktop/main-process-architecture.md) — where
   the `userData` pin runs: at module load, before `app.whenReady()`.
 
+- [Product byline](../product/product-marketing-playbook.md#product-byline) — the
+  user-facing "A Niway product · built by csdev" line, which is a brand
+  statement and changes neither the identifier nor the signing identity.
+
 - Signing identity is separate from the identifier: Niway apps sign under the
   personal Apple Developer team `K9TKC5GG76` (Cristian Sotomayor); "Niway" is
   a naming/GitHub-org convention, not a legal entity Apple knows about.

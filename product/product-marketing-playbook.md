@@ -31,18 +31,18 @@ Stop at the highest layer the available evidence can support.
 
 Apply the playbook through a sequence of small specifications. Each one answers a different question and can be revised without rewriting everything downstream.
 
-| # | Specification | Question answered | Output |
-| --- | --- | --- | --- |
-| 1 | Evidence and claim baseline | What do we know, infer, and still need to prove? | Source ledger and claim register |
-| 2 | Customer progress | In what circumstance does someone seek change? | Job card and before-state narrative |
-| 3 | Alternatives | What happens if the product does not exist? | Competitive-alternatives table |
-| 4 | Positioning | For whom are we unusually valuable, and in what category? | Positioning canvas |
-| 5 | Message architecture | Which promise leads, and what supports it? | Message hierarchy |
-| 6 | Proof strategy | What will make each important claim believable? | Proof plan |
-| 7 | Conversion journey | What must visitors understand before acting? | Page argument and CTA map |
-| 8 | Visual demonstration | What should visitors see instead of merely read? | Visual evidence plan |
-| 9 | Page specification | How do copy, visuals, and interactions form one argument? | Responsive page specification |
-| 10 | Validation | What would show that the argument works or fails? | Test plan and findings log |
+| #   | Specification               | Question answered                                         | Output                              |
+| --- | --------------------------- | --------------------------------------------------------- | ----------------------------------- |
+| 1   | Evidence and claim baseline | What do we know, infer, and still need to prove?          | Source ledger and claim register    |
+| 2   | Customer progress           | In what circumstance does someone seek change?            | Job card and before-state narrative |
+| 3   | Alternatives                | What happens if the product does not exist?               | Competitive-alternatives table      |
+| 4   | Positioning                 | For whom are we unusually valuable, and in what category? | Positioning canvas                  |
+| 5   | Message architecture        | Which promise leads, and what supports it?                | Message hierarchy                   |
+| 6   | Proof strategy              | What will make each important claim believable?           | Proof plan                          |
+| 7   | Conversion journey          | What must visitors understand before acting?              | Page argument and CTA map           |
+| 8   | Visual demonstration        | What should visitors see instead of merely read?          | Visual evidence plan                |
+| 9   | Page specification          | How do copy, visuals, and interactions form one argument? | Responsive page specification       |
+| 10  | Validation                  | What would show that the argument works or fails?         | Test plan and findings log          |
 
 Do not collapse these into one copywriting exercise. A clever headline cannot repair weak positioning or missing evidence.
 
@@ -123,13 +123,13 @@ A target customer can read the circumstance and say, "That is what happens to us
 
 The primary competitor may be waiting, manual work, an internal tool, a spreadsheet, another department, or doing nothing. Named products are only relevant when buyers actually consider them.
 
-| Alternative | Why people choose it | Full cost | Where it wins | Where it fails |
-| --- | --- | --- | --- | --- |
-| Status quo | | | | |
-| Build internally | | | | |
-| Manual workaround | | | | |
-| Named product | | | | |
-| No decision | | | | |
+| Alternative       | Why people choose it | Full cost | Where it wins | Where it fails |
+| ----------------- | -------------------- | --------- | ------------- | -------------- |
+| Status quo        |                      |           |               |                |
+| Build internally  |                      |           |               |                |
+| Manual workaround |                      |           |               |                |
+| Named product     |                      |           |               |                |
+| No decision       |                      |           |               |                |
 
 For internal tools, count the whole ownership burden: design, implementation, hosting, maintenance, documentation, onboarding, troubleshooting, and drift. Do not compare only against the cost of version one.
 
@@ -184,13 +184,13 @@ The team can explain why this audience should choose the product over what they 
 
 For every important capability, ask "so what?" until the answer reaches a meaningful operational or human change.
 
-| Layer | Question | Example shape |
-| --- | --- | --- |
-| Feature | What exists? | Imports an agreed contract |
-| Capability | What can the user do? | Generate a working substitute from that contract |
-| Operational effect | What changes in the workflow? | A dependent task can begin before the real service exists |
-| Team benefit | Why does that matter? | Two teams can work in parallel instead of serially |
-| Outcome | What improves if the mechanism holds? | Less blocked delivery time |
+| Layer              | Question                              | Example shape                                             |
+| ------------------ | ------------------------------------- | --------------------------------------------------------- |
+| Feature            | What exists?                          | Imports an agreed contract                                |
+| Capability         | What can the user do?                 | Generate a working substitute from that contract          |
+| Operational effect | What changes in the workflow?         | A dependent task can begin before the real service exists |
+| Team benefit       | Why does that matter?                 | Two teams can work in parallel instead of serially        |
+| Outcome            | What improves if the mechanism holds? | Less blocked delivery time                                |
 
 The ladder is causal, not decorative. If a feature does not reliably create the claimed outcome, weaken the claim or identify the missing condition.
 
@@ -222,14 +222,14 @@ Every prominent benefit has a plausible mechanism and planned proof; every promi
 
 Before/after framing explains a transformation; it does not prove one. Match the proof to the claim.
 
-| Claim | Useful proof |
-| --- | --- |
-| The workflow is shorter | Side-by-side task flow or timed demonstration |
-| Setup is fast | Representative task-completion measurement |
-| The product handles a scenario | Live or recorded product demonstration |
-| A technical property holds | Documentation, test result, architecture explanation, or reproducible check |
-| Customers get an outcome | Representative customer evidence with context |
-| The product is better than an alternative | Fair comparative test with disclosed conditions |
+| Claim                                     | Useful proof                                                                |
+| ----------------------------------------- | --------------------------------------------------------------------------- |
+| The workflow is shorter                   | Side-by-side task flow or timed demonstration                               |
+| Setup is fast                             | Representative task-completion measurement                                  |
+| The product handles a scenario            | Live or recorded product demonstration                                      |
+| A technical property holds                | Documentation, test result, architecture explanation, or reproducible check |
+| Customers get an outcome                  | Representative customer evidence with context                               |
+| The product is better than an alternative | Fair comparative test with disclosed conditions                             |
 
 Proof should be close to the claim it supports. Logos, generic testimonials, and screenshots without context do not automatically prove the primary promise.
 
@@ -359,6 +359,15 @@ Write for scanning:
 
 Brand personality should make the product memorable without making it harder to understand. "Human, playful, and technically credible" can be a useful product-family direction, but it is not universal guidance. Validate tone against the audience, category, purchase risk, and context.
 
+### Product byline
+
+Every product the owner ships signs itself the same way: **"A Niway product · built by csdev"**.
+
+- **Where:** the product's About or Settings screen, and its landing-page footer. Where a link is possible, `csdev` links to `https://cs19.dev`. Inside an app, plain text is fine when the app only opens an allow-listed set of URLs.
+- **Why both names:** Niway is the product family: the personal site presents every product as built under it, and it survives contributors coming and going. `csdev` is the author, the person a reader can look up. "By csdev" alone contradicts the portfolio; "by Niway" alone hides the author.
+- **What it is not:** a statement of ownership. The copyright holder in `LICENSE`, the app's copyright string and the signing identity are separate decisions (see [app bundle identifiers](../conventions/app-bundle-identifiers.md) for the signing side). A byline change never moves them; moving them is its own decision, with an ADR.
+- **Rollout:** existing products adopt the byline as they ship their next release, not in one sweep.
+
 ### Stop condition
 
 The page remains clear without its visual styling, and its personality does not hide meaning or inflate claims.
@@ -472,4 +481,5 @@ The reported result of one team working two or three sprints ahead is evidence f
 
 - [Design workflow](../conventions/design-workflow.md) — how product-specific decisions become specs and ADRs before implementation.
 - [Core Web Vitals](../web/core-web-vitals.md) — how to measure site performance without overstating what local results prove.
+- [App bundle identifiers](../conventions/app-bundle-identifiers.md) — the signing identity and bundle ids, which the product byline deliberately does not change.
 - [Writing with AI](../conventions/writing-with-ai.md) — publishing AI-drafted technical posts without losing the author's voice or the reader's trust.
