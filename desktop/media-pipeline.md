@@ -189,6 +189,8 @@ mediabunny pasa `hardwareAcceleration: 'no-preference'` por defecto, y en la bui
 
 **Verificación:** el `onEncoderConfig` loguea el config real; si el hardware engancha, los mensajes `[OpenH264]` **desaparecen** de la consola.
 
+> **Exports (re-encoding a finished recording):** keyframe interval, quantizer mode and frame rate matter more than the codec there — see [webcodecs-export-encoding.md](./webcodecs-export-encoding.md).
+
 ### Por qué mediabunny y no FFmpeg
 
 No se portó el stack `MediaRecorder`+FFmpeg del legacy. Gran parte del rol de FFmpeg ahí era **parchear lo que `MediaRecorder` rompe** (WebM sin duration header → remux). mediabunny no usa `MediaRecorder`, así que esos parches no nacen.
