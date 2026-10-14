@@ -181,6 +181,7 @@ through the global monitor. The click smoke script now lives in the repository a
 ## Related
 
 - [../stacks/desktop-swift.md](../stacks/desktop-swift.md) — the assembly recipe this page belongs to.
+- [floating-windows-over-full-screen.md](./floating-windows-over-full-screen.md) — the Electron side of panels over full-screen Spaces, and the app-wide side effect of joining them.
 - [swift-modular-architecture.md](./swift-modular-architecture.md) — the layering the composition root wires; this page is the one AppKit constraint on when that root may act.
 - [../distribution/swift-xcode-macos.md](../distribution/swift-xcode-macos.md) — the Xcode and Sparkle traps on the way to a signed, self-updating release.
 - [../architecture/README.md](../architecture/README.md) — the app only wires; here applied to AppKit's launch timeline.
