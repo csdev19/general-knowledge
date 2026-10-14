@@ -132,3 +132,7 @@ Tauri tiene ventajas reales que podrían importar más adelante:
 3. **Optimización #2:** single-window estricto, matar renderers idle, trimming de bundle.
 4. **Medí** contra el umbral, como se define arriba.
 5. **Solo si** no pasás el umbral, o querés mobile, o el footprint se vuelve queja real → spike de Tauri.
+
+## Related
+
+- [webcodecs-export-encoding.md](./webcodecs-export-encoding.md) — measured: the browser's hardware encoder with the right settings matched x264 on screen recordings, so the encode pipeline did not need FFmpeg.
