@@ -234,5 +234,7 @@ The projection is written down before the "after" export exists; replace it when
 - [public-repo-production-protection.md](./public-repo-production-protection.md) — which refs
   may reach the secrets the publish step holds, and the settings to audit when a repository
   goes public.
+- [dependabot-and-pinned-actions.md](./dependabot-and-pinned-actions.md) — why bump PRs usually
+  show skipped checks under this model, and what to do before merging one.
 - Lefthook playbook — pre-commit, commit-msg and the migration from husky. Merged in hub
   PR #19 onto the `docs/english-only` branch, not yet on `main`.
