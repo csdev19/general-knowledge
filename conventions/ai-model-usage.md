@@ -10,14 +10,20 @@ why process structure dominates model tier._
 | Role | Model | Why |
 | --- | --- | --- |
 | **Default and orchestrator** — conversation, exploration, research, first drafts of specs and plans, final branch review | Opus 5.5 | Strong enough for judgment; cheap enough to spend on reading |
-| **Refiner** — one pass over a finished draft: tighten a spec, resolve contradictions, challenge decisions | Fable | The most capable and the most constrained quota; spend it on thinking, not on reading the repo |
+| **Refiner** — one pass over a finished draft: tighten a spec, resolve contradictions, challenge decisions | Fable | The most capable and the most constrained quota; spend it on thinking, with bounded evidence instead of free exploration |
 | **Executor and code reviewer** — implementation from a brief, per-task review, scans | Sonnet | Long tool loops at low cost; reliable when the brief and the tools carry the rigor |
 
-The rule that follows: **Fable never explores.** Exploration means opening files, grepping,
-reading audit reports and doing web research, and every turn pays to re-read all of it.
-Opus produces the draft and a compact package. Fable gets the package and nothing else:
-the draft, the decisions table, the open questions, and the few files whose exact contents
-matter.
+The rule that follows: **Fable never explores without a bound.** Exploration means opening
+files, grepping, reading audit reports and doing web research, and every turn pays to
+re-read all of it. Opus produces the draft and a compact package: the draft, the decisions
+table, the open questions, and the few files whose exact contents matter. Fable starts from
+the package and may ask for more evidence (named files, symbols, questions); code or a
+cheaper agent fetches it, at most two rounds, each capped in size.
+
+An earlier version of this page said "Fable never explores" with no exception. Two
+adversarial reviews rejected it: a refiner that cannot check a claim against the
+repository writes confident specs that name APIs or paths that do not exist, and a wrong
+spec costs a whole implementation run. The bound, not the ban, is what saves the quota.
 
 The model names change; the roles do not. When a new model arrives, reassign the table
 rather than adding a row.
@@ -76,6 +82,14 @@ next to it. Two consequences:
 
 - **Cost scales with what the agent reads × how many turns it takes**, not with how much
   it writes. Twenty turns over a 120k-token context is about 2.4M tokens read.
+- **The four buckets are priced differently.** On Anthropic's API, cache reads cost 0.1×
+  the base input price, 5-minute cache writes 1.25× and 1-hour writes 2×; output
+  (including thinking) is 5× input. Millions of cached reads can cost less than a few
+  hundred thousand cache writes. How a subscription's usage meter weighs each bucket is
+  not published: calibrate it by logging each run's usage per bucket next to the usage
+  readings, before trusting "context × turns" as a cost model.
+- **Reasoning is output.** A high effort level on a strong model is not free even with no
+  tools; what makes a tool-less pass cheap is that it is one or two turns.
 - **Prompt caching makes re-reading cheap only while the cache is alive.** When a run
   pauses past the cache lifetime (for example, waiting out a rate limit), the next turn
   re-writes the entire context at full price. Resuming is not free; it is close to
@@ -144,6 +158,30 @@ The model's judgment is for what tools cannot see: authorization logic, data flo
 whether the fix matches the intent. A reviewer that skips the tools spends tokens
 re-deriving what a linter would have printed.
 
+### Route reviews by risk, not by rejection count
+
+Escalating to a stronger reviewer after the cheap one asks for changes twice selects the
+wrong cases: repeated rejections measure friction (a missing test, a rename), while the
+dangerous change is the one the cheap reviewer approves at once with an invariant broken in
+a file it never read. Decide the reviewer **before** the first review, from risk computed by
+code: sensitive paths (auth, permissions, payments, deletion, migrations, schema), fan-in of
+changed exports, contract changes, config and CI, new dependencies. A change the classifier
+cannot place counts as high risk. Give the strong reviewer context assembled by code (the
+callers of every changed export, the full text of the decisions that mention the touched
+modules) and bounded evidence requests.
+
+### AI review in continuous integration
+
+When agents open many PRs, review is a gate in CI, not a conversation:
+
+- Run it only after the required checks are green; a red PR goes back to its author
+  without spending review tokens.
+- Report the verdict on the exact head commit (a commit status or check) so a later push
+  voids it, the same rule as human QA approvals.
+- Batch every finding into one repair round; the second review only verifies those fixes.
+  Persistent disagreement goes to a human.
+- Keep a human merge for high-risk changes until measured escaped defects justify more.
+
 ## Open question: how much better is a Fable review than a Sonnet review?
 
 Not measured yet. Expectations to test, not facts:
@@ -190,7 +228,7 @@ turn, so only context written to the cache and context read back are shown.
 | 4 spec writers, cut off and resumed | Fable | 17–36 | 0.42–0.88M each | 1.6–4.9M each | 2 specs; 2 nothing |
 | 2 follow-ups after the reset | Fable | 10 | 0.15–0.18M each | 0.3–0.4M each | nothing |
 
-What it showed:
+What it showed (revised after two adversarial reviews; see "What the reviews changed" below):
 
 - **Fable spent its quota on reading.** Each spec writer read audit reports, the
   codebase, ADRs and web sources itself (over 2M tokens re-read per spec) before writing
@@ -203,6 +241,16 @@ What it showed:
   recovered only by extracting them from the agents' transcripts.
 - **The audit missed two open PRs** that already implemented one of its fixes. A whole
   ticket turned out to be a duplicate.
+
+What the reviews changed. Priced by bucket, an uninterrupted Fable spec run splits
+roughly evenly between cache reads, cache writes and output; in the interrupted runs,
+cache writes dominate. So the likely order of causes is: **parallelism** (seven runs hit the
+cap together), **runs cut mid-flight** (four produced nothing), **resuming with a cold
+cache**, and only then **exploration**. The table does not separate model, task,
+interruption and parallelism, so this order is inference until per-run usage is logged.
+The cheapest fixes are the fan-out and usage-limit protocols above, not a ban on reading.
+A second lesson: in an agent pipeline the implementer, not the reviewer or the refiner,
+usually spends the most; measure it before optimizing the others.
 
 What it would have looked like under this page's protocol (a projection, not measured):
 Opus writes the five spec drafts from the audit reports. Fable refines them two at a time,
