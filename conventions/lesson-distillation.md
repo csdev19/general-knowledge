@@ -76,6 +76,8 @@ right unprompted, the words are not binding yet.
 
 ## Related
 
+- [ai-model-usage.md](./ai-model-usage.md) — a page distilled from one session with this
+  procedure.
 - [verifiable-handoffs](./verifiable-handoffs.md): the PR that ships a
   distilled lesson names the event it protects against.
 - [design-workflow](./design-workflow.md): a lesson that

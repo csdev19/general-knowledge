@@ -21,6 +21,10 @@ caro; una tarea trivial que bloquea a una persona va en modo A.
 
 ## Reparto de roles dentro de una ejecución
 
+> **Note (2026-10):** the model names in this section predate the current roles. See
+> [ai-model-usage.md](./ai-model-usage.md) for which model fills each role today and for
+> how to budget a fan-out on a capped model.
+
 Cualquiera de los dos modos usa la misma forma. Lo que cambia es qué modelo ocupa
 cada casilla.
 
@@ -216,6 +220,8 @@ Para implementar esta delegación en un proyecto nuevo:
 
 ## Ver también
 
+- [ai-model-usage.md](./ai-model-usage.md) — current model roles, quota budgeting for
+  fan-outs, recovering from a usage limit, and reviewer tooling.
 - [design-workflow.md](./design-workflow.md) — de dónde sale el plan
   que esta delegación ejecuta.
 - [plan-to-backlog.md](./plan-to-backlog.md) — convertir un plan aprobado en
