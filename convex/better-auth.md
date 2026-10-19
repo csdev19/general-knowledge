@@ -177,3 +177,5 @@ If a client sits forever on "loading" (`useConvexAuth().isLoading` never `false`
 - [Convex module paths](./module-paths.md) — why a first push can fail on file names.
 - [Infisical secrets playbook](../infra/infisical-secrets.md#convex-deployment-env) —
   delivering deployment env to staging and production.
+- [Auth playbooks](../auth/README.md) — Better Auth on a Worker instead: the 1.7 upgrade,
+  Google sign-in, desktop sign-in through the browser, web email flows.

@@ -25,6 +25,7 @@ realtime out-of-the-box (→ [convex](./fullstack-convex.md)) o prefieras Eden T
 - [Cliente isomórfico](../api/api-client.md) — mismo cliente en server y browser
 - [ADR: oRPC + Hono + Cloudflare](../api/decisions/adr-0002-orpc-hono-cloudflare.md) — por qué esta capa
 - [Gotcha: better-auth cross-origin](../api/gotchas/better-auth-cross-origin.md) — headers inmutables en Workers
+- [Auth playbooks](../auth/README.md) — upgrade de Better Auth a 1.7, Google sign-in, flujos de email en la web
 
 **3 · Web (TanStack Start)**
 - [Data loading](../web/data-loading.md) — loaders + Query; server functions vs cliente isomórfico
