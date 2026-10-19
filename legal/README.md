@@ -40,6 +40,8 @@ The first Kaipu implementation includes a signup notice, **not server-side evide
 
 Templates are source material, not live policies shared across products. Each product owns a reviewed, versioned adaptation and links back here for guidance; changes to the template must not silently change customer agreements.
 
+An OAuth consent screen (Google's branding page) asks for the privacy and terms URLs before sign-in can leave testing; what the privacy policy must say about Google user data is in [auth/google-sign-in.md](../auth/google-sign-in.md#4-legal-pages).
+
 ## First adaptation: Kaipu
 
 - Operator copied from Winku/Sentir: Niway S.A.C., Lima, Peru. Confirm full statutory details for launch.

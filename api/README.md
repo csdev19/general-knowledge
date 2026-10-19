@@ -17,6 +17,8 @@ When one identity has to be shared across products in separate repos, that proxy
 | [decisions/adr-0002-orpc-hono-cloudflare.md](./decisions/adr-0002-orpc-hono-cloudflare.md) | Why oRPC + Hono replaced server functions. |
 | [gotchas/better-auth-cross-origin.md](./gotchas/better-auth-cross-origin.md) | Immutable request headers on Cloudflare Workers. |
 
+Step-by-step auth recipes on this topology — the Better Auth 1.7 upgrade, Google sign-in, desktop sign-in through the browser and the web email flows — live in [auth/](../auth/README.md).
+
 ## Reading order
 
 1. Start with **[hono.md](./hono.md)** for the whole picture.
