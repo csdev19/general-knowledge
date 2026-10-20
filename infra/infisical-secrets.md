@@ -1,6 +1,6 @@
 # Infisical: secrets and environment playbook
 
-> Status: **accepted default, independent of Varlock.** Last reviewed: 2026-09-18.
+> Status: **accepted default, independent of Varlock.** Last reviewed: 2026-10-20.
 > Infisical stores values; existing runtime schemas validate them. Varlock is an
 > optional declaration layer evaluated [separately](./varlock-evaluation.md), not
 > a prerequisite for this playbook.
@@ -86,14 +86,19 @@ permissions, owners, or rotation consequences differ. A one-key folder is useful
 when it represents a genuinely different authority. Record a short description
 of what a leak enables and where to rotate the credential.
 
-Consumer tags should distinguish runtime and release stages, for example
-`api-runtime`, `web-runtime`, `desktop-dev`, `database-tools`, `desktop-signing`,
-and `deploy-api`. **Do not tag signing keys for ordinary desktop development.**
+Name each tag after the app that reads it, using the app's one name from
+[App names](../conventions/app-naming.md): `<product>-api`, `<product>-web`,
+`<product>-desktop`. A second consumer of the same app with a different authority
+is a child of that name: `<product>-desktop-sign`, `<product>-desktop-publish`,
+`<product>-api-db`, `<product>-api-deploy`. The environment is never part of a
+tag; `dev` and `prod` are environments of the project.
+**Do not tag signing keys for ordinary desktop development**: they carry the
+`-sign` child tag, which a development pull never requests.
 Libraries are generally not fetch consumers; the executable using them is.
 
 ### Selection is not authorization
 
-`--tags api-runtime` limits a particular fetch. The logged-in identity may still
+`--tags <product>-api` limits a particular fetch. The logged-in identity may still
 have authority to request other tags or paths. Configure environment/path/tag
 restrictions in Infisical's permission policy and test denied reads as well as
 allowed ones. Restrict who can change tags and values, too.
@@ -126,7 +131,7 @@ the project. Require consumer selection and validate expected keys.
 Use an explicit consumer filter:
 
 ```bash
-infisical run --env=dev --recursive --tags api-runtime -- <command>
+infisical run --env=dev --recursive --tags <product>-api -- <command>
 ```
 
 An explicit `--path` is also appropriate for an operation confined to one folder.
@@ -165,7 +170,7 @@ For a generated-file adapter, use this contract:
 A representative single-folder export is:
 
 ```bash
-infisical export --env=dev --path=/database --tags api-runtime --format=dotenv --silent
+infisical export --env=dev --path=/database --tags <product>-api --format=dotenv --silent
 ```
 
 It writes values to stdout: use only with synthetic fixtures or redirect through
@@ -192,7 +197,7 @@ bootstrap and protects nothing. Keep it for shared environments.
 Where Infisical does earn its place in this shape:
 
 1. **Staging and production: a sync script.** It runs in the reverse direction of a
-   fetch-and-run wrapper: read one consumer tag (for example `convex-api`) from Infisical
+   fetch-and-run wrapper: read one consumer tag (for example `<product>-api`) from Infisical
    and apply each key with `npx convex env set` to the target deployment. Make it
    idempotent, target the deployment explicitly, and never print values. Rotation is
    "change the value in Infisical, re-run the sync". Whether running functions pick up a
@@ -319,6 +324,7 @@ be found by inventory validation rather than silently disappearing from consumer
 ## References and adoption example
 
 - [Environment inventory and README contract](./environment-inventory.md)
+- [App names](../conventions/app-naming.md) — the tag names: `<product>-<role>`, detail after
 - [Tool doctor](../conventions/tool-doctor-pattern.md)
 - [Convex module paths](../convex/module-paths.md) and
   [Better Auth in Convex](../convex/better-auth.md) — the Convex side of deployment env
