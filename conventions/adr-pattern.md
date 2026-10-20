@@ -84,6 +84,26 @@ A feature doc's "Why it is this way" section is a table of `Decision → ADR / s
 never restated reasoning ([feature-docs-as-memory.md](./feature-docs-as-memory.md)). The ADR
 stays the one place the reasoning lives; every other document points at it.
 
+## No hand-kept index
+
+An ADR's own **Status** line is the only record of its state. Nothing else lists ADRs by hand:
+no `docs/adr/README.md` table, no index page whose rows are edited when an ADR is added or
+amended.
+
+The failure this prevents: a hand-kept index is edited by every PR that adds or amends an ADR,
+always at the same rows. New ADRs append at the bottom, and amendments change a State cell, so
+two branches in flight conflict on it even though neither is about the index. It is a second
+copy of the Status line, so it also drifts. This is the same lesson
+[changelog-pattern.md](./changelog-pattern.md) and
+[feature-docs-as-memory.md](./feature-docs-as-memory.md) record for their indexes.
+
+When a panorama is needed, generate it from the Status lines on demand. A small script such as
+`bun run adr:list [filter]` prints number, title and Status, and nothing it prints is committed.
+A docs app may instead render the list at build time from the ADR files. Either way, adding an
+ADR is creating the file, and amending one is editing that file alone. Add a test that fails
+when an ADR has no Status line the script can read, so the generated list cannot silently miss
+one.
+
 ## Measured example
 
 ADR-0022 in one of the owner's own products records a checkpoint upgrade for a speech
@@ -99,7 +119,9 @@ already triggered (and resolved in the same sitting) from one still open, rather
 - [design-workflow.md](./design-workflow.md) — the lifecycle stage that produces an ADR, and
   the ladder that decides whether one is needed.
 - [feature-docs-as-memory.md](./feature-docs-as-memory.md) — where an ADR is cited once a
-  feature ships, never copied.
+  feature ships, never copied; its generated index is the model for listing ADRs.
+- [changelog-pattern.md](./changelog-pattern.md) — the first record of a hand-kept index
+  becoming a merge-conflict magnet.
 - [knowledge-hub-maintenance.md](./knowledge-hub-maintenance.md) — an ADR that records
   reusable, product-agnostic knowledge belongs here in the hub, not only in the project.
 - [writing-with-ai.md](./writing-with-ai.md) — adopting that writing model in a project is
