@@ -148,39 +148,70 @@ which is the failure it exists to prevent. The cost is one billed minute per PR 
 rounds a five-second job up to a whole minute — so count it before adding one to a
 high-traffic repository.
 
-### A label as the trigger _and_ the gate
+### Draft → Ready for review as the trigger
 
-Combining this with a label turns a manual decision into an enforceable precondition, the
-same shape as a review approval:
+Draft state is the readiness signal: a draft means "still accumulating, spend no runners",
+and **Ready for review** means "verify this". GitHub already refuses to merge a draft, and
+no bot churns the draft flag the way bots churn labels.
 
 ```yaml
 on:
   pull_request:
-    types: [opened, reopened, synchronize, labeled, unlabeled]
+    branches: [main]
+    # ready_for_review   — THE trigger.
+    # synchronize        — a new revision while ready; re-verify, cancel the superseded run.
+    # converted_to_draft — back to accumulating; cancel in-flight verification.
+    # opened/reopened    — a PR opened as ready needs its required check from the start.
+    types: [opened, reopened, synchronize, ready_for_review, converted_to_draft]
+
+jobs:
+  verify:
+    # Decided at JOB level, so a draft never boots a runner just to refuse.
+    if: github.event.pull_request.draft == false
+    concurrency:                       # on the expensive job only, never workflow-wide
+      group: verify-pr-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+
+  cancel-superseded:
+    if: github.event.action == 'converted_to_draft'
+    concurrency:
+      group: verify-pr-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Returned to draft; in-flight verification cancelled."
 ```
 
-`labeled`/`unlabeled` are not in the default event set; adding them is what lets a label
-start a run. Then the expensive job refuses to run without the label — **failing, not
-skipping**, in a step placed before checkout so the refusal costs seconds:
+For a release PR, set `"draft-pull-request": true` in `release-please-config.json`. The bot
+then rewrites a draft on every releasable merge and no rewrite allocates a runner; the owner
+presses Ready for review when that candidate is the one to publish. Open ordinary PRs as
+drafts too (`gh pr create --draft`) and mark them ready when they should be checked.
 
-```yaml
-      - name: Require the label
-        if: ${{ github.event_name == 'pull_request' &&
-                !contains(github.event.pull_request.labels.*.name, 'verify') }}
-        run: |
-          echo "::error::Add the 'verify' label to run this."
-          exit 1
-```
+Three traps, each measured on a real release PR:
 
-What this buys, on a release PR that a bot rewrites on every merge to the trunk: nothing
-runs while merges accumulate, the label says "I am releasing this", and from then on
-every update is verified until it merges. Keeping `synchronize` in the event list is what
-makes that last part work.
+- **No `labeled` / `unlabeled`.** A label-based trigger listens to every label change, so a
+  bot's own bookkeeping labels (`autorelease: pending`, `autorelease: tagged`) start full
+  verifications — one of them 13 seconds after the PR had merged and the tag existed.
+- **No `edited`.** The bot edits the PR body in the same second it force-pushes. The
+  `edited` run verifies nothing and reports every check `skipped`, and GitHub counts a
+  skipped required check as passing: the PR read "All checks have passed" while the real
+  run was still working. Without `edited`, a stacked PR retargeted onto `main` needs one
+  push, or close and reopen, to start its checks.
+- **A commit's required check is the worst conclusion across every run of that name on
+  that commit**, not the latest. `skipped` is neutral; a `failure` is permanent and a later
+  success does not outvote it. So the gate reports from the run that verified the commit
+  and stays silent on runs that did not; it must neither skip into a pass nor fail closed
+  on a twin run.
 
-Forgetting the label must not be dangerous. Check that the thing being gated has a second
-gate behind it — a release pipeline whose deploy job sits behind `needs: verify` fails at
-the tag, before anything is signed or published. Then a forgotten label costs a failed
-run, not an incident.
+Concurrency belongs on the expensive job, not the workflow: a workflow-level group lets an
+irrelevant event cancel a valid verification before its own job conditions skip it.
+
+The earlier version of this pattern used a `verify` label as both trigger and gate. Drop
+it for the draft flag; the label is what produced the first trap above.
+
+Forgetting to mark a PR ready must not be dangerous either. The release pipeline still has
+its own `verify` (and platform E2E) behind `needs:`, so a candidate that merged unverified
+fails at the tag, before anything is signed or published.
 
 ## Follow-ups
 

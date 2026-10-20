@@ -59,7 +59,8 @@ their outcome, and give them `workflow_dispatch` for manual catch-up.
 **R7 — Never move a platform-gated suite to a cheaper runner.** A suite whose tests skip
 off-platform passes without testing; see the trap in
 [ci-runner-cost.md](./ci-runner-cost.md#the-trap-a-cheaper-runner-can-make-a-suite-pass-without-testing-anything).
-Platform E2E runs on the platform, at release time, against the bundle that ships.
+Platform E2E runs on the platform, against the bundle that ships: on a ready candidate for
+that platform, and again at release time.
 
 **R8 — Keep the evidence.** Archive the billing export before changing anything, and
 the next one after. Otherwise "we saved 80 %" is a feeling.
@@ -75,18 +76,24 @@ Three tiers. Each check has one home, marked ●, and at most one echo, marked �
 | Package builds                       |         ●         |                 ○                 |         ●         |
 | Unit and component tests             |         ●         |                 ○                 |         ●         |
 | App builds (web, API bundle)         |                   |                 ○                 |         ●         |
-| Platform E2E (Electron, mobile)      |     on demand     |                                   |         ●         |
+| Platform E2E (Electron, mobile)      |     on demand     |   ● that platform's candidates    |         ○         |
 | Native rebuilds, signing, notarizing |                   |                                   |         ●         |
 | Security scan, dependency audit      |                   |                 ○                 |         ●         |
 | Deploy, upload, migrate              |                   |                                   | ● after all above |
 
 - **Local push** is the Lefthook `pre-push` running `verify`. Free, seconds, bypassable.
 - **Candidate** is the release PR that release-please maintains, or a manual
-  `workflow_dispatch` of the validation workflow. It runs `verify` on `main` **before the
-  tag exists**, so a failure costs a fix and a push, not a tag and a patch release. Cheap:
-  one Linux job per release-PR update, not per feature-PR push.
+  `workflow_dispatch` of the validation workflow. The bot opens the PR as a **draft**
+  (`draft-pull-request: true`) and rewrites it on every releasable merge; a draft allocates
+  no runner. Pressing **Ready for review** is the signal "this is the one I am publishing":
+  from then on every revision runs `verify`, plus the platform E2E when the candidate is for
+  that platform. It all runs **before the tag exists**, so a failure costs a fix and a push,
+  not a tag and a patch release. See
+  [pr-checks.md](./pr-checks.md#draft--ready-for-review-as-the-trigger) for the workflow shape.
 - **Release** is the tag workflow. `verify` job first, then platform E2E against the built
-  bundle, then publish. Enforced by `needs:`, not by habit.
+  bundle, then publish. Enforced by `needs:`, not by habit. The E2E stays here as well as in
+  the candidate: the tagged SHA is a merge commit, not the candidate's head, and R1 is about
+  the SHA that ships.
 
 Per-feature-PR cloud checks are a fourth, optional tier. They earn their minutes only when
 (a) branch protection makes them required, because then they are a guarantee instead of a
@@ -100,9 +107,17 @@ paying for a status icon.
 | One owner, no branch protection             | Off; hook + candidate replace them |     ●     |      ●       |
 | One owner, agents pushing on their behalf   | Off; agents run `verify` too       |     ●     |      ●       |
 | Two or more people merging                  | `verify` only, required, cached    |     ●     |      ●       |
-| Public repository with outside contributors | `verify` only, required            |     ●     |      ●       |
+| Public repository with outside contributors | `verify` + platform E2E, required  |     ●     |      ●       |
 
 The release gate is in every row. That column is what R1 means.
+
+In every row, **draft means "do not spend runners yet"**: PR-time checks, where they exist,
+run only on non-draft PRs. The public row is different because GitHub-hosted runners,
+macOS included, are free for public repositories. That removes the cost that keeps a
+private repository's checks local, so every non-draft PR runs `verify` and the platform E2E,
+and the pre-push hook shrinks to the fast checks (lint, format, types). Do not copy that row
+while the repository is private: macOS bills at about ten times Linux, which is the problem
+this page was written after.
 
 ## What you give up without PR-time cloud checks, and how to close it
 
@@ -161,16 +176,23 @@ jobs:
     # build → platform E2E against that build → sign → publish, in that order
 ```
 
-Candidate tier on the release PR (the bot's branch prefix is `release-please--`):
+Candidate tier on the release PR (the bot's branch prefix is `release-please--`;
+`"draft-pull-request": true` in `release-please-config.json`):
 
 ```yaml
 on:
   pull_request:
     branches: [main]
+    types: [opened, reopened, synchronize, ready_for_review, converted_to_draft]
 jobs:
   verify:
-    if: startsWith(github.head_ref, 'release-please--')
-    # same steps as above; skipped jobs on other PRs cost nothing
+    if: >-
+      startsWith(github.head_ref, 'release-please--') &&
+      github.event.pull_request.draft == false
+    concurrency:
+      group: verify-pr-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    # same steps as above; skipped jobs on drafts and other PRs cost nothing
 ```
 
 Bot workflow filter:
@@ -199,6 +221,9 @@ Retired validation workflows keep `workflow_dispatch:` only and say why in the h
 - [ ] Every workflow with `pull_request:` either is required by branch protection or has a
       header sentence justifying its minutes.
 - [ ] `release-please.yml` (or any bot) has a `paths` filter.
+- [ ] `release-please-config.json` sets `"draft-pull-request": true`, and no PR workflow
+      lists `labeled`, `unlabeled` or `edited` in its `types`.
+- [ ] Every platform E2E that runs at the tag also runs on that platform's ready candidate.
 - [ ] Every non-Linux runner is in a release workflow, or its header says which ladder rung
       it is on and why.
 - [ ] Billing → Budgets: Actions limit is non-zero, alerts on.
@@ -220,6 +245,15 @@ Kaipu, September 2026, 23 days, single owner, three deployables (desktop, web, A
 
 Local `verify`: 27 s cold, 3 s warm. Desktop suite: 17 s locally, 208 s on `ubuntu-latest`.
 The projection is written down before the "after" export exists; replace it when it does.
+
+### A tag burnt by an E2E that only ran after it
+
+Kaipu desktop 0.8.0, 2026-09-25. The macOS E2E sat in the tag workflow between `Build` and
+`Sign`; it failed on its first click. Result: tag created, GitHub Release published with
+zero assets, version number burnt. Installed apps were safe, because the update feed is
+written after signing. `verify` had not missed anything: it contains no E2E by design. The
+fix was to run the same E2E job on the ready desktop candidate as well, so the next failure
+cost a push. Source: that repository's ADR 0006.
 
 ## Related
 
