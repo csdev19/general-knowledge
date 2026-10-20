@@ -1,9 +1,17 @@
 # Continuous Integration (testing)
 
-_How the test suites run in CI against a single shared Neon test branch — two parallel jobs, one secret, and the schema-drift and quoted-URL gotchas._
+_How the test suites run in CI against a single shared Neon test branch — two parallel jobs, one secret, and the schema-drift and quoted-URL gotchas. Which tier runs them is set by release-gated-verification.md._
 
-CI runs on every PR to `main` via `.github/workflows/pr-validation.yml`. Two jobs run in parallel,
-both bound to the `testing` GitHub environment.
+**Which tier runs these jobs is decided in
+[release-gated-verification.md](../release-gated-verification.md), not here.** This page used
+to say CI runs on every PR to `main`; that is no longer the default. On a private
+single-owner repository the pre-push hook runs `verify` and the cloud runs it on the ready
+release candidate and at the tag. Every-PR checks are for repositories with several mergers
+or public ones, and even then only on non-draft PRs
+([pr-checks.md](../pr-checks.md#draft--ready-for-review-as-the-trigger)).
+
+Wherever they run, the jobs below share one shape: they run in parallel, both bound to the
+`testing` GitHub environment.
 
 ## Jobs
 
