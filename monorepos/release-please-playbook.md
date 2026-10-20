@@ -284,15 +284,33 @@ On some private org repos the default token also makes release-please's GraphQL 
 
 ---
 
-## Step 6 — Keep release PRs out of the heavy CI
+## Step 6 — Keep release PRs out of the heavy CI, but verify them
 
 A release PR touches `package.json` and `CHANGELOG.md`, so it matches most path filters and would
-otherwise run the full build/test matrix on a mechanical version bump. Skip it:
+otherwise run the full build/test matrix on a mechanical version bump. Skip the matrix:
 
 ```yaml
 jobs:
   validate:
     if: ${{ !startsWith(github.head_ref, 'release-please--') }}
+```
+
+**Do not skip `verify` on it.** The release PR is not mechanical from your checks' point of view:
+it is the only PR whose files a bot wrote, and bot commits never pass the pre-push hook. The first
+check that sees `CHANGELOG.md`, the manifest and the bumped `package.json` is otherwise the
+release workflow's `verify` — after release-please has already created the tag and the GitHub
+Release, so a failure burns the version. Run the cheap Linux `verify` on the release PR when it is
+marked ready, and only there; the shape that costs nothing on ordinary PRs is in
+[release-gated-verification.md](./release-gated-verification.md#a-required-check-with-candidate-only-verification).
+
+**Keep the generated files out of the formatter check.** release-please writes changelogs in its
+own style (`*` bullets, double blank lines) and rewrites them on every release, so a formatter
+check (`prettier --check`, `oxfmt --check`, `biome format`) rejects them, and formatting them by
+hand is undone by the next release. Ignore them in the formatter's config:
+
+```jsonc
+// .oxfmtrc.json / .prettierignore equivalent
+{ "ignorePatterns": ["**/CHANGELOG.md"] }
 ```
 
 ---
@@ -302,12 +320,15 @@ jobs:
 1. Land the config + manifest + workflows on `main`.
 2. **The release PR appears** with a sane version and a changelog containing only the commits since
    `bootstrap-sha`. Nothing has shipped yet — opening a PR is free.
-3. Merge it. **The tag exists** and it points at the merge commit that carries the bumped
+3. **`verify` passes on the release PR branch** (`gh pr checkout <n> && bun run verify`, or the
+   candidate job of Step 6). The first release is the first time the generated files meet your
+   formatter and linters.
+4. Merge it. **The tag exists** and it points at the merge commit that carries the bumped
    `package.json`.
-4. **The deploy workflows actually started.** If the tag exists but no workflow ran, the token is
+5. **The deploy workflows actually started.** If the tag exists but no workflow ran, the token is
    wrong (Step 3) — that is the single most common failure.
-5. The deployed build reports the released version.
-6. Re-run the deploy run from the Actions UI once, to prove rollback works before you need it.
+6. The deployed build reports the released version.
+7. Re-run the deploy run from the Actions UI once, to prove rollback works before you need it.
 
 ---
 
@@ -322,6 +343,8 @@ jobs:
 | `Cannot read properties of undefined (reading 'version')`      | The released `package.json` has no `version` field.                                            |
 | An app you never deploy keeps cutting releases                 | Add it to `exclude-paths`.                                                                     |
 | Want a specific next version (e.g. declare `1.0.0`)            | `Release-As: 1.0.0` footer in a commit body.                                                   |
+| Release workflow's `verify` fails on `CHANGELOG.md` after the tag exists | The formatter checks release-please's generated changelogs, and nothing verified the release PR. Ignore `**/CHANGELOG.md` in the formatter and verify the release PR (Step 6). Ship the fix as a patch release; the failed version stays burnt. |
+| A group release PR merged but never tagged; every later run logs `untagged, merged release PRs outstanding - aborting` | Seen with `linked-versions` + `separate-pull-requests: true` (release-please 17.3.0). The plugin titles the group PR `chore${scope}: release <group> libraries`, but a merged title is parsed only with the component pattern or the top-level `group-pull-request-title-pattern`, which defaults to `chore: release ${branch}`. Neither matches, so building the release logs `Bad pull request title`, and **every later run aborts, for every component**, until that PR is tagged. Fix: set `"group-pull-request-title-pattern": "chore${scope}: release${component} libraries"` at the top level of the config (versions still come from the PR body); the next run on `main` then tags the stuck PR. Set it before the first grouped release. |
 | Considering `node-workspace` / `linked-versions` on **Bun**    | Bun's root `workspaces` is an **object** (`{ packages: [], catalog: {} }`), not the array these plugins expect. Verify with a dry run before committing to it; Topology A avoids the question entirely. |
 
 Commit type → bump table: see
