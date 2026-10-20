@@ -56,7 +56,7 @@ system will and will not generate for you, and which tool holds the signing swit
 | --- | --- | --- |
 | [swift-xcode-macos.md](./swift-xcode-macos.md) | Swift / Xcode / Sparkle | Written — drawn from a shipped app, five releases (`v0.1.1` → `v0.4.0`) |
 | `rust-tauri-macos.md` | Rust / Tauri 2 | Not written yet |
-| `electron-macos.md` | Electron / electron-builder | Not written yet |
+| [electron-macos.md](./electron-macos.md) | Electron / electron-builder / electron-updater | Written — drawn from a shipped app, releases `v0.1.0` → `v0.9.0`; in-app self-update not yet validated there |
 
-The two unwritten docs are slots, not promises: write each one from a repository that has actually
+The unwritten doc is a slot, not a promise: write it from a repository that has actually
 released, the way the Swift doc was, rather than from the tool's documentation.
