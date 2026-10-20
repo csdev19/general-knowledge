@@ -91,6 +91,36 @@ table: a touched path updates that doc's relevant section and its `lastVerified`
 feature with no doc yet gets one created. A feature doc is never updated "later" — the moment a
 diff touches its paths is the only moment it is meant to change.
 
+## Anti-pattern: the append-only progress log
+
+The tempting alternative is one `progress.md` that every phase or PR appends to ("read this file
+alone to know where the build stands"). It was tried in invisible-assistant from 2026-09-03 to
+2026-10-19 and removed. The evidence:
+
+- **It outgrew its reader.** At about 9,600 lines (660 KB) an agent's file reader refused to
+  open it, so the instruction "read it before touching the app" could not be followed. Agents
+  only grepped its headings, or copied the shape of its last entry to write the next one.
+- **Nobody decided from it.** On the day it was audited, every decision came from the code, the
+  open plan, the ADRs, the flow docs, the design files and the hub playbooks. None came from the
+  log.
+- **It duplicated the PR body.** Checks, test counts and "not verified live" were already in each
+  pull request.
+- **It was a conflict magnet.** Every PR edited its last lines, so any two open PRs conflicted.
+  In one day about six PRs needed manual conflict fixes, and each merge broke the next one. This
+  is the same failure the generated index above avoids.
+- **Deleting it is not free.** Code comments and ADRs had started citing its entries as evidence
+  (a threshold derivation, a measurement): 132 references in 82 files. They had to be rewritten as
+  permalinks to the file at its last commit.
+
+What replaces it:
+
+- **Current state:** feature docs (this page), flow docs and ADR Status lines. They are edited
+  in place, they are small enough to read, and each lives in its own file.
+- **What one change did, checked and left unverified:** that PR's body
+  ([verifiable-handoffs.md](./verifiable-handoffs.md)).
+- **Evidence the code depends on:** a doc of its own, linked from the code. It must not be an
+  entry in a log.
+
 ## Related
 
 - [design-workflow.md](./design-workflow.md) — the spec and ADRs a feature doc's "Why it is
