@@ -107,17 +107,64 @@ paying for a status icon.
 | One owner, no branch protection             | Off; hook + candidate replace them |     ●     |      ●       |
 | One owner, agents pushing on their behalf   | Off; agents run `verify` too       |     ●     |      ●       |
 | Two or more people merging                  | `verify` only, required, cached    |     ●     |      ●       |
+| Public repository, collaborators-only PRs   | Off; immediate pass (see below)    |     ●     |      ●       |
 | Public repository with outside contributors | `verify` + platform E2E, required  |     ●     |      ●       |
 
 The release gate is in every row. That column is what R1 means.
 
 In every row, **draft means "do not spend runners yet"**: PR-time checks, where they exist,
-run only on non-draft PRs. The public row is different because GitHub-hosted runners,
-macOS included, are free for public repositories. That removes the cost that keeps a
-private repository's checks local, so every non-draft PR runs `verify` and the platform E2E,
-and the pre-push hook shrinks to the fast checks (lint, format, types). Do not copy that row
-while the repository is private: macOS bills at about ten times Linux, which is the problem
-this page was written after.
+run only on non-draft PRs. The outside-contributors row is different because
+GitHub-hosted runners, macOS included, are free for public repositories, and strangers do
+not run your hooks. So every non-draft PR runs `verify` and the platform E2E, and the
+pre-push hook shrinks to the fast checks (lint, format, types). Do not copy that row while
+the repository is private: macOS bills at about ten times Linux, which is the problem this
+page was written after.
+
+**Free minutes are not free time.** A public repository whose pull requests come only from
+collaborators gets nothing from per-PR runs that the hook and the candidate do not already
+give, and pays in waiting: every merge, every layer of a stack. Use the collaborators-only
+row, and move to the outside-contributors row the day strangers' pull requests are accepted.
+
+## A required check with candidate-only verification
+
+Once branch protection or a ruleset **requires** a check, "verify only the candidate" needs
+one more piece: every other pull request must still get that check reported, or it sits on
+"Expected" forever and cannot merge. A job-level `if: startsWith(github.head_ref, …)` is not
+enough on its own: a job skipped by its `if` reports `skipped`, and a workflow that never
+starts reports nothing at all.
+
+The shape that works:
+
+1. **A classify job runs first on every non-draft revision.** It is cheap (seconds, no
+   checkout needed) and outputs `release` — the head branch matches the bot's prefix
+   (`release-please--branches--*`) or the run is a manual dispatch — plus `docs_only` and
+   `e2e` when the candidate tier skips the platform E2E for documentation.
+2. **Every verifying job `needs:` the classify job** and runs only when it classified a
+   candidate. An ordinary pull request starts no verifying runner.
+3. **The required gate reports from a decision, never from the event shape.** It runs when
+   the classification says "not a candidate" (and passes at once), when the classification
+   failed (and fails), or when a candidate's verification reached a verdict. A draft, a
+   cancelled classification or a superseded run reports **nothing** — GitHub takes the worst
+   conclusion across runs on a commit, so a red from a run that decided nothing outlives the
+   green that follows it. See [pr-checks.md](./pr-checks.md#making-a-sometimes-skipped-job-a-required-check).
+4. **No `branches:` filter on `pull_request`.** In a GitHub stack every pull request targets
+   the branch below it, yet each is judged against the stack base's required check. Filter to
+   `main` and the upper layers never run, so **Merge stack** never turns ready. With the
+   classify-and-pass shape the cost of running on every base is one short job.
+5. **Simulate the conditions in a script, in `verify`.** The gate's correctness lives in
+   `if:` expressions and a shell step that no unit test reaches. A small checker that parses
+   the workflow, evaluates each job's `if:` against scenarios (ordinary, stacked, draft,
+   candidate, superseded, failed classification, dispatch) and runs the gate's real script
+   against a decision table catches the regressions that otherwise ship as a stuck or a
+   falsely green check. Derive each scenario's classification from its event, never from the
+   expectation, or the check agrees with itself.
+
+What it costs, in the ADR: `main` can be red between releases; a broken test surfaces on the
+release pull request, possibly several merges after its cause; and outside contributions are
+unverified. The section above on what you give up applies unchanged. Reopen when a release
+pull request fails on a regression that takes more than one bisect to place (first lever:
+unit tests in the pre-push hook), when strangers' pull requests are accepted, or when a second
+person merges regularly.
 
 ## What you give up without PR-time cloud checks, and how to close it
 
@@ -176,7 +223,60 @@ jobs:
     # build → platform E2E against that build → sign → publish, in that order
 ```
 
-Candidate tier on the release PR (the bot's branch prefix is `release-please--`;
+Candidate tier with a **required** check (the shape described above; condensed, the
+eligibility checker and the E2E job are omitted):
+
+```yaml
+on:
+  pull_request: # no `branches:` filter, so every layer of a stack reports
+    types: [opened, reopened, synchronize, ready_for_review, converted_to_draft]
+  workflow_dispatch:
+jobs:
+  changes:
+    name: Classify the change
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.classify.outputs.release }}
+    steps:
+      - id: classify
+        env:
+          EVENT: ${{ github.event_name }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          release=false
+          case "$EVENT:$HEAD_REF" in
+            workflow_dispatch:* | pull_request:release-please--branches--*) release=true ;;
+          esac
+          echo "release=$release" >> "$GITHUB_OUTPUT"
+
+  verify:
+    needs: [changes]
+    if: needs.changes.result == 'success' && needs.changes.outputs.release == 'true'
+    # … the steps from the release gate above
+
+  gate: # the REQUIRED check
+    name: Merge requirements
+    needs: [changes, verify]
+    if: >-
+      always() && github.event_name == 'pull_request' && (
+        (needs.changes.result == 'success' && needs.changes.outputs.release == 'false') ||
+        needs.changes.result == 'failure' ||
+        needs.verify.result == 'success' || needs.verify.result == 'failure'
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          CHANGES: ${{ needs.changes.result }}
+          RELEASE: ${{ needs.changes.outputs.release }}
+          VERIFY: ${{ needs.verify.result }}
+        run: |
+          [ "$CHANGES" = "success" ] || { echo "classification failed"; exit 1; }
+          [ "$RELEASE" = "false" ] && { echo "not a release candidate"; exit 0; }
+          [ "$VERIFY" = "success" ]
+```
+
+Candidate tier without a required check (the bot's branch prefix is `release-please--`;
 `"draft-pull-request": true` in `release-please-config.json`):
 
 ```yaml
@@ -224,6 +324,9 @@ Retired validation workflows keep `workflow_dispatch:` only and say why in the h
 - [ ] `release-please-config.json` sets `"draft-pull-request": true`, and no PR workflow
       lists `labeled`, `unlabeled` or `edited` in its `types`.
 - [ ] Every platform E2E that runs at the tag also runs on that platform's ready candidate.
+- [ ] If a check is required: an ordinary pull request and the upper layer of a stack both
+      get it reported (no `branches:` filter; a classify job; the gate passes "not a
+      candidate"), and a script in `verify` simulates the gate's conditions.
 - [ ] Every non-Linux runner is in a release workflow, or its header says which ladder rung
       it is on and why.
 - [ ] Billing → Budgets: Actions limit is non-zero, alerts on.
@@ -245,6 +348,25 @@ Kaipu, September 2026, 23 days, single owner, three deployables (desktop, web, A
 
 Local `verify`: 27 s cold, 3 s warm. Desktop suite: 17 s locally, 208 s on `ubuntu-latest`.
 The projection is written down before the "after" export exists; replace it when it does.
+
+### Back from "every PR" to candidate-only, once the repository was public
+
+Kaipu, 2026-10-19. The repository went public on 2026-10-05 and moved every pull request onto
+full verification (its ADR 0010, the outside-contributors row). Two weeks later, with pull
+requests still limited to collaborators:
+
+| Measured on a code pull request          | Every PR verified | Candidate-only (ADR 0027) |
+| ---------------------------------------- | ----------------- | ------------------------- |
+| Wall time to a green required check      | 234 s             | ~10 s                     |
+| of which the macOS E2E                   | 210 s             | 0 (release PR only)       |
+| Linux checks (parallel, slowest part)    | ~100 s            | 0 (release PR only)       |
+| Upper layer of a stack                   | never ran — stuck | ~10 s                     |
+
+Classify 4 s, gate 3 s, alias 3 s on that repository's own PR #350. The stuck stack (its PR
+#347) was the `branches: [main]` filter: the upper pull request targeted the lower one's
+branch, so the workflow never started and **Merge stack** waited on "Expected" forever. The
+pre-push hook kept lint, format, cached builds and types (about 7 s); unit tests stayed off the
+push by the owner's choice, named in the ADR as the first lever if a release turns red.
 
 ### A tag burnt by an E2E that only ran after it
 
