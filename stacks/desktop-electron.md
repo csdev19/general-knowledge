@@ -41,4 +41,4 @@ antes de decidir entre Electron y Tauri.
   remota (si existe) es secundaria. Habilita monetización sin backend obligatorio.
 - **Node externals**: el main es Node — cuida el bundling (externalizar deps nativas). Ver la
   lección en [packages/case-study](../packages/case-study-design-tokens-package.md) y el gotcha de auth.
-- **Distribución**: auto-update (electron-updater) + version gate; documentado en el backlog/roadmap del producto.
+- **Distribución**: auto-update (electron-updater) + version gate; documentado en el backlog/roadmap del producto. Pipeline de release, bucket, feed y cliente: [distribution/electron-macos.md](../distribution/electron-macos.md).
