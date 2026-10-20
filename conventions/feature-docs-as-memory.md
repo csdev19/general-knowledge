@@ -9,7 +9,9 @@
 
 The executable version of this convention is the `cs-document-feature` skill (**planned** —
 replaces a template's `feature-docs` skill and `save-feature` command once built). This page is
-the reasoning; the skill is the procedure.
+the reasoning; the skill is the procedure. Adopting feature docs in a repository, the guardrails
+that keep them small, and how a trial is judged: [feature-docs-playbook.md](./feature-docs-playbook.md)
+(an experiment started 2026-10-19).
 
 ## Why one flat file, cross-module
 
@@ -55,6 +57,9 @@ What bit an agent or a user, each with the PR that fixed it.
 Newest first, one line each.
 ```
 
+The History section is under trial: the first adoption leaves it out, because a table appended on
+every PR is a small progress log. See the playbook's "Deviation under trial".
+
 ## The paths table is the contract
 
 "Where it lives" is not documentation of the code — it is a check on it. The ship step greps
@@ -94,3 +99,5 @@ diff touches its paths is the only moment it is meant to change.
 - [changelog-pattern.md](./changelog-pattern.md) — the generated-index lesson this convention
   reapplies.
 - [verifiable-handoffs.md](./verifiable-handoffs.md) — the ship step that updates a feature doc.
+- [feature-docs-playbook.md](./feature-docs-playbook.md) — the adoption procedure, guardrails and
+  the trial's measures.
