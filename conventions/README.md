@@ -22,6 +22,7 @@ Reusable, product-agnostic conventions and workflow patterns distilled from real
 - **[mvp-first-then-refactor.md](./mvp-first-then-refactor.md)** — Two-phase feature workflow: ship an inline MVP end-to-end first, then extract the domain/application/infra layers once it's stable. When to refactor.
 - **[changelog-pattern.md](./changelog-pattern.md)** — Docs-app changelog as a decision journal: one file per entry, auto-generated index (no manual index = no merge conflicts), entry bar, and how it complements release-please. _(Spanish)_
 - **[plan-to-backlog.md](./plan-to-backlog.md)** — Converting an approved plan into self-sufficient backlog deliverables that runner agents execute in parallel; the plan becomes superseded. _(Spanish)_
+- **[feature-docs-playbook.md](./feature-docs-playbook.md)** — Adopting feature docs: pick three features, one flat file each, a generated index, the update rule in the repo's instructions; guardrails (state not history, 100 lines, links not copies, gotchas expire); how a trial is judged, keep or delete. Experiment started 2026-10-19.
 - **[working-with-the-owner.md](./working-with-the-owner.md)** — How the hub's owner thinks, decides, and wants to be worked with: context dumped in one pass and expected processed, prose options with a counterargument, one free-text reply, coarse-grained approval, decisions written down with a reopen condition.
 
 ## Agent skills
