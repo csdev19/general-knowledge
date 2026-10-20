@@ -112,6 +112,11 @@ data directory**.
 
 ## Making a sometimes-skipped job a required check
 
+> When only release candidates are verified and every other pull request should pass at
+> once — stacked ones included — the full shape (classify job, gate that passes "not a
+> candidate", no `branches:` filter) is in
+> [release-gated-verification.md](./release-gated-verification.md#a-required-check-with-candidate-only-verification).
+
 The gotcha above says a required check that never reports blocks merge forever. The same
 bites a job that is present but **skipped by an `if:`** — and that is the normal shape of
 an expensive job you only want on some PRs. You cannot require it directly: on every PR
