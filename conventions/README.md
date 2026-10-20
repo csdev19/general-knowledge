@@ -9,6 +9,7 @@ Reusable, product-agnostic conventions and workflow patterns distilled from real
 - **[schemas-first.md](./schemas-first.md)** — Define Zod (v4) schemas in the domain package and reuse them across backend and frontend.
 - **[tagging-system.md](./tagging-system.md)** — Two-tier tags: default tags in code (slug/label/emoji/color) + per-scope custom tags with a curated color palette. One source of truth across web/mobile/widget.
 
+- **[app-naming.md](./app-naming.md)** — One name per app, `<product>-<role>` (`<product>-api`, `<product>-web`, `<product>-desktop`), used for its directory, package, deployed resource and secrets tag; detail goes after it (`<product>-desktop-sign`); never the environment or the framework.
 - **[app-bundle-identifiers.md](./app-bundle-identifiers.md)** — Reverse-DNS bundle IDs under `dev.niway.*` (niway.dev), frozen after first release; why users never see them and why shipped exceptions (Kaipu's `com.niway.*`) are grandfathered rather than migrated; renaming an Electron app without moving its `userData` folder.
 
 ## Data & delivery

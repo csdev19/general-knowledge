@@ -95,6 +95,9 @@ same reasons.
 
 ## Related
 
+- [App names](./app-naming.md) — the directory, deployed-resource and secrets-tag name
+  (`<product>-<role>`), which unlike the bundle identifier can still be adopted later.
+
 - [Main-process architecture](../desktop/main-process-architecture.md) — where
   the `userData` pin runs: at module load, before `app.whenReady()`.
 
