@@ -46,6 +46,8 @@ impression: they are what the user sees before a single line of your code runs.
 - [macos-app-icon-and-dmg.md](./macos-app-icon-and-dmg.md) — the app icon's real geometry, and how
   to make Finder open the DMG with your layout, headlessly, in CI. Toolchain-agnostic: the icon is
   PNG slots and the DMG is `hdiutil` + a `.DS_Store` whether the app is Swift, Rust or JavaScript.
+- [electron-icon-and-dmg.md](./electron-icon-and-dmg.md) — the Electron / electron-builder version:
+  `dmg:` keys instead of a `.DS_Store`, the tray template image and the dev Dock icon.
 
 ## Per-toolchain challenges
 
@@ -56,7 +58,7 @@ system will and will not generate for you, and which tool holds the signing swit
 | --- | --- | --- |
 | [swift-xcode-macos.md](./swift-xcode-macos.md) | Swift / Xcode / Sparkle | Written — drawn from a shipped app, five releases (`v0.1.1` → `v0.4.0`) |
 | `rust-tauri-macos.md` | Rust / Tauri 2 | Not written yet |
-| [electron-macos.md](./electron-macos.md) | Electron / electron-builder / electron-updater | Written — drawn from a shipped app, releases `v0.1.0` → `v0.9.0`; in-app self-update not yet validated there |
+| [electron-macos.md](./electron-macos.md) (+ [icon and DMG](./electron-icon-and-dmg.md)) | Electron / electron-builder / electron-updater | Written — drawn from a shipped app, releases `v0.1.0` → `v0.9.0`; in-app self-update not yet validated there |
 
 The unwritten doc is a slot, not a promise: write it from a repository that has actually
 released, the way the Swift doc was, rather than from the tool's documentation.
