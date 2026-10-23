@@ -6,7 +6,9 @@ and how to get Finder's install window to open with your layout on a machine tha
 This is the layer where the build tool helps least. `xcodebuild`, `tauri build` and
 `electron-builder` all hand you a working `.app`; none of them has an opinion about whether the
 icon has the right margins or whether the disk image opens as a designed window. Both are just
-files you commit, so the technique below is the same in every toolchain.
+files you commit, so the technique below is the same in every toolchain. For Electron, where
+electron-builder's `dmg:` keys replace the hand-captured `.DS_Store`, see
+[electron-icon-and-dmg.md](./electron-icon-and-dmg.md).
 
 ---
 

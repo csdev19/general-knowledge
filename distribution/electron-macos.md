@@ -248,6 +248,7 @@ client.
 - [README.md](./README.md): the six-stage spine and the publication rules
 - [swift-xcode-macos.md](./swift-xcode-macos.md): the Swift / Sparkle sibling
 - [macos-app-icon-and-dmg.md](./macos-app-icon-and-dmg.md): icon and DMG layout
+- [electron-icon-and-dmg.md](./electron-icon-and-dmg.md): the electron-builder `dmg:` block, tray and dev Dock icon
 - [../stacks/desktop-electron.md](../stacks/desktop-electron.md): the Electron stack recipe
 - [../monorepos/release-automation.md](../monorepos/release-automation.md): version drift and release-please
 - [../monorepos/ci-cd-pipelines.md](../monorepos/ci-cd-pipelines.md): tag-driven pipelines
