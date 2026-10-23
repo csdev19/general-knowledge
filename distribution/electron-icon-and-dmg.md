@@ -171,9 +171,8 @@ Reference app `invisible-assistant` (`apps/desktop`):
 - Icon, tray, Dev Dock: PR #265 (`build/icon-source.svg`, `build/tray-source.svg`,
   `src/main/tray.ts`, `applyDevDockIcon` in `src/main/index.ts`)
 - Favicon and Apple touch icon: PR #266
-- DMG window: branch `fix/desktop-dmg-design` (`electron-builder.yml` `dmg:` block,
-  `build/dmg-background.svg`, `dmg-background.png`, `dmg-background@2x.png`); no PR number yet when
-  this was written
+- DMG window: invisible-assistant PR #268 (`electron-builder.yml` `dmg:` block,
+  `build/dmg-background.svg`, `dmg-background.png`, `dmg-background@2x.png`)
 - Baseline it improves on: a sibling Electron app that ships electron-builder's default window
   (grey background, dashed arrow)
 
