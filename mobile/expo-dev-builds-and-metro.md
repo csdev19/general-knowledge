@@ -134,3 +134,5 @@ module.exports = config;
 
 - [Google Maps on mobile](./google-maps.md) — the maps-specific build + key setup.
 - [Convex client connection](../convex/client-connection.md) — what the JS connects to.
+- [`../infra/fixed-dev-tunnel-for-devices.md`](../infra/fixed-dev-tunnel-for-devices.md): this page
+  gets the device to **Metro**; that one gets it to the **local API** at a fixed HTTPS URL.
