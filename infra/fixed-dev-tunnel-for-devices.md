@@ -60,13 +60,15 @@ has to come from a tunnel instead.
    zone, tunnel name, hostname prefix, local origin. Pulling values is the one moment local
    development talks to the secrets manager; `dev` itself never does.
 
-8. **Rotate on demand, by one command, never on a calendar.** Rotating means: new hash, repoint the
-   ingress, create the new CNAME, delete the old `<app>-*` records that point at this tunnel, update
-   the secrets manager, re-pull, restart the bundler. Scheduled weekly, that is recurring toil for a
-   server that is down most of the day and already requires a session. Make it one idempotent
-   command (`tunnel:rotate`) so it costs a minute when wanted; a cron can call it later if the
-   posture changes. Create the new record before deleting the old ones so a failure mid-way leaves
-   the previous URL working.
+8. **Rotate on demand, by one command, never on a calendar.** Scheduled weekly, rotation is
+   recurring toil for a server that is down most of the day and already requires a session. Make it
+   one idempotent command (`tunnel:rotate`) so it costs a minute when wanted; a cron can call it
+   later if the posture changes. Order the steps so a failure anywhere leaves a working URL in the
+   app: check the secrets-manager key is reachable **before** touching anything; serve old **and**
+   new hostnames from the ingress; create the new CNAME; update the secrets manager; only then
+   delete the old `<app>-*` records and narrow the ingress to the new hostname; re-pull; restart
+   the bundler. Replacing the ingress first, as a first draft did, makes the old URL answer 404
+   the moment the next step fails.
 
 9. **One tunnel, one connector at a time.** Two laptops running the same named tunnel at once
    load-balance requests between them with no error. Either keep the rule "stop here before starting
