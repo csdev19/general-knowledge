@@ -47,9 +47,11 @@ has to come from a tunnel instead.
 
 6. **Tunnel operations take an API token, not `wrangler login`.** Wrangler rejects the OAuth
    session for every tunnel call ("Cloudflare Tunnel commands require API token authentication").
-   Give it `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` through the project's `.env`, which
-   Wrangler reads for itself; when a `.dev.vars` exists, that `.env` is **not** copied into the
-   Worker's `env`, so the token never reaches application code. One token with
+   Give it `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` through the app's one `.env`, which
+   Wrangler reads for itself. The same file also feeds the local Worker's `env`, so the dev-scoped
+   token is visible to local Worker code; production never receives it. Do not split it into a
+   `.dev.vars` to hide it: Wrangler then reads `.dev.vars` **instead of** `.env`, and two files
+   become two sources of truth where the hidden one silently wins. One token with
    *Account → Cloudflare Tunnel → Edit* (Wrangler fetches the tunnel token) and *Zone → DNS → Edit* on
    the one zone (for rotation) serves both the dev server and the rotate command. This also removes
    the question of which account each laptop is logged into.
