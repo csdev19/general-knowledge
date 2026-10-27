@@ -21,5 +21,9 @@ and **Android platform gotchas that only reproduce on a real device**.
 > `persist` is genuinely the right call — see
 > [`architecture/client-state-persistence.md`](../architecture/client-state-persistence.md).
 
+> For **reaching the local API from a physical device** at one fixed HTTPS URL (a named Cloudflare
+> Tunnel owned by `wrangler dev`, hostname kept in the secrets manager, rotation by command), see
+> [`infra/fixed-dev-tunnel-for-devices.md`](../infra/fixed-dev-tunnel-for-devices.md).
+
 > For **Convex as the backend** (client connection + Better Auth hosted in Convex), see
 > the [`convex/`](../convex/) topic.
