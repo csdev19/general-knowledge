@@ -30,10 +30,16 @@ PR for, and a closed PR takes its context with it. The file works offline and
 lands with `git pull`; the PR body is a copy for reading without checking
 out.
 
-**One fixed commit message.** `wip: session checkpoint` is what pickup
+**One fixed commit message.** `chore: session checkpoint` is what pickup
 recognises. Only that commit is ever rewritten; the user's real commits are
 never touched, and the rewrite is guarded by `--force-with-lease`, which
 fails instead of overwriting if two sessions touched one branch.
+
+The message is a Conventional Commit because repositories that enforce the
+format with a `commit-msg` hook refuse anything else: the earlier
+`wip: session checkpoint` was rejected, since `wip` is not a type. `chore`
+also adds nothing to a release-please changelog. Pickup still recognises the
+older `wip:` message, so a session parked before the change can be resumed.
 
 **Never on `main`.** Parking on the default branch creates a `wip/`
 branch first. This is the same rule as every other change.
