@@ -7,7 +7,7 @@ edit expensive: a renamed page, a split section or a product detail promoted int
 reaches every consumer at once, silently.
 
 The executable version of this convention is the
-[`cs-update-knowledge-hub` skill](https://github.com/niway-dev/skills/tree/main/skills/cs-update-knowledge-hub).
+[`cs-knowledge-hub` skill](https://github.com/niway-dev/skills/tree/main/skills/cs-knowledge-hub).
 This page is the reasoning; the skill is the procedure. Deciding *whether* a lesson belongs in
 the hub at all is [lesson-distillation.md](./lesson-distillation.md); this page covers how it
 lands once it does.
@@ -57,6 +57,19 @@ its index is found only by search, which is how duplicates get written.
 New pages and rewritten sections are written in English. Existing Spanish pages are translated
 when they are substantially rewritten, not in passing — a drive-by translation hides the real
 change in a large diff.
+
+## Consult before deciding, correct where the claim lives
+
+The hub is the highest source of knowledge, so it is read before a decision and fixed when work
+disproves it. The skill is one upsert with three modes: **consult** (search the whole hub, cite
+page paths, say plainly when there is nothing), **add** (the rest of this page) and **correct**.
+
+A failed hypothesis is corrected on the page that states it, in place, with the evidence that
+invalidated it and the date. A note in a project doc beside a stale hub page leaves the next
+reader with the wrong claim and no warning. The old claim stays visible, marked as superseded,
+only when the history stops someone repeating the mistake; otherwise git keeps it. If the
+corrected page is a skill's reasoning and a rule changed, the skill changes in the same sitting
+(see below).
 
 ## Pairing with the skills repo
 
