@@ -57,4 +57,4 @@ still pending.
   behaviour updates the PR body under the same rules.
 - [architecture/decisions](../architecture/decisions/): the records a
   settled-decision comment points at.
-- [development-pipeline.md](./development-pipeline.md): the budgeted review loop and babysitting rules around these comments.
+- [development-pipeline](./development-pipeline.md): the budgeted review loop and babysitting rules around these comments.

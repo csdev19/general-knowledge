@@ -119,4 +119,4 @@ feature doc; both are meant to join it.
   lifecycle.
 - [lesson-distillation.md](./lesson-distillation.md) — a lesson that becomes a new skill still
   starts here, at design.
-- [development-pipeline.md](./development-pipeline.md): what happens after the spec is approved, up to a merge-ready PR.
+- [development-pipeline.md](./development-pipeline.md) — what happens after the spec is approved, up to a merge-ready PR.
