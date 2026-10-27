@@ -33,7 +33,9 @@ that — but "here is how you check me", with everything else as context.
 | What this does | What the work is, in the reader's terms |
 | Why | The problem it solves — for a defect, the concrete input and wrong output, never the category |
 | What changes for you | Every observable behaviour change: before, after, and what to do instead |
-| Verify it yourself | Setup, numbered steps, expected result, and the failure mode — ordered by risk |
+| Proof | One row per acceptance criterion of the issue: what was done, how to check it, the evidence (output, screenshot or video link) |
+| Decisions | Each reversible choice made during the work: options considered, the one taken, why |
+| Verify it yourself | Setup, numbered steps, expected result, and the failure mode — ordered by risk; the steps the Proof table points to |
 | What I did not verify | Paths not exercised, things asserted from reading rather than running, known flakiness |
 
 "Verify it yourself" is the section the rest exists for. The others are
@@ -49,6 +51,19 @@ place for (how to verify, what was not verified) moves to a comment, never out o
 That format lives in the repository that wants it. The shared skill carries no per-project
 variants: a variant written into it follows the user into every other repository, and when the
 project is an employer's or a client's, it carries their process into a personal one.
+
+## Proof, decisions and the title
+
+The **Proof** table exists because the reader of a finished PR is the final QA, and a criterion
+with no row is a criterion nobody can tell was met. A row without evidence is marked `not
+verified` rather than dropped, so the gap is visible. The **Decisions** section exists so the
+reader can ask "why this and not that" while changing it is still cheap. The PR **title** says why
+the change matters, not the mechanism: BAD `perf(server): negotiate permessage-deflate on the
+websocket`, GOOD `perf(server): cut websocket frame size by 70%+ with gzipping`. Before opening,
+check that no PR exists for the branch; before posting, check title, body and attachments for
+secrets and private details. If `gh pr create` hits the GraphQL rate limit, open the PR through
+`gh api repos/<owner>/<repo>/pulls`. The reasoning behind the proof list is in
+[development-pipeline](./development-pipeline.md#the-proof-list).
 
 ## Four rules that carry most of the value
 
