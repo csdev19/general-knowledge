@@ -15,7 +15,7 @@ the reasoning; the skills are the procedure.
 The repo is the transport and a fixed file is the restart document. Parking
 writes `.session/HANDOFF.md` at the repo root, commits it as one disposable
 checkpoint, pushes, and opens a draft PR. Picking up reads it, summarises it
-in three lines, undoes the checkpoint, and waits for the go.
+in three lines, removes `.session/` in the working tree, and waits for the go.
 
 The file is a **restart document, not a transcript**: goal, mode, where we
 stopped, what is decided, what is open, git state, and what the agent needs
@@ -31,9 +31,19 @@ lands with `git pull`; the PR body is a copy for reading without checking
 out.
 
 **One fixed commit message.** `chore: session checkpoint` is what pickup
-recognises. Only that commit is ever rewritten; the user's real commits are
-never touched, and the rewrite is guarded by `--force-with-lease`, which
-fails instead of overwriting if two sessions touched one branch.
+recognises. Only that commit is ever touched; the user's real commits are
+never rewritten. A checkpoint that has not been pushed yet is amended in
+place. One that is already on the remote is not amended: a new checkpoint
+goes on top, because amending it needs a force-push, and that is the kind of
+history rewrite that automated permission layers (for example Claude Code's
+auto mode) block as destructive, leaving the agent unable to push at all.
+
+**Pickup does not rewrite history either.** The checkpoint stays on the
+branch; the first real commit after pickup goes on top of it, includes the
+removal of `.session/`, and a plain push fast-forwards. The checkpoint's
+cost is one extra commit on the branch, which a squash merge keeps out of
+the default branch. Undoing it with a reset would make the next push a
+force-push for the same reason.
 
 The message is a Conventional Commit because repositories that enforce the
 format with a `commit-msg` hook refuse anything else: the earlier
