@@ -34,6 +34,7 @@ reasoning, the skill is the procedure, and they link both ways. When a skill
 changes because something worked or failed in practice, its page here changes
 with it.
 
+- **[development-pipeline.md](./development-pipeline.md)** — From approved spec to merge-ready PR with no questions mid-run: a router for live sessions and playbooks for the queue, one gate (proof row per criterion, verdict tied to the head, low risk merges alone), risk classified by the verifier, a review loop budgeted in rounds, per-platform verification with screenshots and video. Skill: `cs-autopilot` (**planned**).
 - **[design-workflow.md](./design-workflow.md)** — Capture → roadmap promise → design (research always, an ADR-contradiction check, options in prose, a hard gate) → spec + 0..n ADRs in their own PR → an ephemeral plan deleted at ship. Skill: `cs-design` (**planned**).
 - **[adr-pattern.md](./adr-pattern.md)** — Format (context, decision, alternatives rejected, consequences, non-goals, reopen condition), when a decision needs one, and how it links to the spec and the feature doc. Paired reasoning for whichever skill writes ADRs (`cs-design`, **planned**).
 - **[backlog-and-roadmap.md](./backlog-and-roadmap.md)** — The backlog is the GitHub issue list (label `backlog`, `gh issue list --label backlog --author @me` as the index); the roadmap per product is promise-only, edited when promising and never at ship; status is always derived. Skill: `cs-capture` (**planned**).
