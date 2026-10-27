@@ -61,7 +61,7 @@ picked up for design.
    - otherwise, decide.
 3. **Input**: the backlog item's body plus anything pasted into the conversation. On an
    explicit "read this and keep it" request: general, reusable content goes straight to the
-   hub via `cs-update-knowledge-hub` (the project links it, never duplicates it); anything
+   hub via `cs-knowledge-hub` (the project links it, never duplicates it); anything
    specific to this project goes into the backlog item and, once the spec is approved, into
    the spec's own "Sources and unverified claims" section. There is no separate
    project-local knowledge folder for this — one home per fact, not two.
