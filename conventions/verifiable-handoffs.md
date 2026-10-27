@@ -92,3 +92,4 @@ entirely: the diff already enumerates, and enumeration is not guidance.
   whose exit code a handoff quotes.
 - [writing-with-ai](./writing-with-ai.md) — the same checks-over-claims rule applied to
   published writing: the author's words are verified against their raw input.
+- [development-pipeline](./development-pipeline.md) — the proof list every PR carries and the gate it feeds.

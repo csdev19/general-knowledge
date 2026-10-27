@@ -53,3 +53,4 @@ findings.
 
 - [ai-agent-delegation](./ai-agent-delegation.md): which model the auditor
   runs on, and why that is announced before dispatch.
+- [development-pipeline](./development-pipeline.md): where the audit brief feeds the review loop.
