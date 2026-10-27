@@ -8,6 +8,11 @@ Where the runner's code is stricter than this page, the code wins and this page 
 Status: adopted 2026-10-27; the skills and runner changes that apply it are being built.
 Design: [niway-dev/skills spec](https://github.com/niway-dev/skills/blob/main/docs/specs/2026-10-27-development-pipeline-design.md)
 and its ADRs 0001–0006.
+Skills that apply it: [`cs-autopilot`](https://github.com/niway-dev/skills/tree/main/skills/cs-autopilot),
+[`cs-review-loop`](https://github.com/niway-dev/skills/tree/main/skills/cs-review-loop),
+[`cs-babysit`](https://github.com/niway-dev/skills/tree/main/skills/cs-babysit),
+[`cs-tracker`](https://github.com/niway-dev/skills/tree/main/skills/cs-tracker), and each project's
+`verify` skill.
 
 ## Why
 
