@@ -5,7 +5,7 @@ interrupting the owner, who reviews once at the end. This page defines the flow 
 skills follow it in live sessions, and an unattended runner enforces it in code where it runs.
 Where the runner's code is stricter than this page, the code wins and this page should be fixed._
 
-Status: adopted 2026-10-27; the skills and runner changes that apply it are being built.
+Status: adopted 2026-10-27. The skills that apply it are merged and in use. The runner's checks (proof list, risk callout, round budget, second-provider review) are merged but off by default and have not yet been run on a real PR, so the gate is enforced by skills in live sessions and not yet by the runner in practice. Per-app `verify` skills: one Electron app is done; the Expo one only launches the app, and route deep links are unconfirmed.
 Design: [niway-dev/skills spec](https://github.com/niway-dev/skills/blob/main/docs/specs/2026-10-27-development-pipeline-design.md)
 and its ADRs 0001–0006.
 Skills that apply it: [`cs-autopilot`](https://github.com/niway-dev/skills/tree/main/skills/cs-autopilot),
