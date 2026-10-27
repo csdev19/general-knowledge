@@ -1,5 +1,9 @@
 # Backlog and roadmap: issues as the backlog, the roadmap as a promise
 
+> **Note (2026-10-27).** The work queue has moved to the issue tracker, which is now the only
+> queue; the GitHub-issue backlog described below is superseded for that role. See
+> [development-pipeline](./development-pipeline.md).
+
 > **One-minute summary.** The backlog is the GitHub issue list, not a folder: an idea is
 > captured as an issue labelled `backlog` the moment it appears, and the label plus
 > `author:@me` *is* the index — nothing to keep in sync by hand. The roadmap is a separate,
@@ -8,8 +12,8 @@
 > from the issue and its PRs, never written down anywhere — that removes the one file every
 > shipping PR would otherwise fight over.
 
-The executable version of the capture half of this convention is the `cs-capture` skill
-(**planned** — not built yet). This page is the reasoning; the skill is the procedure.
+The executable version of the capture half of this convention is the capture operation of the
+[`cs-tracker` skill](https://github.com/niway-dev/skills/tree/main/skills/cs-tracker). This page is the reasoning; the skill is the procedure.
 
 ## Backlog: capture as a GitHub issue
 

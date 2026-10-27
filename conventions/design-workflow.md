@@ -6,8 +6,7 @@
 > an ephemeral plan on the code branch, deleted when the feature ships. Nothing is "updated
 > later" — each stage has one owner and one moment it happens in.
 
-The executable version of this convention is the `cs-design` skill (**planned** — not built
-yet; until it exists, use `superpowers:brainstorming` and `superpowers:writing-plans`). This
+The executable version of this convention is the [`cs-design` skill](https://github.com/niway-dev/skills/tree/main/skills/cs-design). This
 page is the reasoning; the skill is the procedure.
 
 ## The lifecycle
