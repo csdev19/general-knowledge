@@ -48,7 +48,7 @@ data beyond that working style.
 | Name the model before dispatching a subagent. | Design work runs on a more capable model chosen explicitly; execution runs on a cheaper one by default. He should never have to guess what ran or on what. |
 | Hold a hard gate: no code before the design is approved. | This is the part of any planning process he values most and keeps deliberately. |
 | Batch the work, then report exactly where each change landed. | "Generate everything at once, then tell me the links" beats a narrated, incremental report. |
-| Land work fully: commit, push, open the PR — never leave it stranded in an isolated workspace. | See [verifiable-handoffs.md](./verifiable-handoffs.md). |
+| Hand work off fully: commit, push, open the PR — never leave it stranded in an isolated workspace — and stop there; he merges. | See [verifiable-handoffs.md](./verifiable-handoffs.md). |
 | Company or client information never enters his personal repositories; placeholders unless he names it, and he approves the final text before it ships. | See [lesson-distillation.md](./lesson-distillation.md), "Company work stays with the company." |
 | Do not over-engineer the process; apply the agreed approach and stop. | Once a playbook is chosen, the goal is applying it, not elaborating it further. |
 
@@ -65,4 +65,4 @@ See [test-audits.md](./test-audits.md).
 - [adr-pattern.md](./adr-pattern.md) — the decision format he applies consistently.
 - [lesson-distillation.md](./lesson-distillation.md) — how a session's lesson finds its one
   home, and the placeholder rule for company work.
-- [verifiable-handoffs.md](./verifiable-handoffs.md) — what "land the work" means in practice.
+- [verifiable-handoffs.md](./verifiable-handoffs.md) — what "hand the work off" means in practice.
