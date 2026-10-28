@@ -11,7 +11,7 @@ Corrected 2026-10-28: an earlier version let low-risk PRs merge without the owne
 that agents never merge, whatever the risk. The unattended machine cannot run live end-to-end checks
 for most products (mobile and desktop apps, memory limits), so green CI is not proof enough to land
 code with nobody looking. The decision is the development-workflow ADR "Agents never merge"
-(niway-dev/development-workflow, number to be assigned).
+(niway-dev/development-workflow (ADR-0020)).
 Design: [niway-dev/skills spec](https://github.com/niway-dev/skills/blob/main/docs/specs/2026-10-27-development-pipeline-design.md)
 and its ADRs 0001–0006.
 Skills that apply it: [`cs-autopilot`](https://github.com/niway-dev/skills/tree/main/skills/cs-autopilot),
