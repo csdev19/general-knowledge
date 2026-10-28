@@ -1,11 +1,17 @@
 # Development pipeline: from spec to a merge-ready PR
 
-_How agents carry work from an approved spec to a pull request that is ready to merge, without
-interrupting the owner, who reviews once at the end. This page defines the flow and **the gate**:
+_How agents carry work from an approved spec to a pull request that is ready for a person to merge,
+without interrupting the owner, who reviews once at the end and merges. **Agents never merge.**
+This page defines the flow and **the gate**:
 skills follow it in live sessions, and an unattended runner enforces it in code where it runs.
 Where the runner's code is stricter than this page, the code wins and this page should be fixed._
 
 Status: adopted 2026-10-27; the skills and runner changes that apply it are being built.
+Corrected 2026-10-28: an earlier version let low-risk PRs merge without the owner. The owner decided
+that agents never merge, whatever the risk. The unattended machine cannot run live end-to-end checks
+for most products (mobile and desktop apps, memory limits), so green CI is not proof enough to land
+code with nobody looking. The decision is the development-workflow ADR "Agents never merge"
+(niway-dev/development-workflow, number to be assigned).
 Design: [niway-dev/skills spec](https://github.com/niway-dev/skills/blob/main/docs/specs/2026-10-27-development-pipeline-design.md)
 and its ADRs 0001–0006.
 Skills that apply it: [`cs-autopilot`](https://github.com/niway-dev/skills/tree/main/skills/cs-autopilot),
@@ -20,7 +26,8 @@ An agent that writes good code still leaves a person as the bottleneck if every 
 person to chase CI, answer bots and decide whether the change is safe. Two failure modes come with
 fixing that carelessly: an agent that stops to ask questions and blocks the owner's terminal, and
 an agent that declares its own work safe and merges it. The pipeline removes the first by never
-asking mid-run, and the second by letting only code that did not write the change decide its risk.
+asking mid-run, and the second by never letting an agent merge: only a person does, and only code
+that did not write the change decides its risk.
 
 ## The flow
 
@@ -34,7 +41,7 @@ asking mid-run, and the second by letting only code that did not write the chang
 | 5. Review | A review loop with a budget in rounds (see Review loop) |
 | 6. PR | Why, what changed, the proof list, the decision log ([verifiable-handoffs](./verifiable-handoffs.md)) |
 | 7. Babysit | CI, bots and review threads until merge-ready ([review-feedback](./review-feedback.md)) |
-| 8. Merge or hand off | Low risk merges on its own; everything else goes to the owner with the final report |
+| 8. Hand off | Every PR goes to the owner with the final report; the owner merges |
 
 Work happens in a git worktree inside the repository and in subagents; the main session
 coordinates. No step needs a separate plan document: the spec's criteria are the plan. Work that
@@ -59,7 +66,7 @@ considered, the one taken, so the owner can ask "why this" at review time and ch
 
 ## The gate
 
-Ready to merge means, on the current head:
+Ready for a person to merge (**merge-ready**) means, on the current head:
 
 1. every acceptance criterion has a proof row with evidence;
 2. required checks are green, with CI classified before any retry;
@@ -68,9 +75,10 @@ Ready to merge means, on the current head:
    `git patch-id` at the verdict commit with the current head);
 5. the branch is up to date with its base and the forge reports it mergeable.
 
-It may merge **without the owner** only when, in addition, the verifier classified it low risk and
-no security rule applies. In a stack, only the contiguous verified run from the bottom lands,
-bottom-up, one PR at a time.
+**An agent never merges, at any risk level.** A PR that meets the gate stays open and goes to the
+owner with the final report; the owner merges it. The verifier's risk sets how deep the review goes,
+not who merges. In a stack, only the contiguous verified run from the bottom is handed over, and the
+owner merges it bottom-up, one PR at a time.
 
 ## The proof list
 
@@ -84,7 +92,7 @@ Every PR body has this section, one row per acceptance criterion of the issue:
 | <copied from the issue> | <one line> | <command or steps> | <output, screenshot or video link> |
 ```
 
-The runner refuses review and merge while a criterion has no row or a row has no evidence, and
+The runner refuses review and hand-off while a criterion has no row or a row has no evidence, and
 spends one repair round to fill it. Judging whether the evidence convinces stays with the reviewer
 and the owner.
 
@@ -102,8 +110,9 @@ The verifier's PR comment opens with a callout whose label is always `Risk: <lev
 > **Risk: high.** Touches `src/auth/session.ts` (sensitive word: session).
 ```
 
-Low risk uses `[!NOTE]` and `**Risk: low**`. Levels are `low` and `high` while the merge rule is
-binary; a new level is added only when it changes something (reviewer model, rounds, who merges).
+Low risk uses `[!NOTE]` and `**Risk: low**`. Levels are `low` and `high` while the review rules are
+binary; a new level is added only when it changes something (reviewer model, rounds, second
+provider). Risk decides how much review a PR gets, never who merges.
 
 ## Review loop
 
@@ -129,6 +138,7 @@ binary; a new level is added only when it changes something (reviewer model, rou
   a flake: rebase instead of retrying.
 - One watcher per PR, never a hand-written polling loop. Act only on checks and comments newer than
   the last push.
+- Babysitting ends at a report, `merge-ready` or `blocked`. It never merges or enables auto-merge.
 
 ## Verification on the real surface
 
@@ -150,7 +160,8 @@ which runs unattended and needs no screen-recording permission:
 
 The runner already records every lifecycle event. The numbers that judge this pipeline: repair
 rounds per PR, attempts ending blocked, proof rows missing at first review, and escaped defects per
-twenty auto-merges. Neither reference stack publishes such numbers; these are ours to collect.
+twenty merged PRs (defects found after the owner merged). Neither reference stack publishes such
+numbers; these are ours to collect.
 
 ## Prior art
 
