@@ -229,7 +229,11 @@ Inspired by Obsidian's vault model:
 
 - Avoids orphaned entries pointing to deleted/moved files
 - The registry and files are always colocated — copy the folder, you have everything
-- No reconciliation needed when files are moved externally
+- Copying the folder carries the whole library
+
+Corrected 2026-10-31: colocation does not remove reconciliation. A file renamed in the file
+manager still separates from its sidecar, and a change of naming rule leaves every older item
+disagreeing. See [vault-reconciliation.md](./vault-reconciliation.md).
 
 ---
 
