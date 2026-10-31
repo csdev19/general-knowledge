@@ -127,6 +127,13 @@ binary; a new level is added only when it changes something (reviewer model, rou
   the logs.
 - A failure in code the diff never touches means a stale base (`git merge-base --is-ancestor`), not
   a flake: rebase instead of retrying.
+- A lone PR rebases onto its base. A layer of a stack takes the base as a merge, and the merge is
+  carried up through every layer as fast-forwards. A rebase rewrites the commits that the layers
+  above, and every checkout of them, are built on.
+- A merge without markers is not proof that the branch still works. The base can change what a
+  value means without touching any line the branch changed. Those uses compile and merge cleanly.
+  So the full suite runs on the top of the stack, and on the layer that targets the default
+  branch, before any layer is pushed.
 - One watcher per PR, never a hand-written polling loop. Act only on checks and comments newer than
   the last push.
 
