@@ -68,9 +68,12 @@ El renderer no puede leer `file://` directo (CSP + seguridad). El main expone un
 - ⚠️ **El id es el filename.** Renombrar el `title` NO renombra el archivo (intencional: el path es estable, la metadata es mutable). Si el usuario renombra el `.mp4` en el explorador de archivos, cambia el id y se "desconecta" del sidecar viejo.
 - ⚠️ `isUnsafeId()` (`media-protocol.ts:13`) rechaza ids con `/`, `\` o `..` — guard contra path traversal en el protocolo. No bypassear.
 - ⚠️ El vault directory puede cambiar en runtime; nunca cachear un `LibraryVault` de larga vida — usar `currentVault()`.
+- ⚠️ **Names drift.** External renames, a new naming rule and crashes leave files and sidecars disagreeing; realigning them is [vault-reconciliation.md](./vault-reconciliation.md). Any move into the vault must not overwrite: [no-replace-file-placement.md](./no-replace-file-placement.md).
 - ⚠️ Borrar es best-effort (`Promise.allSettled`): si el sidecar o thumb fallan, el archivo igual se borra. No tratar un fallo parcial como "no se borró nada".
 
 ## Related
 
 - [Filesystem-First Monetization](./filesystem-first-monetization.md) — el porqué de producto
 - [IPC Contract](./ipc-contract.md) — los handlers `library:*`
+- [Vault reconciliation](./vault-reconciliation.md): realigning the folder and the library
+- [No-replace file placement](./no-replace-file-placement.md): moving files in without overwriting

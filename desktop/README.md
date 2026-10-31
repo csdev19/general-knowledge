@@ -33,6 +33,8 @@ Reusable architecture patterns for building a local-first desktop app with Elect
 - [permissions-and-onboarding.md](./permissions-and-onboarding.md) — Cross-platform screen/mic/camera permission checks and requests (macOS quirks especially), split into pure renderer logic + thin main-process wiring, and the first-run onboarding flow.
 - [native-dependencies.md](./native-dependencies.md) — A native module's prebuilds target Node's ABI, not Electron's: rebuild explicitly (`rebuild:native`, `npmRebuild: false`, a stamp inside `node_modules` the setup doctor compares), never from `postinstall` — which breaks every unrelated CI job and is the shape of a supply-chain attack. Consumers degrade to "feature off".
 - [library-vault.md](./library-vault.md) — Local-first storage: files as the source of truth, JSON metadata sidecars, a configurable vault directory, and a privileged streamable media protocol for playback.
+- [vault-reconciliation.md](./vault-reconciliation.md) — Realigning a filesystem-first library with its folder: follow names only, never infer identity, never delete (quarantine with a manifest), list the ambiguous; on demand, idempotent, strict sidecar reads, maintenance mode that refuses rather than queues, and a before → after table as the preview. With a measured example of a dry run on real data catching what fixtures missed.
+- [no-replace-file-placement.md](./no-replace-file-placement.md) — Placing a file without overwriting in Node.js, which has no rename-without-replace: `link` then identity-checked `unlink`, an exclusive-copy fallback that honours short writes, bigint identities, case-only renames, placed markers, directory fsync, and the threat model to write down.
 
 ## Distribution & product
 

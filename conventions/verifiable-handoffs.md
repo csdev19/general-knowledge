@@ -83,7 +83,10 @@ the check ran. Undoing the fix and watching it go red is the cheap confirmation,
 and it is the same discipline as writing a failing test first. The trap is
 strongest across a boundary the suite does not cross — a bundle, a boot path, a
 rendered page — where every unit test stays green while the product is broken,
-so the check has to exercise the layer that actually failed.
+so the check has to exercise the layer that actually failed. The same holds for the fixtures
+of a data change: built from the inputs the author expected, they cannot fail on the ones the
+author did not imagine. Read a sample of the proposed output on a copy of the real data
+([measured example](../desktop/vault-reconciliation.md#measured-example)).
 
 **Reading a file is a verification step.** When the thing to check is a
 judgement call — a contract, a refusal, a default — name the file and the
@@ -101,6 +104,8 @@ entirely: the diff already enumerates, and enumeration is not guidance.
 
 - [english-only](./english-only.md) — the handoff artifact is English whatever
   language the conversation is in.
+- [vault-reconciliation](../desktop/vault-reconciliation.md) — a dry run on real data that
+  caught what fixtures could not.
 - [design-workflow](./design-workflow.md) — what precedes
   the work this hands back.
 - [ci-cd-pipeline-strategy](./ci-cd-pipeline-strategy.md) — the `verify` gate
