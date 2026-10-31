@@ -180,7 +180,8 @@ When agents open many PRs, review is a gate in CI, not a conversation:
   voids it, the same rule as human QA approvals.
 - Batch every finding into one repair round; the second review only verifies those fixes.
   Persistent disagreement goes to a human.
-- Keep a human merge for high-risk changes until measured escaped defects justify more.
+- A person merges every PR, whatever its risk (agents never merge; decided 2026-10-28). Risk sets
+  how deep the review goes, not who merges.
 
 ## Open question: how much better is a Fable review than a Sonnet review?
 
