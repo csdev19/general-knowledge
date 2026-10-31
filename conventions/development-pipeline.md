@@ -137,6 +137,31 @@ binary; a new level is added only when it changes something (reviewer model, rou
 - One watcher per PR, never a hand-written polling loop. Act only on checks and comments newer than
   the last push.
 
+**The worktree stays until babysitting ends** (implemented in skills,
+[ADR 0008](https://github.com/niway-dev/skills/blob/main/docs/adr/0008-agent-worktrees-never-hold-the-owners-branch.md)).
+Git lets a branch live in one worktree only, so an agent worktree never checks out the PR's branch:
+it holds a local branch `agent/<slug>` (the branch with `/` replaced by `-`) tracking
+`origin/<branch>`, pushes with `git push origin HEAD:<branch>`, and opens the PR with
+`gh pr create --head <branch>`. The owner can check the branch out in the main checkout at any
+time. Opening the PR hands it to babysitting instead of deleting the worktree; babysitting removes
+the worktree when it ends (merge-ready or blocked), and a sweep at session start removes the ones
+whose PR is merged or closed. Every removal requires a clean tree, HEAD equal to the remote tip
+(waived only for a merged PR, whose branch is often deleted), and an unlocked worktree.
+
+**Unattended babysitting** (designed; the runner part is pending, see the
+[queue, babysit and worktrees spec](https://github.com/niway-dev/skills/blob/main/docs/specs/2026-10-28-queue-babysit-worktrees-design.md)).
+A PR left behind by a finished session still gets conflicts, red checks and comments. The runner
+gains a `babysit` attempt kind for issues in the code-review state:
+
+- It runs only when something is new on the PR: a conflict, a red required check, or a review
+  comment newer than the head commit. Nothing new, nothing runs.
+- It never merges. A push hands the new head back to [the gate](#the-gate) with a small re-review
+  budget, and attempts per PR are capped.
+- A live session that babysits a PR first posts a marker comment `<!-- babysit:live:<until> -->`
+  (two hours ahead, refreshed if the run goes longer), and the runner leaves that PR alone until
+  then, so the two never push over each other. The live side posts it today; the runner does not
+  read it yet.
+
 ## Verification on the real surface
 
 Each project keeps a `verify` skill: a map of scenarios, each a command that drives the real app and
