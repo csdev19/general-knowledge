@@ -174,19 +174,12 @@ gains a `babysit` attempt kind for issues in the code-review state:
 
 ## Verification on the real surface
 
-Each project keeps a `verify` skill: a map of scenarios, each a command that drives the real app and
-writes screenshots and a video into a folder the proof list links. Use the drivers' own recording,
-which runs unattended and needs no screen-recording permission:
-
-| Platform | Driver | Screenshot | Video |
-|---|---|---|---|
-| Web | Playwright | `page.screenshot` | `recordVideo` |
-| Electron | Playwright `_electron.launch` | same | same |
-| Expo / React Native | Maestro | `takeScreenshot` | `startRecording` / `stopRecording` |
-| iOS simulator | `xcrun simctl` | `io booted screenshot` | `io booted recordVideo` |
-| Android emulator | `adb` | `exec-out screencap` | `screenrecord` |
-| Tauri | `tauri-driver` (WebDriver) on Linux and Windows; macOS unconfirmed | WebDriver | OS recorder |
-| Swift native | XCUITest | `XCTAttachment` | simulator recording |
+Each project may keep a `verify` skill: a map of its scenarios (login, seed data, named states),
+each a command that drives the real app and writes captures into a folder the proof list links.
+Driver knowledge is not per project: the recipe for each stack (driver, stand-up and capture
+commands, traps, probe status) lives in [verification/](../verification/README.md), which the
+`cs-capture-evidence` skill reads before capturing and corrects after. Prefer the drivers' own
+recording, which runs unattended and needs no screen-recording permission.
 
 ## How we know it works
 
