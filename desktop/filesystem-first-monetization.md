@@ -170,3 +170,7 @@ El usuario apunta la app a su propio bucket R2/S3. Vos cobrás el software/la ca
 
 - R2 tiene **cero egress** → nadie paga cuando alguien mira/descarga un archivo.
 - Encaja perfectamente con un stack de Cloudflare Workers/R2.
+
+## Related
+
+- [Software licensing](../legal/software-licensing.md): which license a source-published product uses; the business model above decides what is charged for, the license decides what others may do with the code.

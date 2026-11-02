@@ -87,3 +87,4 @@ _El diseño de este hub está en [`docs/specs/2026-07-10-general-knowledge-hub-d
 ## Product legal documents
 
 - [Terms, privacy, Cloud and cookies templates](./legal/README.md) — reusable starting points for evolving products, with adaptation guidance.
+- [Software licensing](./legal/software-licensing.md) — picking a license for a source-published tool: permissive, copyleft, non-commercial or competing-use, plus relicensing, CLA and trademark mechanics.

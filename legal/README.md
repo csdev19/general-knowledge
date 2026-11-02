@@ -10,6 +10,10 @@ Last reviewed: 2026-09-14.
 - [Cloud and acceptable use](cloud-and-acceptable-use-template.md): promotional capacity, anti-abuse controls, over-quota accounts and shutdown.
 - [Cookies and local storage](cookies-template.md): sessions, preferences and diagnostics.
 
+## Guides
+
+- [Software licensing for a source-published tool](software-licensing.md): choosing between permissive, copyleft, non-commercial and competing-use licenses; relicensing, CLA/DCO, dual licensing and trademark policy; public case studies. Not legal advice.
+
 These are original adaptations of the structure used in Niway's Winku and Sentir projects, tailored first for Kaipu. They are not a legal opinion or a guarantee against claims. Do not transplant Sentir's healthcare/AI clauses into unrelated products or reuse blanket statements such as “we never share data with third parties” when infrastructure providers process it.
 
 ## Adapt before publishing
