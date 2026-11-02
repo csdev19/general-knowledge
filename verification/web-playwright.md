@@ -1,6 +1,6 @@
 # Web (TypeScript) and HTML mockups — Playwright
 
-**Status:** probed (Chromium cached under `~/Library/Caches/ms-playwright` on the owner's Mac, 2026-11-02).
+**Status:** probed (owner's Mac, 2026-11-02: `npx playwright@1.64.1 screenshot` of a `file://` mockup at both viewports; skills#45).
 
 ## Stand up
 
@@ -20,6 +20,11 @@ Interaction (login, a click, a filled form) needs a short script with `page.scre
 with the `recordVideo` context option, only for flows of several steps.
 
 ## Traps
+
+- Browser revision: each Playwright version needs its own browser build. `npx playwright@latest`
+  fails with "Executable doesn't exist … chromium_headless_shell-<rev>" when only an older build is
+  cached. Use the project's pinned `@playwright/test` version when there is one; otherwise run
+  `npx playwright install chromium` once (about 100 MB).
 
 - Hydration: capture after the page is idle (`waitForLoadState('networkidle')` or a test id), or
   the image shows a skeleton.
