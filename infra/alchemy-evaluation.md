@@ -168,6 +168,11 @@ The smallest reversible experiment, touching no production object:
   within one release cycle after the web Worker moves, so the second tool has a
   sunset.
 
+## Raw reports
+
+The context package and both advocate briefs are kept verbatim in
+[docs/reviews/2026-11-02-alchemy-adversarial-review/](../docs/reviews/2026-11-02-alchemy-adversarial-review/README.md).
+
 ## References
 
 - Alchemy: <https://alchemy.run> · state stores <https://alchemy.run/state-store> ·
