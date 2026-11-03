@@ -12,7 +12,7 @@ profile.
 
 | Layer | Holds | Lives in |
 |---|---|---|
-| Procedure | gate, load, plan, build, words pass, critique, learn | the [`cs-apply-taste` skill](https://github.com/niway-dev/skills/tree/main/skills) in the cs-tack/skills repo |
+| Procedure | gate, load, plan, build, words pass, critique, learn | the [`cs-apply-taste` skill](https://github.com/niway-dev/skills/blob/main/skills/cs-apply-taste/SKILL.md) in the skills repo |
 | Profile | principles, never list, references, one page per app type | this folder |
 | Application | this product's register, tokens or their source, overrides | the project's `design-brief` |
 
