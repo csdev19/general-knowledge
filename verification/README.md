@@ -46,4 +46,7 @@ the next session from trying the same thing.
 - Each capture states what is on screen, how it was reached, the commit, and what it does not prove.
 - Check every image and output for secrets before delivery; redact or drop the evidence, never the claim.
 - Text evidence stays text. An image of text only when asked.
+- Layout: one row per state, the table grows down. `State | Before | After` for a visible change
+  whose base can be stood up, `State | Capture` otherwise; `—` where a state has no "before". Never
+  several states side by side: each extra column shrinks every image on a PR page.
 - Stop every process the capture started.
