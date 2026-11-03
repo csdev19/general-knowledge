@@ -215,6 +215,70 @@ Run both on the same input and score against ground truth:
 
 Record the result as a measured example on this page and update the roles table.
 
+## Model size and code review: external evidence (collected 2026-11-03)
+
+No standard benchmark compares the Haiku, Sonnet and Opus tiers on code review. What exists,
+with what each source actually measured. Figures were read on the linked page unless marked.
+
+**Recall against precision across tiers**
+
+- [Bigger Isn't Always Better (arXiv 2606.15689)](https://arxiv.org/abs/2606.15689), June 2026
+  preprint. 150 review samples (100 mutation-injected bugs, 50 real bug-fix PRs from eight
+  open-source repositories), five models including Haiku 4.5 and Sonnet 4.6. Haiku 4.5: F1 0.365
+  against 0.343, 18 % higher recall, 3.2× cheaper per review. Precision favoured Sonnet
+  (0.558 against 0.486; figure from a search summary, not checked on the page). Best model F1 0.847
+  on synthetic bugs and 0.066 on real PRs; F1 falls from 0.657 on diffs under 10 lines to 0.043
+  over 150 lines; near-zero recall on performance bugs for every model.
+- [CodeRabbit: Sonnet 5.5 vs Opus 5.5](https://www.coderabbit.ai/blog/sonnet-5-5-model-review),
+  vendor post. 13 real open-source PRs, one verified bug each, three-judge majority. Caught:
+  Sonnet 5.5 thinking 6/13 (actionable precision 41 %), Opus 5.5 Standard 8/13 (67 %), Opus 5.5
+  Max 10/13 (52 %). Their split: Sonnet for the main pass, Opus where a miss is expensive.
+- [Bito: Haiku 5.5, Sonnet 5.5 or Opus 5.5 for coding](https://bito.ai/blog/claude-haiku-5-5-vs-sonnet-5-5-vs-opus-5-5/),
+  vendor post. Agentic coding, not review. Relevant parts: a planted auth trap (a quoted empty
+  token that lets an empty `Authorization` header through) that Haiku 5.5 medium missed and
+  Haiku 5.5 high found, for $0.014 against $0.009; Opus leads Haiku by 8–10 points on audit turns;
+  Haiku's price doubles above 100K-token prompts, which most of its long-session requests crossed.
+- [OpenRouter: Opus vs Sonnet vs Haiku](https://openrouter.ai/blog/insights/claude-opus-vs-sonnet-vs-haiku/)
+  and [fast.io](https://fast.io/resources/best-claude-model-for-coding-2026/),
+  [haimaker](https://haimaker.ai/blog/claude-opus-vs-sonnet-vs-haiku/): tier guides for coding,
+  no review measurement. Not checked page by page.
+- [SWE-Review-Bench](https://github.com/lmnst/SWE-Review-Bench): a 20-case pilot of cold review on
+  Sonnet 4.5 only; too small to rank tiers.
+
+**Filtering a noisy proposer**
+
+- [Sifting the Noise (arXiv 2601.22952)](https://arxiv.org/abs/2601.22952), ISSTA 2026. LLM agents
+  (Aider, OpenHands, SWE-agent) filtering static-analysis false positives. On OWASP Benchmark the
+  false-positive rate fell from over 92 % to as low as 6.3 %; SWE-agent with Sonnet 4 flagged 95.5 %
+  of false positives at 95.5 % precision on OSS-Fuzz C/C++. Agent frameworks help strong backbones
+  and give inconsistent gains with weak ones. Aggressive filtering can also drop real findings;
+  no figure in the abstract.
+- [Augment: how accurate is AI code review?](https://www.augmentcode.com/guides/ai-code-review-accuracy),
+  a vendor guide citing primary sources (not checked one by one): Google's Tricorder kept an
+  analyzer only while its effective false-positive rate stayed under 10 %; Coverity reported that
+  above 30 % people start ignoring a tool; CR-Bench (arXiv 2603.11078) found a reflection loop
+  raised recall from 27 % to 33 % while signal-to-noise fell from 5.1 to 1.95; a CodeRabbit field
+  study (arXiv 2607.03316) found 56 % of agentic reviews rejected, false positives the top reason,
+  10 % of them from missing visibility into other files; a March 2026 preprint (arXiv 2603.18740)
+  found that framing code as bug-free cut vulnerability detection by 16–94 points.
+
+**What the evidence supports, as hypotheses for a review pipeline**
+
+- A cheaper tier at high effort can match or beat a mid tier on recall while losing precision;
+  effort matters as much as tier on the cheap model.
+- A noisy proposer is usable only behind a filter: published reviews above roughly 10–30 % false
+  positives lose their readers. Run deterministic filters first (scope, cited line exists,
+  duplicate of an open thread), then a stronger model, batched, on what remains.
+- Real PRs and large diffs are far harder than injected bugs; measure on real, held-out PRs.
+
+### Measured example: Wachiman re-reviews (2026-11-02)
+
+Six rebuilt incremental re-reviews of real PRs, two runs per arm, audited blind by a different
+vendor's model. Haiku 5.5 high cost $0.07 per re-review against $0.50 for Opus 5.5 high, posted
+11 valid findings per run against Opus's 6, but 5 of 17 and 2 of 13 were invalid (Opus 0), most
+of them true but pre-existing and outside the push. Sonnet 5.5 medium found almost nothing.
+Report: [wachiman-benchmarks `2026-11-02-re-review-models`](https://github.com/niway-dev/wachiman-benchmarks/pull/8).
+
 ## Measured example: one remediation session
 
 A security and database audit of a monorepo (Kaipu), five surfaces, then fixes and specs.
