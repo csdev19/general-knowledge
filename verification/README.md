@@ -49,4 +49,12 @@ the next session from trying the same thing.
 - Layout: one row per state, the table grows down. `State | Before | After` for a visible change
   whose base can be stood up, `State | Capture` otherwise; `—` where a state has no "before". Never
   several states side by side: each extra column shrinks every image on a PR page.
+- "Before" is the surface without the change: the commit before the first edit (for a stacked
+  change, the commit the first layer starts from, since the layer below already carries part of it), or a
+  capture taken before editing. A small change compared against a partly changed base looks
+  identical, and the comparison proves nothing.
+- An app is captured running for real. A render of its UI in a browser with fake data checks
+  layout only; label it when it is the only evidence.
+- An app with a window gets one capture at the size it opens with, no forced resize: a layout that
+  breaks only at the launch size is invisible in captures taken at a chosen size.
 - Stop every process the capture started.
