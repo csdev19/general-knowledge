@@ -7,7 +7,7 @@ How to build and structure workspace packages in a monorepo: the `infra-*` namin
 | File | Summary |
 | ---- | ------- |
 | [infrastructure-naming.md](./infrastructure-naming.md) | The `infra-<capability>` naming convention for infrastructure packages and why it works. |
-| [shared-package-build-strategy.md](./shared-package-build-strategy.md) | Consuming packages as source in dev (HMR) vs built `dist` for prod, the tsdown `devExports` pattern, and the Node main-process gotcha. |
+| [shared-package-build-strategy.md](./shared-package-build-strategy.md) | Consuming packages as source in dev (HMR) vs built `dist` for prod, the tsdown `devExports` pattern, the Node main-process gotcha, and why a declaration bundle needs every bundled source as a tsconfig root (one program, no brace globs, no heap flag). |
 | [repository-contracts-and-implementations.md](./repository-contracts-and-implementations.md) | Repository contracts (interfaces) live in the domain; implementations live in infrastructure — rules, naming, and examples. |
 | [case-study-design-tokens-package.md](./case-study-design-tokens-package.md) | Worked example: building a shared design-tokens package end to end, with generated committed CSS, drift tests, and phased delivery. |
 

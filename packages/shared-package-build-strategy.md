@@ -118,6 +118,40 @@ the code is inlined.
 consumed by a **Node** target (a desktop main process, a Node script) must either be bundled by the
 consumer (above) or resolved to built JS. Bundling is the simplest and needs no dist at dev time.
 
+## Gotcha: a declaration bundle needs every bundled source as a tsconfig root
+
+When one published package folds private workspace packages into its bundle (`noExternal:
+[/^@scope\//]`), the `.d.ts` bundler has to emit declarations for those packages' sources too.
+Two things go wrong there, and together they look like "TypeScript needs more memory":
+
+- **Lazy mode emits nothing for them.** Workspace packages resolve through `node_modules/@scope/*`
+  symlinks, so TypeScript treats them as external libraries and skips their emit. The plugin
+  prints `Failed to emit declaration file. Please try to enable eager` and produces `export {}`.
+- **Eager mode opens a program per module and keeps them all.** `rolldown-plugin-dts` with
+  `eager` creates a fresh TypeScript program for every module that is not a **root** of the
+  package's `tsconfig.json`, and retains each one. Six bundled packages outside `include` meant
+  16 programs of ~1,500 files: 8 GB, 33 s, and a `SIGKILL` on a 7 GB CI runner for a bundle
+  whose JS takes 2 s and 220 MB.
+
+The fix is one program: every bundled package's `src` is listed in the publishing package's
+`include`, **one glob per package**. TypeScript does not expand `{a,b}` braces in `include`, so
+`"../{core,ui}/src/**/*"` matches nothing and the config looks fixed while it is not.
+
+```jsonc
+// packages/<published>/tsconfig.json
+{
+  "include": ["src/**/*", "../core/src/**/*", "../ui/src/**/*"],
+  "exclude": ["../*/src/**/*.test.ts", "../*/src/**/*.test.tsx"]
+}
+```
+
+Verify by what the compiler sees, not by the text: `ts.parseJsonConfigFileContent(...).fileNames`
+must contain every bundled source, and a debug run (`DEBUG=rolldown-plugin-dts:tsc-compiler`)
+must log `create program for module` **once**. Keep that as a test next to the exports tests so a
+dropped glob fails in seconds. A raised `--max-old-space-size` is not a fix: it hides the extra
+programs until the runner is smaller than the flag, and then the build dies five minutes in with
+no error message instead of failing fast with a heap error.
+
 ## Gotcha: match the package's `vitest` major to the app's
 
 A shared package with its own `vitest` devDependency **must pin the same major** the consuming apps
