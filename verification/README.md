@@ -41,6 +41,9 @@ the next session from trying the same thing.
 ## Rules for every surface
 
 - Captures go to a git-ignored `.evidence/<branch-or-topic>/` and are never committed.
+  One exception: a published UI catalog is a generated product artefact, not evidence; it lives
+  in its own repository, one commit per run, never in the code repository (Kaipu Record's
+  [ADR 0045](https://github.com/niway-dev/kaipu-record/blob/main/apps/documentation/src/content/docs/architecture/decisions/0045-ui-catalog-images-live-in-a-separate-repository.mdx)).
 - Delivery: inline in T3 Code chat as `![alt](<absolute path>)`; PR with `gh pr edit <n> --attach
   <file>#<alt>` (gh ≥ 2.99, 10 MB per image); tracker issue through its attachment upload.
 - Each capture states what is on screen, how it was reached, the commit, and what it does not prove.
