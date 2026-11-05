@@ -7,7 +7,7 @@ machine. Reconstructing it by hand costs a series of commit-and-PR
 instructions per project, and something is lost anyway.
 
 The executable version of this convention is the pair
-[`cs-park`](https://github.com/niway-dev/skills/tree/main/skills/cs-park) and [`cs-pickup`](https://github.com/niway-dev/skills/tree/main/skills/cs-pickup). This page is
+[`cs-park`](https://github.com/niway-dev/cs-tack/tree/main/skills/cs-park) and [`cs-pickup`](https://github.com/niway-dev/cs-tack/tree/main/skills/cs-pickup). This page is
 the reasoning; the skills are the procedure.
 
 ## The rule

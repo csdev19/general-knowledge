@@ -29,7 +29,7 @@ Reusable, product-agnostic conventions and workflow patterns distilled from real
 ## Agent skills
 
 Each convention below has an executable counterpart in the
-[skills repo](https://github.com/niway-dev/skills): the page here is the
+[cs-tack repo](https://github.com/niway-dev/cs-tack): the page here is the
 reasoning, the skill is the procedure, and they link both ways. When a skill
 changes because something worked or failed in practice, its page here changes
 with it.

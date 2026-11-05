@@ -12,16 +12,16 @@ profile.
 
 | Layer | Holds | Lives in |
 |---|---|---|
-| Procedure | gate, load, plan, build, words pass, critique, learn | the [`cs-apply-taste` skill](https://github.com/niway-dev/skills/blob/main/skills/cs-apply-taste/SKILL.md) in the skills repo |
+| Procedure | gate, load, plan, build, words pass, critique, learn | the [`cs-apply-taste` skill](https://github.com/niway-dev/cs-tack/blob/main/skills/cs-apply-taste/SKILL.md) in the skills repo |
 | Profile | principles, never list, references, one page per app type | this folder |
 | Application | this product's register, tokens or their source, overrides | the project's `design-brief` |
 
 The skill holds no taste of its own. Decisions:
-[ADR 0019](https://github.com/niway-dev/skills/blob/main/docs/adr/0019-taste-precedence-brief-profile-platform-then-frontend-design.md)
+[ADR 0019](https://github.com/niway-dev/cs-tack/blob/main/docs/adr/0019-taste-precedence-brief-profile-platform-then-frontend-design.md)
 (precedence) and
-[ADR 0020](https://github.com/niway-dev/skills/blob/main/docs/adr/0020-taste-profile-in-the-public-hub-grown-by-confirmed-write-back.md)
+[ADR 0020](https://github.com/niway-dev/cs-tack/blob/main/docs/adr/0020-taste-profile-in-the-public-hub-grown-by-confirmed-write-back.md)
 (where the profile lives and how it grows), from the
-[apply-taste spec](https://github.com/niway-dev/skills/blob/main/docs/specs/2026-11-03-apply-taste-design.md).
+[apply-taste spec](https://github.com/niway-dev/cs-tack/blob/main/docs/specs/2026-11-03-apply-taste-design.md).
 
 ## Precedence
 
