@@ -8,7 +8,7 @@ keeps both: the author owns the claims a reader would want a person behind,
 and the model does the expensive, mechanical part.
 
 Skills: `cs-write-blog-post` (procedure) and `cs-audit-blog-post` (review), in
-the [skills repo](https://github.com/niway-dev/skills).
+the [cs-tack repo](https://github.com/niway-dev/cs-tack).
 
 ## The two kinds of text
 

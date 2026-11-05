@@ -9,10 +9,10 @@ workload the system will actually face. This convention names the three
 artifacts that prevent them and the order in which they are produced.
 
 The executable versions of this convention are three skills in the
-[skills repo](https://github.com/niway-dev/skills):
-[`cs-capture-evidence`](https://github.com/niway-dev/skills/tree/main/skills/cs-capture-evidence),
-[`cs-check-budget`](https://github.com/niway-dev/skills/tree/main/skills/cs-check-budget) and
-[`cs-optimize-with-evidence`](https://github.com/niway-dev/skills/tree/main/skills/cs-optimize-with-evidence).
+[cs-tack repo](https://github.com/niway-dev/cs-tack):
+[`cs-capture-evidence`](https://github.com/niway-dev/cs-tack/tree/main/skills/cs-capture-evidence),
+[`cs-check-budget`](https://github.com/niway-dev/cs-tack/tree/main/skills/cs-check-budget) and
+[`cs-optimize-with-evidence`](https://github.com/niway-dev/cs-tack/tree/main/skills/cs-optimize-with-evidence).
 This page is the reasoning; the skills are the procedure. For things that
 are broken rather than slow, the `diagnose` skill's feedback-loop discipline
 applies first.

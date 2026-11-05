@@ -7,7 +7,7 @@ edit expensive: a renamed page, a split section or a product detail promoted int
 reaches every consumer at once, silently.
 
 The executable version of this convention is the
-[`cs-knowledge-hub` skill](https://github.com/niway-dev/skills/tree/main/skills/cs-knowledge-hub).
+[`cs-knowledge-hub` skill](https://github.com/niway-dev/cs-tack/tree/main/skills/cs-knowledge-hub).
 This page is the reasoning; the skill is the procedure. Deciding *whether* a lesson belongs in
 the hub at all is [lesson-distillation.md](./lesson-distillation.md); this page covers how it
 lands once it does.

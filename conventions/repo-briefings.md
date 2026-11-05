@@ -7,7 +7,7 @@ this?". Split by audience, not by topic: the same fact reads differently to
 each.
 
 The executable version of this convention is the
-[`cs-generate-briefings` skill](https://github.com/niway-dev/skills/tree/main/skills/cs-generate-briefings).
+[`cs-generate-briefings` skill](https://github.com/niway-dev/cs-tack/tree/main/skills/cs-generate-briefings).
 This page is the reasoning; the skill is the procedure.
 
 ## The rule

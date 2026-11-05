@@ -12,12 +12,12 @@ that agents never merge, whatever the risk. The unattended machine cannot run li
 for most products (mobile and desktop apps, memory limits), so green CI is not proof enough to land
 code with nobody looking. The decision is the development-workflow ADR "Agents never merge"
 (niway-dev/development-workflow (ADR-0020)).
-Design: [niway-dev/skills spec](https://github.com/niway-dev/skills/blob/main/docs/specs/2026-10-27-development-pipeline-design.md)
+Design: [niway-dev/cs-tack spec](https://github.com/niway-dev/cs-tack/blob/main/docs/specs/2026-10-27-development-pipeline-design.md)
 and its ADRs 0001–0006.
-Skills that apply it: [`cs-autopilot`](https://github.com/niway-dev/skills/tree/main/skills/cs-autopilot),
-[`cs-review-loop`](https://github.com/niway-dev/skills/tree/main/skills/cs-review-loop),
-[`cs-babysit`](https://github.com/niway-dev/skills/tree/main/skills/cs-babysit),
-[`cs-tracker`](https://github.com/niway-dev/skills/tree/main/skills/cs-tracker), and each project's
+Skills that apply it: [`cs-autopilot`](https://github.com/niway-dev/cs-tack/tree/main/skills/cs-autopilot),
+[`cs-review-loop`](https://github.com/niway-dev/cs-tack/tree/main/skills/cs-review-loop),
+[`cs-babysit`](https://github.com/niway-dev/cs-tack/tree/main/skills/cs-babysit),
+[`cs-tracker`](https://github.com/niway-dev/cs-tack/tree/main/skills/cs-tracker), and each project's
 `verify` skill.
 
 ## Why
@@ -148,7 +148,7 @@ provider). Risk decides how much review a PR gets, never who merges.
 - Babysitting ends at a report, `merge-ready` or `blocked`. It never merges or enables auto-merge.
 
 **The worktree stays until babysitting ends** (implemented in skills,
-[ADR 0008](https://github.com/niway-dev/skills/blob/main/docs/adr/0008-agent-worktrees-never-hold-the-owners-branch.md)).
+[ADR 0008](https://github.com/niway-dev/cs-tack/blob/main/docs/adr/0008-agent-worktrees-never-hold-the-owners-branch.md)).
 Git lets a branch live in one worktree only, so an agent worktree never checks out the PR's branch:
 it holds a local branch `agent/<slug>` (the branch with `/` replaced by `-`) tracking
 `origin/<branch>`, pushes with `git push origin HEAD:<branch>`, and opens the PR with
@@ -159,7 +159,7 @@ whose PR is merged or closed. Every removal requires a clean tree, HEAD equal to
 (waived only for a merged PR, whose branch is often deleted), and an unlocked worktree.
 
 **Unattended babysitting** (designed; the runner part is pending, see the
-[queue, babysit and worktrees spec](https://github.com/niway-dev/skills/blob/main/docs/specs/2026-10-28-queue-babysit-worktrees-design.md)).
+[queue, babysit and worktrees spec](https://github.com/niway-dev/cs-tack/blob/main/docs/specs/2026-10-28-queue-babysit-worktrees-design.md)).
 A PR left behind by a finished session still gets conflicts, red checks and comments. The runner
 gains a `babysit` attempt kind for issues in the code-review state:
 

@@ -4,9 +4,9 @@ _How to stand up and capture evidence on each surface — one page per stack, re
 
 An agent that builds a mockup or changes something observable proves it on the real surface: a
 screenshot, a video, the verbatim output of a request, a serial log. The procedure is the
-[`cs-capture-evidence` skill](https://github.com/niway-dev/skills/tree/main/skills/cs-capture-evidence)
+[`cs-capture-evidence` skill](https://github.com/niway-dev/cs-tack/tree/main/skills/cs-capture-evidence)
 (`produce` entry); the decision is
-[skills ADR 0017](https://github.com/niway-dev/skills/blob/main/docs/adr/0017-surface-evidence-generic-procedure-stack-recipes-in-the-hub.md).
+[cs-tack ADR 0017](https://github.com/niway-dev/cs-tack/blob/main/docs/adr/0017-surface-evidence-generic-procedure-stack-recipes-in-the-hub.md).
 These pages are the memory the procedure reads and writes.
 
 ## Three layers

@@ -13,7 +13,7 @@
 > shipping PR would otherwise fight over.
 
 The executable version of the capture half of this convention is the capture operation of the
-[`cs-tracker` skill](https://github.com/niway-dev/skills/tree/main/skills/cs-tracker). This page is the reasoning; the skill is the procedure.
+[`cs-tracker` skill](https://github.com/niway-dev/cs-tack/tree/main/skills/cs-tracker). This page is the reasoning; the skill is the procedure.
 
 ## Backlog: capture as a GitHub issue
 
