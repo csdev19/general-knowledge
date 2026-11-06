@@ -130,3 +130,7 @@ correctness.
 When the objective is met with the margin the owner asked for, on the
 workload the objective names. Not when ideas run out, and not when local
 numbers look good at the sizes the tests happened to use.
+
+## Related
+
+- [Large views](../web/large-view-architecture.md): a render-count test as the evidence row for a UI optimisation
