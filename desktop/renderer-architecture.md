@@ -133,3 +133,4 @@ doesn't reshape the component tree.
 
 - [Media Pipeline](./media-pipeline.md)
 - [Product Philosophy](./product-philosophy.md)
+- [Large views](../web/large-view-architecture.md): when a page's data gets big, keep render cost local (stable edges, memo, zones)
