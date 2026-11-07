@@ -181,6 +181,11 @@ commands, traps, probe status) lives in [verification/](../verification/README.m
 `cs-capture-evidence` skill reads before capturing and corrects after. Prefer the drivers' own
 recording, which runs unattended and needs no screen-recording permission.
 
+Capture before review, not only for the PR. A unit suite that renders into a simulated DOM has no
+layout ([testing-strategy](../monorepos/testing-strategy.md)), so a collapsed column, truncated
+copy or an overlap passes types, tests and a code review alike. The first picture of the real
+surface is where they show up, and a reviewer can only judge what they have seen.
+
 ## How we know it works
 
 The runner already records every lifecycle event. The numbers that judge this pipeline: repair
