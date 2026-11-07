@@ -128,6 +128,26 @@ design ticket whose first deliverable is the measurement, not the refactor.
 What the supervisor must not do: auto-split components. Where a cut goes (zones, slices) is a
 design decision with trade-offs, taken in a design conversation with options and gaps.
 
+## Controls that rebuild a whole collection
+
+Memoising lanes fixes the cost of one change. It does not fix a control whose every move
+replaces many items at once, such as a threshold slider that re-detects and rebuilds a hundred
+segments. Find these by reading what each handler hands to the state: one copied item is cheap,
+a regenerated list is not.
+
+For such a control, split the gesture in two:
+
+- **Preview while the pointer is down.** Update the value and a cheap summary (a count, a
+  percentage) without touching the shared state. Throttle it with a leading call and one trailing
+  call, so the first move answers at once and a pointer held still still shows the last value. A
+  leading-only throttle leaves the summary on an older value.
+- **Apply once on release.** One commit, one undo step. A click or a key press is the same
+  commit, with no preview.
+
+The counter-argument is real: while dragging, the items themselves do not change, only the
+summary. That is the price of not rebuilding them per move; if the result must be visible live,
+measure the per-move cost first and decide with the number.
+
 ## Related
 
 - [evidence-driven optimization](../conventions/evidence-driven-optimization.md): evidence,
