@@ -54,9 +54,12 @@ agent copies the steps into its todo list verbatim, so the sequence lives in the
 agent's memory. A step not taken stays in the list as `skip: <reason>`.
 
 - **Live (router).** The agent classifies the request (feature, bug fix, refactor, babysit, stack)
-  and says so in its first line. It asks the rigor questions **once, at the start**: the end state
-  as a checkable predicate, what must not change, what counts as proof. Then it never asks again.
-  A question whose answer can be observed by running something is answered by running it.
+  and says so in its first line. It **does not ask**: it writes the end state as a checkable
+  predicate, what must not change and what counts as proof as assumptions in its opening message,
+  takes the default the repo and the hub support for any open choice, and starts. The owner judges
+  the result from the evidence in the PR (captures for UI) and reverses what they disagree with.
+  Something observable is answered by running it. _Changed 2026-11-09 (cs-tack ADR 0025): the
+  start used to carry rigor questions; the owner answered them the same way every time._
 - **Queue (label).** The runner picks the playbook from the issue's type label. Questions are
   settled before the issue is ready; an issue that lacks them is not dispatched.
 
@@ -131,6 +134,11 @@ provider). Risk decides how much review a PR gets, never who merges.
 
 ## Babysitting
 
+- Babysitting runs in its own thread, started from the PR link, never in the thread that built
+  the PR: it waits on CI and reviewers, and each wake-up of a big thread re-reads (and after the
+  cache expires, re-writes) everything the build put in it. The coordinator stays small; each
+  review thread and each red CI log goes to a fresh cheap worker with a brief, and the coordinator
+  reviews the commits and pushes once ([ai-model-usage](./ai-model-usage.md#the-mistakes-measured)).
 - Order: conflicts, then review threads, then CI. Batch known fixes into one push.
 - A flaky job earns **one** fresh build. An identical second failure means it was not a flake: read
   the logs.
