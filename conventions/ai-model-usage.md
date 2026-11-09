@@ -11,7 +11,10 @@ why process structure dominates model tier._
 | --- | --- | --- |
 | **Default and orchestrator** — conversation, exploration, research, first drafts of specs and plans, final branch review | Opus 5.5 | Strong enough for judgment; cheap enough to spend on reading |
 | **Refiner** — one pass over a finished draft: tighten a spec, resolve contradictions, challenge decisions | Fable | The most capable and the most constrained quota; spend it on thinking, with bounded evidence instead of free exploration |
-| **Executor and code reviewer** — implementation from a brief, per-task review, scans | Sonnet | Long tool loops at low cost; reliable when the brief and the tools carry the rigor |
+| **Executor and code reviewer** — implementation from a brief, per-task review, scans | Sonnet (low, medium, high) | Long tool loops at low cost; reliable when the brief and the tools carry the rigor |
+| **Mechanical worker** — one PR comment, a CI log summary, a search, a sweep, an edit with an exact recipe | Haiku (high effort) | The cheapest model that holds up when the brief is exact |
+
+Opus and Fable run only as main sessions, never as subagents: the main session's model is the check on what workers return, and paying a strong model twice for the same unit buys little. A unit too hard for Sonnet high is split smaller, or the main session does it. _Corrected 2026-11-09: the concurrency and pipeline sections below used to dispatch Opus and Fable agents; two weeks of logs showed $387 of Opus and Fable subagent work that Sonnet or Haiku workers cover (see "The mistakes, measured")._
 
 The rule that follows: **Fable never explores without a bound.** Exploration means opening
 files, grepping, reading audit reports and doing web research, and every turn pays to
@@ -51,9 +54,10 @@ shares the same reading.
 
 | Model | Agents at once | Condition |
 | --- | --- | --- |
-| Sonnet | 5–6 | independent items, each with its own output file |
-| Opus | 3–4 | drafts and research |
-| Fable | 2 | refinement only, from a compact package |
+| Sonnet | 5–6 | independent items, each with its own output file: drafts, research, implementation, review |
+| Haiku high | 5–6 | mechanical units with an exact brief |
+
+Opus and Fable are not fan-out models; they run one main session each.
 
 **Shared reading goes first, once.** When several agents need the same material, one agent
 reads it and writes a digest file; the others read the digest. A first run on any new kind
@@ -61,10 +65,12 @@ of task is a measurement: dispatch one, read its cost, then decide how many more
 
 ### The pipeline for design work
 
-1. **Opus drafts, in parallel.** Each agent explores its own area and leaves a draft plus a
-   package: decisions, open questions, and the files whose exact contents matter.
-2. **Fable refines, two at a time.** Its input is the package only, never the repository.
-   One pass to challenge decisions, find contradictions and tighten the text.
+1. **Sonnet workers explore and draft, in parallel**, dispatched by the Opus main session.
+   Each explores its own area and leaves a draft plus a package: decisions, open questions,
+   and the files whose exact contents matter. The Opus session merges them.
+2. **Fable refines in its own thread.** Its input is the package only, never the repository
+   and never the drafting conversation. One pass to challenge decisions, find contradictions
+   and tighten the text.
 3. **Sonnet implements and reviews, in parallel**, in worktrees, after a collision check
    against open pull requests.
 4. **Short follow-ups (recording owner answers, small revisions) go to Opus directly.**
@@ -94,6 +100,41 @@ next to it. Two consequences:
   pauses past the cache lifetime (for example, waiting out a rate limit), the next turn
   re-writes the entire context at full price. Resuming is not free; it is close to
   starting over.
+- **A thread's cost grows with the square of its length.** Each turn re-reads everything
+  before it, so turn 100 pays for the 99 before it. Splitting one long thread into phases
+  that start from an artifact keeps every turn near the floor.
+- **Changing model mid-thread rewrites the whole context.** Caches are per model: the first
+  turn on the new model writes everything again at the write price, and the new model then
+  re-reads the old phase on every turn.
+
+## The mistakes, measured
+
+Knowing the mechanism above was not enough: until 2026-11 the skills that drive agent work did
+not enforce it. Each mistake below, the rule that prevents it, and its share of two weeks of
+main-session spend in the measured example.
+
+| Mistake | Why it costs | Prevention |
+| --- | --- | --- |
+| One thread runs every phase (design, build, babysit) | Growth re-read on every turn; quadratic | One phase per thread; the next starts from the artifact (spec, issue, PR) |
+| `/model` to change phase inside a thread | The whole context rewritten for the new model, then carried | A new thread on the phase's model |
+| A big thread resumed after the cache expired | The whole context written again at 2× input | Small threads; resume from the artifact, not the thread |
+| The main session reads raw material (whole files, CI logs, raw JSON, full diffs) | Every token re-read on every later turn | Range reads, capped output, `--jq`; a worker reads and returns the conclusion |
+| Subagents on the strongest models, or forks of the conversation | Paying the top price for units a cheaper worker does; a fork inherits the whole context | Fresh workers on Sonnet or Haiku high, each with a brief that holds only its unit |
+| Asking the owner what the agent can decide | A round trip, and often an idle gap that expires the cache | Decide, write the assumption, show evidence |
+
+What turned out cheap, and stays: the end-of-run lesson step and the size of skill files
+(each well under 1% of spend). Trimming them would not have moved the bill.
+
+### Measured example: one owner's sessions, 2026-10-25 to 2026-11-08
+
+Local Claude Code logs, 453 main sessions, priced at list API rates: $2,672 in total, $2,029
+in main sessions. Re-reading conversation growth 31%, output 20%, cache writes of growth 19%,
+re-caching after more than an hour idle 11%, the fixed session floor (median 37k tokens) 10%,
+model switches 3%. 80% of the spend was in requests that already carried more than 100k
+tokens of context. Subagents: Opus $303, Fable $84, Sonnet $255, Haiku $3.
+[cs-tack ADRs 0026 and 0027](https://github.com/niway-dev/cs-tack/tree/main/docs/adr) apply
+the prevention; the scripts and the full numbers are in its `tools/token-usage/` and
+`docs/evidence/2026-11-09-token-spend.md`.
 
 ## Protocol: before a fan-out on a capped model
 

@@ -24,6 +24,11 @@ caro; una tarea trivial que bloquea a una persona va en modo A.
 > **Note (2026-10):** the model names in this section predate the current roles. See
 > [ai-model-usage.md](./ai-model-usage.md) for which model fills each role today and for
 > how to budget a fan-out on a capped model.
+>
+> **Corrected 2026-11-09:** the Opus cells for the *implementador con juicio* and for
+> fan-out work no longer hold. Opus and Fable run only as main sessions (orchestrator,
+> final branch review); every subagent is Sonnet or Haiku high with a brief. Evidence:
+> [ai-model-usage.md, "The mistakes, measured"](./ai-model-usage.md#the-mistakes-measured).
 
 Cualquiera de los dos modos usa la misma forma. Lo que cambia es qué modelo ocupa
 cada casilla.
