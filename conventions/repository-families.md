@@ -7,7 +7,7 @@
 A **repository family** is a set of separate repositories that an AI agent treats as one
 virtual monorepo. A private **coordinator** repository holds the shared instructions and the setup
 script. The members are cloned inside it and ignored by git. This pattern has been shared publicly
-by other teams; this page is one concrete, tested version of it.
+by other teams (no source is linked here); this page is one concrete, tested version of it.
 
 ## The problem
 
@@ -107,11 +107,13 @@ By hand, in order. The steps can be scripted.
    symlinking it.
 5. In each member, set the key:
    ```bash
+   cd acme-workspace   # skip if you are already inside it
    git -C acme-engine config --local family.coordinator "$PWD"
    git -C acme-cloud config --local family.coordinator "$PWD"
    ```
 6. Write the allow list of top-level paths for each public member, and the pre-push logic, in the
-   coordinator. Commit and push the coordinator.
+   coordinator, along with the list of destinations that count as the family. Commit and push the
+   coordinator.
 7. In each public member, install a `pre-push` hook that calls the coordinator's logic. Do not
    overwrite an existing `pre-push` or a `core.hooksPath`.
 8. Register the session hook in the Claude Code settings on `SessionStart` and `SubagentStart`.
@@ -141,6 +143,8 @@ after with your usage tool; the figure is "measure it" until a measurement is re
 - The pre-push hook is local: `--no-verify` or editing the script bypasses it. A server-side check
   in the public repository would be the enforceable layer; this pattern does not provide one.
 - It inspects paths, not file contents.
+- It exists only where setup ran. A fresh clone of a public member that was never linked has no
+  guard; the session-start warning covers that only inside Claude Code sessions.
 - Nothing here fixes two members edited in one worktree.
 
 ## Related

@@ -9,7 +9,6 @@ Reusable, product-agnostic conventions and workflow patterns distilled from real
 - **[schemas-first.md](./schemas-first.md)** — Define Zod (v4) schemas in the domain package and reuse them across backend and frontend.
 - **[tagging-system.md](./tagging-system.md)** — Two-tier tags: default tags in code (slug/label/emoji/color) + per-scope custom tags with a curated color palette. One source of truth across web/mobile/widget.
 
-- **[repository-families.md](./repository-families.md)** — Separate repositories (public and private) worked as one virtual monorepo by agents: a private coordinator with shared `AGENTS.md`, member clones ignored by git, a session hook that injects the rules, a pre-push allow-list guard, the limits, and a by-hand setup.
 - **[app-naming.md](./app-naming.md)** — One name per app, `<product>-<role>` (`<product>-api`, `<product>-web`, `<product>-desktop`), used for its directory, package, deployed resource and secrets tag; detail goes after it (`<product>-desktop-sign`); never the environment or the framework.
 - **[app-bundle-identifiers.md](./app-bundle-identifiers.md)** — Reverse-DNS bundle IDs under `dev.niway.*` (niway.dev), frozen after first release; why users never see them and why shipped exceptions (Kaipu's `com.niway.*`) are grandfathered rather than migrated; renaming an Electron app without moving its `userData` folder.
 
@@ -21,6 +20,7 @@ Reusable, product-agnostic conventions and workflow patterns distilled from real
 
 ## Workflow conventions
 
+- **[repository-families.md](./repository-families.md)** — Separate repositories (public and private) worked as one virtual monorepo by agents: a private coordinator with shared `AGENTS.md`, member clones ignored by git, a session hook that injects the rules, a pre-push allow-list guard, the limits, and a by-hand setup.
 - **[mvp-first-then-refactor.md](./mvp-first-then-refactor.md)** — Two-phase feature workflow: ship an inline MVP end-to-end first, then extract the domain/application/infra layers once it's stable. When to refactor.
 - **[changelog-pattern.md](./changelog-pattern.md)** — Docs-app changelog as a decision journal: one file per entry, auto-generated index (no manual index = no merge conflicts), entry bar, and how it complements release-please. _(Spanish)_
 - **[plan-to-backlog.md](./plan-to-backlog.md)** — Converting an approved plan into self-sufficient backlog deliverables that runner agents execute in parallel; the plan becomes superseded. _(Spanish)_
