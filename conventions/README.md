@@ -20,6 +20,7 @@ Reusable, product-agnostic conventions and workflow patterns distilled from real
 
 ## Workflow conventions
 
+- **[repository-families.md](./repository-families.md)** — Separate repositories (public and private) worked as one virtual monorepo by agents: a private coordinator with shared `AGENTS.md`, member clones ignored by git, a session hook that injects the rules, a pre-push allow-list guard, the limits, and a by-hand setup.
 - **[mvp-first-then-refactor.md](./mvp-first-then-refactor.md)** — Two-phase feature workflow: ship an inline MVP end-to-end first, then extract the domain/application/infra layers once it's stable. When to refactor.
 - **[changelog-pattern.md](./changelog-pattern.md)** — Docs-app changelog as a decision journal: one file per entry, auto-generated index (no manual index = no merge conflicts), entry bar, and how it complements release-please. _(Spanish)_
 - **[plan-to-backlog.md](./plan-to-backlog.md)** — Converting an approved plan into self-sufficient backlog deliverables that runner agents execute in parallel; the plan becomes superseded. _(Spanish)_
