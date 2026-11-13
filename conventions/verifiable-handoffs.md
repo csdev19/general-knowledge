@@ -30,16 +30,17 @@ that — but "here is how you check me", with everything else as context.
 
 | Section | Answers |
 | --- | --- |
-| What this does | What the work is, in the reader's terms |
-| Why | The problem it solves — for a defect, the concrete input and wrong output, never the category |
-| What changes for you | Every observable behaviour change: before, after, and what to do instead |
-| Proof | One row per acceptance criterion of the issue: what was done, how to check it, the evidence (output, screenshot or video link) |
+| Status table | Type, issue, risk, rollout, release, evidence and decisions, readable in a few seconds |
+| Needs you | Everything only the owner can do or decide: text to read, a decision to veto, a manual step |
+| What | What the work is and the result someone can observe, in the reader's terms |
+| Why | The problem it solves; for a defect, the concrete input and wrong output, never the category |
+| Evidence | One row per acceptance criterion of the issue: the evidence the owner can open (output, screenshot, video, a named CI check), or `not verified` and why |
 | Decisions | Each reversible choice made during the work: options considered, the one taken, why |
-| Verify it yourself | Setup, numbered steps, expected result, and the failure mode — ordered by risk; the steps the Proof table points to |
-| What I did not verify | Paths not exercised, things asserted from reading rather than running, known flakiness |
+| Changes, How to test, Not verified, Checks, Notes | Collapsed detail: one row per fact that is now true, steps ordered by risk with the expected result, paths not exercised, commands CI does not run |
 
-"Verify it yourself" is the section the rest exists for. The others are
-context that makes it followable.
+The evidence and "How to test" are what the rest exists for. The others are
+context that makes them followable. The template, and the script that checks it, live in the
+[`cs-write-handoff` skill](https://github.com/niway-dev/cs-tack/blob/main/skills/cs-write-handoff/references/pr-body.md).
 
 ## The repo's format wins on shape
 
@@ -52,9 +53,9 @@ That format lives in the repository that wants it. The shared skill carries no p
 variants: a variant written into it follows the user into every other repository, and when the
 project is an employer's or a client's, it carries their process into a personal one.
 
-## Proof, decisions and the title
+## Evidence, decisions and the title
 
-The **Proof** table exists because the reader of a finished PR is the final QA, and a criterion
+The **Evidence** table exists because the reader of a finished PR is the final QA, and a criterion
 with no row is a criterion nobody can tell was met. A row without evidence is marked `not
 verified` rather than dropped, so the gap is visible. The **Decisions** section exists so the
 reader can ask "why this and not that" while changing it is still cheap. The PR **title** says why
@@ -62,8 +63,8 @@ the change matters, not the mechanism: BAD `perf(server): negotiate permessage-d
 websocket`, GOOD `perf(server): cut websocket frame size by 70%+ with gzipping`. Before opening,
 check that no PR exists for the branch; before posting, check title, body and attachments for
 secrets and private details. If `gh pr create` hits the GraphQL rate limit, open the PR through
-`gh api repos/<owner>/<repo>/pulls`. The reasoning behind the proof list is in
-[development-pipeline](./development-pipeline.md#the-proof-list).
+`gh api repos/<owner>/<repo>/pulls`. The reasoning behind the evidence table is in
+[development-pipeline](./development-pipeline.md#the-evidence-table).
 
 ## Four rules that carry most of the value
 
@@ -112,4 +113,4 @@ entirely: the diff already enumerates, and enumeration is not guidance.
   whose exit code a handoff quotes.
 - [writing-with-ai](./writing-with-ai.md) — the same checks-over-claims rule applied to
   published writing: the author's words are verified against their raw input.
-- [development-pipeline](./development-pipeline.md) — the proof list every PR carries and the gate it feeds.
+- [development-pipeline](./development-pipeline.md) — the evidence table every PR carries and the gate it feeds.

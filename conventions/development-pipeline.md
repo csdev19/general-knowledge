@@ -39,7 +39,7 @@ that did not write the change decides its risk.
 | 3. Build | One **verifiable unit** per acceptance criterion: the failing test or reproduction first, then the code, the check and the commit |
 | 4. Prove | Each criterion gets a proof row, on the real surface when it is UI (see Verification) |
 | 5. Review | A review loop with a budget in rounds (see Review loop) |
-| 6. PR | Why, what changed, the proof list, the decision log ([verifiable-handoffs](./verifiable-handoffs.md)) |
+| 6. PR | Why, what changed, the evidence table, the decision log ([verifiable-handoffs](./verifiable-handoffs.md)) |
 | 7. Babysit | CI, bots and review threads until merge-ready ([review-feedback](./review-feedback.md)) |
 | 8. Hand off | Every PR goes to the owner with the final report; the owner merges |
 
@@ -83,16 +83,16 @@ owner with the final report; the owner merges it. The verifier's risk sets how d
 not who merges. In a stack, only the contiguous verified run from the bottom is handed over, and the
 owner merges it bottom-up, one PR at a time.
 
-## The proof list
+## The evidence table
 
 Every PR body has this section, one row per acceptance criterion of the issue:
 
 ```markdown
-## Proof
+## Evidence
 
-| Criterion | What was done | How to check it | Evidence |
-|---|---|---|---|
-| <copied from the issue> | <one line> | <command or steps> | <output, screenshot or video link> |
+| Criterion | Evidence |
+|---|---|
+| <copied from the issue> | <output, screenshot, video link or CI check name; or `not verified: reason`> |
 ```
 
 The runner refuses review and hand-off while a criterion has no row or a row has no evidence, and
@@ -183,7 +183,7 @@ gains a `babysit` attempt kind for issues in the code-review state:
 ## Verification on the real surface
 
 Each project may keep a `verify` skill: a map of its scenarios (login, seed data, named states),
-each a command that drives the real app and writes captures into a folder the proof list links.
+each a command that drives the real app and writes captures into a folder the evidence table links.
 Driver knowledge is not per project: the recipe for each stack (driver, stand-up and capture
 commands, traps, probe status) lives in [verification/](../verification/README.md), which the
 `cs-capture-evidence` skill reads before capturing and corrects after. Prefer the drivers' own
@@ -211,7 +211,7 @@ numbers; these are ours to collect.
 ## Related
 
 - [design-workflow.md](./design-workflow.md): stages 1–2.
-- [verifiable-handoffs.md](./verifiable-handoffs.md): the PR body and the proof list.
+- [verifiable-handoffs.md](./verifiable-handoffs.md): the PR body and the evidence table.
 - [review-feedback.md](./review-feedback.md): treating each review comment as a claim to verify.
 - [audit-briefs.md](./audit-briefs.md): briefing the reviewer.
 - [ai-model-usage.md](./ai-model-usage.md): which model plays which role.
