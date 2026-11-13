@@ -47,7 +47,8 @@ acme-workspace/          private coordinator repository
    - how to work.
 
    `CLAUDE.md` is a single line, `@AGENTS.md`, because Claude Code reads `CLAUDE.md` and reads
-   `AGENTS.md` only when no `CLAUDE.md` exists.
+   `AGENTS.md` only when no `CLAUDE.md` exists
+   ([memory docs](https://code.claude.com/docs/en/memory)).
 
 2. **`.gitignore` and `.ignore`.** `.gitignore` lists the member folders without a trailing slash.
    `.ignore` re-includes each with `!/<member>/`, because ripgrep skips gitignored folders and a
@@ -73,7 +74,9 @@ acme-workspace/          private coordinator repository
      missing, and offers the setup commands without running them.
 
 6. **A git `pre-push` hook in each public member.** The logic lives in the coordinator. The hook:
-   - reads the allow list from the coordinator's `origin/main`, never its working tree;
+   - reads the allow list from the coordinator's `origin/main`, never its working tree. It fetches
+     the coordinator's origin first, with a short timeout, and falls back to the last fetched copy
+     with a warning when the fetch fails;
    - checks every commit being pushed that the remote does not have;
    - refuses a path whose top-level entry is not in the allow list, or a deploy file name (for
      example `wrangler.toml`, `fly.toml`, `vercel.json`, `netlify.toml`);
@@ -135,8 +138,19 @@ By hand, in order. The steps can be scripted.
 
 ## Cost
 
-The injected instructions add input tokens to every session and subagent. Measure it before and
-after with your usage tool; the figure is "measure it" until a measurement is recorded here.
+The injected instructions add input tokens to every model request, not once per session: the
+injected text stays in the context and is re-read each time. A subagent gets its own copy.
+
+One family's measurement, 2026-11-13:
+
+- An `AGENTS.md` of about 6,000 characters added about 2,400 input tokens to every model request in
+  a member session, and about 2,400 more for each subagent.
+- Almost all of it was cache reads, the cheapest kind of input.
+- Over one week of real use (about 12,000 requests in the member projects) that was about 2.3% more
+  input tokens and about 1.3% more API-equivalent cost.
+
+**Keep `AGENTS.md` short:** its size is paid on every request. Measure your own family before and
+after with your usage tool, since the figures depend on its size and usage.
 
 ## Limits
 
