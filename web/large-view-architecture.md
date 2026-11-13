@@ -155,4 +155,4 @@ measure the per-move cost first and decide with the number.
 - [renderer architecture](../desktop/renderer-architecture.md): pages compose, features own
   blocks; the zones above are that rule applied when data gets large.
 - [verifiable handoffs](../conventions/verifiable-handoffs.md): before/after numbers belong in the
-  PR's Proof table.
+  PR's Evidence table.

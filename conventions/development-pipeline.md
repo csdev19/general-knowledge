@@ -37,7 +37,7 @@ that did not write the change decides its risk.
 | 1. Design | Options, spec and ADRs ([design-workflow](./design-workflow.md)); this hub is consulted before deciding |
 | 2. Contract | The approved spec is committed on the issue's branch; it is what the code is checked against |
 | 3. Build | One **verifiable unit** per acceptance criterion: the failing test or reproduction first, then the code, the check and the commit |
-| 4. Prove | Each criterion gets a proof row, on the real surface when it is UI (see Verification) |
+| 4. Prove | Each criterion gets an evidence row, on the real surface when it is UI (see Verification) |
 | 5. Review | A review loop with a budget in rounds (see Review loop) |
 | 6. PR | Why, what changed, the evidence table, the decision log ([verifiable-handoffs](./verifiable-handoffs.md)) |
 | 7. Babysit | CI, bots and review threads until merge-ready ([review-feedback](./review-feedback.md)) |
@@ -71,7 +71,7 @@ considered, the one taken, so the owner can ask "why this" at review time and ch
 
 Ready for a person to merge (**merge-ready**) means, on the current head:
 
-1. every acceptance criterion has a proof row with evidence;
+1. every acceptance criterion has an evidence row, with evidence or `not verified: reason`;
 2. required checks are green, with CI classified before any retry;
 3. the review loop ended with no open blocker or should-fix finding;
 4. the review verdict was given for **this** head: a new push or a rebase voids it (compare
@@ -95,7 +95,8 @@ Every PR body has this section, one row per acceptance criterion of the issue:
 | <copied from the issue> | <output, screenshot, video link or CI check name; or `not verified: reason`> |
 ```
 
-The runner refuses review and hand-off while a criterion has no row or a row has no evidence, and
+The runner refuses review and hand-off while a criterion has no row, or a row has neither evidence
+nor a `not verified: reason` (a stated gap passes the gate and stays visible to the reviewer), and
 spends one repair round to fill it. Judging whether the evidence convinces stays with the reviewer
 and the owner.
 
@@ -197,7 +198,7 @@ surface is where they show up, and a reviewer can only judge what they have seen
 ## How we know it works
 
 The runner already records every lifecycle event. The numbers that judge this pipeline: repair
-rounds per PR, attempts ending blocked, proof rows missing at first review, and escaped defects per
+rounds per PR, attempts ending blocked, evidence rows missing at first review, and escaped defects per
 twenty merged PRs (defects found after the owner merged). Neither reference stack publishes such
 numbers; these are ours to collect.
 

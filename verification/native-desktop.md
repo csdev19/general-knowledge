@@ -9,5 +9,5 @@
 | Rust GUI (egui, iced, Slint) | none known | the app's own frame dump if it has one; `screencapture` |
 
 `screencapture` needs the Screen Recording permission for the calling terminal, so it is a
-**manual** capture: the proof row says so and the run is not queueable. Write the first probe of
+**manual** capture: the evidence row says so and the run is not queueable. Write the first probe of
 each stack back to this page.

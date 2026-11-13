@@ -12,4 +12,4 @@ await app.close()
 
 Runs unattended and needs no Screen Recording permission. Build the main process first if the repo
 compiles it. OS dialogs and permission prompts are outside the window: they cannot be captured this
-way and the proof row says so.
+way and the evidence row says so.
