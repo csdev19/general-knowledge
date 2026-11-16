@@ -74,14 +74,17 @@ Ready for a person to merge (**merge-ready**) means, on the current head:
 1. every acceptance criterion has an evidence row, with evidence or `not verified: reason`;
 2. required checks are green, with CI classified before any retry;
 3. the review loop ended with no open blocker or should-fix finding;
-4. the review verdict was given for **this** head: a new push or a rebase voids it (compare
-   `git patch-id` at the verdict commit with the current head);
+4. the review verdict was given for **this** head: a new push voids it, and so does a rebase that
+   changes the diff (compare `git patch-id` at the verdict commit with the current head; for a
+   layer of a stack, of its own diff against the layer below, see
+   [stacked-prs.md](./stacked-prs.md#changing-a-layer));
 5. the branch is up to date with its base and the forge reports it mergeable.
 
 **An agent never merges, at any risk level.** A PR that meets the gate stays open and goes to the
 owner with the final report; the owner merges it. The verifier's risk sets how deep the review goes,
 not who merges. In a stack, only the contiguous verified run from the bottom is handed over, and the
-owner merges it bottom-up, one PR at a time.
+owner merges it with `gh stack merge`, which merges that PR and every PR below it as one operation
+([stacked-prs.md](./stacked-prs.md#merging)).
 
 ## The evidence table
 
@@ -145,11 +148,14 @@ provider). Risk decides how much review a PR gets, never who merges.
   the logs.
 - A failure in code the diff never touches means a stale base (`git merge-base --is-ancestor`), not
   a flake: rebase instead of retrying.
-- A lone PR rebases onto its base. A layer of a stack takes the base as a merge, and the merge is
-  carried up through every layer as fast-forwards. A rebase rewrites the commits that the layers
-  above, and every checkout of them, are built on.
-- A merge without markers is not proof that the branch still works. The base can change what a
-  value means without touching any line the branch changed. Those uses compile and merge cleanly.
+- A PR whose base is the default branch rebases onto it. A layer of a stack is a layer of a native
+  GitHub stack (`gh stack`, see [stacked-prs.md](./stacked-prs.md)): when a layer changes, the
+  layers above are replayed with `gh stack rebase --upstack` and pushed together. A layer whose own
+  diff did not change (same `git patch-id`) keeps its review verdict; one whose diff changed, for
+  example by a conflict resolution, is reviewed again. A PR that depends on another open PR is
+  never created with `gh pr create --base`: that is a chain of ordinary PRs, not a stack.
+- A clean rebase is not proof that the branch still works. A lower layer can change what a value
+  means without touching any line the upper layer changed. Those uses compile and rebase cleanly.
   So the full suite runs on the top of the stack, and on the layer that targets the default
   branch, before any layer is pushed.
 - One watcher per PR, never a hand-written polling loop. Act only on checks and comments newer than
@@ -217,3 +223,5 @@ numbers; these are ours to collect.
 - [audit-briefs.md](./audit-briefs.md): briefing the reviewer.
 - [ai-model-usage.md](./ai-model-usage.md): which model plays which role.
 - [ci-cd-pipeline-strategy.md](./ci-cd-pipeline-strategy.md): the CI gate the PR must pass.
+- [stacked-prs.md](./stacked-prs.md): dependent PRs as a native stack, headless-safe `gh stack`
+  commands, verifying membership, merging.

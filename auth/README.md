@@ -45,7 +45,8 @@ of pull requests, so they apply.
   merged into the branch below them after that branch had already landed, so their code sat on a
   dead branch and needed a carrier PR. Retarget each PR to `main` as soon as the one below it
   merges, before merging it, and check `git log origin/main` after the last merge rather than
-  trusting the "Merged" badge.
+  trusting the "Merged" badge. A native stack removes the first half of this problem: see
+  [stacked-prs.md](../conventions/stacked-prs.md); the second half (check `origin/main`) still holds.
 - **Count tests without the build cache.** A cached `turbo run test` replays the last result; when a
   PR body quotes test counts, take them from an uncached run (`--force`, or `CI=true` with the cache
   off) so the number belongs to this commit.
