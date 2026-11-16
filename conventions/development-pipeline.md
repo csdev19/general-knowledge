@@ -152,9 +152,8 @@ provider). Risk decides how much review a PR gets, never who merges.
   GitHub stack (`gh stack`, see [stacked-prs.md](./stacked-prs.md)): when a layer changes, the
   layers above are replayed with `gh stack rebase --upstack` and pushed together. A layer whose own
   diff did not change (same `git patch-id`) keeps its review verdict; one whose diff changed, for
-  example by a conflict resolution, is reviewed again. A PR that
-  depends on another open PR is never created with `gh pr create --base`: that is a chain of
-  ordinary PRs, not a stack.
+  example by a conflict resolution, is reviewed again. A PR that depends on another open PR is
+  never created with `gh pr create --base`: that is a chain of ordinary PRs, not a stack.
 - A clean rebase is not proof that the branch still works. A lower layer can change what a value
   means without touching any line the upper layer changed. Those uses compile and rebase cleanly.
   So the full suite runs on the top of the stack, and on the layer that targets the default

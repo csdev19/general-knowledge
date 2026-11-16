@@ -162,8 +162,9 @@ conflict resolved once is replayed on the next layer. A review verdict that is k
 change; a verdict keyed to the whole branch does not.
 
 After any rebase, the merge-ready claim for every changed head is void until it is re-checked: the
-layers' tests run again, from the top layer down, **before** `gh stack push`, and each layer's
-`git patch-id` is compared with the one at its verdict. A clean rebase does not prove the suite still
+full suite runs again on the top layer and on the layer that targets the default branch,
+**before** `gh stack push`, and each layer's `git patch-id` is compared with the one at its
+verdict. A clean rebase does not prove the suite still
 passes, because a lower layer can change what a value means without touching a line the upper layer
 changed.
 
