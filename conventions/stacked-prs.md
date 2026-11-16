@@ -50,7 +50,7 @@ arguments in the second column.
 | --- | --- | --- |
 | Start a stack | `gh stack init <branch> [<branch>...]` (bottom to top; existing branches are adopted, missing ones created) | `gh stack init` (asks for names) |
 | Add a layer | `gh stack add <branch>` from the top branch | `gh stack add` (asks for a name) |
-| Open the PRs | `gh stack submit --auto --open` | `gh stack submit` (asks for a title per PR) |
+| Open the PRs | `gh stack submit --auto --open` (ready for review; `--auto` alone opens drafts and does not prompt) | `gh stack submit` (asks for a title per PR) |
 | Read state | `gh stack view --json` | `gh stack view` (full-screen view) |
 | Enrol existing PRs | `gh stack link <pr-or-branch> <pr-or-branch>...` (bottom to top) | — |
 | Replay layers after a change | `gh stack rebase` (or `--upstack` from the changed layer) | — |
@@ -151,7 +151,8 @@ When a layer changes, the layers above it are **rebased**, not merged into:
 ```bash
 gh stack checkout <layer>      # the layer that owns the change; commit and test there
 gh stack rebase --upstack      # replay every layer above onto it
-gh stack push                  # atomic push of all active branches
+# run the tests on the top layer, then on the layer on the default branch (below)
+gh stack push                  # only now: atomic push of all active branches
 ```
 
 `rebase` replays each layer in order and detects a merged lower PR (including a squash-merge), so
@@ -161,7 +162,8 @@ conflict resolved once is replayed on the next layer. A review verdict that is k
 change; a verdict keyed to the whole branch does not.
 
 After any rebase, the merge-ready claim for every changed head is void until it is re-checked: the
-layers' tests run again, from the top layer down. A clean rebase does not prove the suite still
+layers' tests run again, from the top layer down, **before** `gh stack push`, and each layer's
+`git patch-id` is compared with the one at its verdict. A clean rebase does not prove the suite still
 passes, because a lower layer can change what a value means without touching a line the upper layer
 changed.
 
@@ -187,8 +189,8 @@ gh stack merge <stack-number> --yes # every unmerged PR in the stack
 ## Stacked PRs are not enabled
 
 `gh stack` or the stacks API can answer `404`, or `submit` can exit `9` with "Stacked PRs are not
-enabled", when the repository does have the feature. Two causes seen in our own use come before
-concluding it is missing; check in this order:
+enabled", when the repository does have the feature. Check these two causes, in this order, before
+concluding it is missing:
 
 1. **The wrong GitHub account.** A machine can be logged in to `gh` with several accounts, and the
    active one may not be the one the repository belongs to. `gh auth status` shows which is
@@ -197,10 +199,12 @@ concluding it is missing; check in this order:
    every `gh` call, including the extension's. Check that it is set without printing it
    (`[ -n "$GH_TOKEN" ] && echo set`), run the command with it removed
    (`env -u GH_TOKEN -u GITHUB_TOKEN gh stack ...`), and retry.
-3. **The repository really has no stacks feature.** `gh api repos/<owner>/<repo>/stacks` returns a
-   list (possibly empty) when it does. When it does not, tell the owner: do not fall back to
-   `gh pr create --base`. Under a terminal `submit` offers to create ordinary unstacked PRs; that
-   is the fake stack this page exists to prevent, and an agent must not accept it.
+
+If both are ruled out, the repository may really lack the feature. `gh api
+repos/<owner>/<repo>/stacks` returns a list (possibly empty) when it has it. When it does not,
+tell the owner; do not fall back to `gh pr create --base`. Under a terminal `submit` offers to
+create ordinary unstacked PRs. That is the fake stack this page exists to prevent, and an agent
+must not accept it.
 
 ## Related
 

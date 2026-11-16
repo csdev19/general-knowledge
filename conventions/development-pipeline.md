@@ -150,8 +150,9 @@ provider). Risk decides how much review a PR gets, never who merges.
   a flake: rebase instead of retrying.
 - A PR whose base is the default branch rebases onto it. A layer of a stack is a layer of a native
   GitHub stack (`gh stack`, see [stacked-prs.md](./stacked-prs.md)): when a layer changes, the
-  layers above are replayed with `gh stack rebase --upstack` and pushed together, so each layer's
-  own diff stays the same and its review verdict, keyed to that diff, stays valid. A PR that
+  layers above are replayed with `gh stack rebase --upstack` and pushed together. A layer whose own
+  diff did not change (same `git patch-id`) keeps its review verdict; one whose diff changed, for
+  example by a conflict resolution, is reviewed again. A PR that
   depends on another open PR is never created with `gh pr create --base`: that is a chain of
   ordinary PRs, not a stack.
 - A clean rebase is not proof that the branch still works. A lower layer can change what a value
