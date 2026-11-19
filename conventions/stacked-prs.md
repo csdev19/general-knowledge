@@ -168,6 +168,58 @@ verdict. A clean rebase does not prove the suite still
 passes, because a lower layer can change what a value means without touching a line the upper layer
 changed.
 
+## When the stack sat open: lower layers merged, `push` refused
+
+A stack that stays open for days meets two problems at the next rebase. Both look like "the push
+does not work"; neither is about authentication.
+
+**Check which layers already merged, before rebasing.** List the stack's PRs with their state
+(`gh pr list --search "<ticket>" --state all --json number,state,baseRefName`). A layer that is
+`MERGED` is on the default branch, and a squash-merge gives it new commit ids, so the old layer
+branches no longer describe what is on `main`. Rebase the remaining layers onto
+`origin/<default>`, starting after the last merged layer's old tip:
+
+```bash
+git fetch origin
+git rebase --onto origin/<default> <old tip of the last merged layer> <first remaining layer>
+# then each upper layer onto the rewritten one, using the old tip of its parent
+git rebase --onto <rewritten parent> <old tip of parent> <layer>
+```
+
+Record every old tip in a file before the first rebase; `--onto` needs them, and they are gone
+once a branch moves. When `gh stack rebase` cannot run (no valid token in a headless session, for
+example), this is the same replay done with plain `git`; the stack object on GitHub is untouched,
+and `gh stack push` from a terminal that is logged in publishes the result.
+
+Symptoms of skipping the check: the bottom PR stays `DIRTY` or `CONFLICTING` after the "fix", its
+head commit on GitHub is still the old one, and the diff against the default branch carries the
+merged layers' commits a second time.
+
+**A refused push is usually the pre-push hook.** `gh stack push` runs `git push`, so the
+repository's `pre-push` hook runs too, and its failure is reported only as "failed to push some
+refs". Reproduce it to read the real message:
+
+```bash
+git push --dry-run --force-with-lease origin <top-layer>
+```
+
+In a non-login shell (ssh, an agent) the hook can also die with `command not found` because the
+toolchain is not on `PATH`; set the same `PATH` a terminal has. What a long-lived stack typically
+trips:
+
+- **An ADR number taken on the default branch.** Another PR merged an ADR with the same number
+  while the stack was open. A check that compares with `origin/<default>` fails, and the fix is to
+  renumber the stack's ADR (file name, title, and every link and comment that names it) in the
+  layer that introduced it, not in a loose top commit. If the collision is already on the default
+  branch (the merged lower layer carried the old number), the renumber becomes the first commit of
+  the remaining stack.
+- **Formatting of files resolved by hand.** A conflict resolution can leave a file the formatter
+  would change. Run the formatter on the files you touched, in the layer where each first went
+  wrong, so every PR passes its own check and not only the top one.
+
+After the rebase, the earlier rule applies: the claim "ready" is void until the checks have run on
+the rewritten heads.
+
 ## Merging
 
 The owner merges. An agent never merges or enables auto-merge, at any risk level.
