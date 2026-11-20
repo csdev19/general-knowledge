@@ -1,6 +1,7 @@
 # varlock: evaluated, not the default
 
-> Status: **evaluated and set aside** (2026-09-18). `invisible-assistant` runs
+> Status: **evaluated and set aside** (2026-09-18; re-evaluated in
+> validate-only mode 2026-10-19, same outcome). `invisible-assistant` runs
 > it; `kaipu-record-monorepo` started adopting it and stopped partway, keeping
 > [Infisical alone](./infisical-secrets.md). This doc exists so the decision is
 > not re-litigated from scratch, and so the parts that _are_ worth knowing
@@ -88,6 +89,41 @@ Recorded so a future adoption does not rediscover it:
 
 Versions that installed and ran cleanly together: `varlock` 1.19.0,
 `@varlock/infisical-plugin` 2.1.1, `@varlock/cloudflare-integration` 1.5.2.
+
+## Validate-only mode does not change the answer
+
+The tempting middle ground: keep secrets out of varlock entirely (no
+`infisical()` resolvers, values come from a generated `.env`) and use only its
+schema, checked by `varlock load` before the dev command. It looks cheap
+because it avoids the runtime integrations above, and it turns `.env.example`
+into a file that is actually checked.
+
+It still loses, when the project already validates with zod:
+
+- **The duplicate remains.** Production values never pass through a developer
+  machine, so the runtime zod schema must stay as the production guard. The
+  `.env.schema` becomes a second declaration of the same variables, and needs
+  its own drift test against zod.
+- **The real problem is usually the example file, not the lack of a schema.**
+  Once a single command generates every `.env` from the store, nobody copies
+  `.env.example` any more. Deleting it and making the project's variable
+  inventory the one prose description, with a test that fails when a zod key is
+  missing from it, removes the drift with no new tool.
+- **Its redaction does not protect against an agent.** `@sensitive` values are
+  redacted in varlock's own output and in apps wired through its runtime. An
+  agent that runs `infisical export` or prints a `.env` never goes through
+  varlock. That leak is stopped by an agent-side guard (a pre-tool hook that
+  refuses commands printing secret values), not by the schema tool.
+
+Validate-only is worth it in the case the first bullet of the next section
+names: no validation layer exists yet.
+
+### Measured example — `kaipu-record-monorepo`, 2026-10-19
+
+Re-evaluated after the repo moved to one `env:pull` command that writes every
+consumer's `.env`. Rejected for the three reasons above; the four
+`.env.example` files are deleted instead, and the docs inventory is kept in step
+with the zod schemas by a test. Recorded in the repo's ADR 0026.
 
 ## When to reach for it anyway
 
