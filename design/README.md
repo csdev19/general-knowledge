@@ -45,6 +45,7 @@ above it overrides.
 | [principles.md](./principles.md) | calm by default, the words rule, tokens source of truth |
 | [never.md](./never.md) | what the owner does not want, each with a one-line why |
 | [references.md](./references.md) | the reference bank: link, register, app types, the owner's note |
+| [explanatory-animations.md](./explanatory-animations.md) | the minimal-first process for a diagram that tells a product's story step by step (a process, not a taste entry) |
 | [landing.md](./landing.md), [dashboard.md](./dashboard.md), [cli.md](./cli.md), [mobile.md](./mobile.md), [desktop.md](./desktop.md), [playful-tools.md](./playful-tools.md) | entries per app type |
 
 ## Entry template
