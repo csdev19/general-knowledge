@@ -26,6 +26,14 @@ variables, a Tailwind `@theme`, a theme file), code is the source of truth and t
 and is regenerated from it. One line in the brief says which: `Tokens source: brief` or
 `Tokens source: <path>`.
 
+## Components
+
+### Secondary surfaces reuse the page's primary and secondary buttons
+- **When:** a banner, modal, toast or notice has actions. Its main action uses the page's primary button and its other action uses the page's secondary button: the same component and variant.
+- **When not:** never a button style made just for that surface.
+- **Reference:** [wachiman.dev](https://wachiman.dev) cookie banner: Accept uses the "Install for free" style, Decline uses the "Read the docs" style. Owner's words, translated: "the main CTA must have the page's styles."
+- **Since:** 2026-11-25. Refined: —
+
 ## Precedence and floor
 
 Brief > this profile > `frontend-design`, inside platform conventions and above an accessibility floor.
