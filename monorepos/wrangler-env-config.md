@@ -24,9 +24,14 @@ versions auto-load `.env` (and `.dev.vars` for local Worker secrets) at dev and 
 
 ## Deploy with Wrangler, not a parallel deploy path
 
-The apps ship through `wrangler deploy` (CI uses `cloudflare/wrangler-action`). Don't introduce a
-second, redundant deploy path (e.g. an `alchemy.run.ts` orchestrator) alongside it — two paths that
-both "deploy the Worker" drift and one silently wins.
+The apps ship through `wrangler deploy`, from CI only (either `cloudflare/wrangler-action` or a
+repo script that pins the wrangler version and passes `--secrets-file`). Don't introduce a second,
+redundant deploy path (e.g. an `alchemy.run.ts` orchestrator) alongside it — two paths that both
+"deploy the Worker" drift and one silently wins.
+
+This rule forbids a parallel path; it is not an evaluation of Alchemy as the single path. That
+evaluation, with what an adoption would cost and what would reopen it, is in
+[infra/alchemy-evaluation.md](../infra/alchemy-evaluation.md).
 
 ## Pin Wrangler once, in the Bun catalog
 
