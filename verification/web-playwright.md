@@ -72,3 +72,7 @@ fresh linked worktree often has no `node_modules`: look in the main checkout. Th
 - A shared dev server the owner is running: pick another port, never kill theirs.
 - Auth: reuse the project's E2E storage state ([e2e](../monorepos/testing/e2e.md)); that setup is
   what a project `verify` scenario is for.
+
+## Related
+
+- [explanatory-animations.md](../design/explanatory-animations.md): the process that needs mid-animation screenshots, not only the end state.
